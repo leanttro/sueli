@@ -156,12 +156,12 @@ def api_expositores():
         cur.execute(f"""
             SELECT e.*, c.nome as categoria_nome, c.slug as categoria_slug,
                    p.nome as plano_nome, p.exibe_whatsapp, p.exibe_instagram,
-                   p.exibe_regiao, p.exibe_site, p.destaque as plano_destaque
+                   p.exibe_regiao, p.exibe_site
             FROM expositores e
             LEFT JOIN categorias c ON e.categoria_id = c.id
             LEFT JOIN planos p ON e.plano_id = p.id
             {filtros}
-            ORDER BY e.destaque DESC, p.destaque DESC, e.nome
+            ORDER BY e.destaque DESC, e.nome
         """, params)
 
         rows = []
