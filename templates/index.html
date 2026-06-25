@@ -7,22 +7,29 @@
 <meta name="description" content="Eventos que conectam pessoas e negócios dentro do seu condomínio: feiras, dia da beleza, coffee break e ações promocionais.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png">
+<meta property="og:image" content="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png">
+<meta property="og:title" content="Oficina Empreender SP — Eventos que conectam pessoas e negócios">
+<meta property="og:description" content="Idealizo e organizo feiras, dias de beleza, coffee breaks e ações promocionais que transformam o espaço do seu condomínio em um ponto de encontro memorável.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png">
 <style>
   :root{
-    --vinho:#7D1538;
-    --vinho-escuro:#3E0B1C;
-    --vinho-suave:#A8345C;
-    --dourado:#C7973A;
-    --dourado-claro:#E7C77E;
-    --creme:#FBF6EF;
-    --rosa-suave:#F4E6EA;
+    --vinho:#541f51;
+    --vinho-escuro:#3a1538;
+    --vinho-suave:#7a3577;
+    --dourado:#c9d454;
+    --dourado-claro:#dde87a;
+    --creme:#f8f8f4;
+    --rosa-suave:#f2f0f8;
     --carvao:#2B1F26;
     --cinza:#7C7079;
-    --linha:#E7DAD9;
+    --linha:#ddd8e8;
     --branco:#FFFFFF;
-    --sombra: 0 20px 50px -20px rgba(61,11,28,.35);
+    --sombra: 0 20px 50px -20px rgba(84,31,81,.3);
     --raio: 4px;
   }
   *{box-sizing:border-box;}
@@ -34,7 +41,7 @@
     background:var(--creme);
     -webkit-font-smoothing:antialiased;
   }
-  h1,h2,h3,h4{font-family:'Playfair Display',serif; margin:0; font-weight:600; letter-spacing:.2px;}
+  h1,h2,h3,h4{font-family:'Inter',sans-serif; margin:0; font-weight:700; letter-spacing:-.3px;}
   p{margin:0;}
   a{text-decoration:none;color:inherit;}
   img{max-width:100%; display:block;}
@@ -44,8 +51,8 @@
   .container{max-width:1180px;margin:0 auto;padding:0 24px;}
   .eyebrow{
     display:inline-flex;align-items:center;gap:10px;
-    font-family:'Playfair Display',serif; font-style:italic; font-weight:500;
-    color:var(--vinho); font-size:15px; letter-spacing:.3px; margin-bottom:14px;
+    font-family:'Inter',sans-serif; font-style:normal; font-weight:600;
+    color:var(--vinho); font-size:14px; letter-spacing:.4px; text-transform:uppercase; margin-bottom:14px;
   }
   .eyebrow::before{content:'';width:28px;height:1px;background:var(--dourado);}
   .section-head{max-width:640px; margin-bottom:48px;}
@@ -70,18 +77,21 @@
   /* ---------- HEADER ---------- */
   header.site{
     position:fixed;top:0;left:0;right:0;z-index:50;
-    padding:18px 0; transition:background .35s ease, padding .35s ease, box-shadow .35s ease;
+    padding:10px 0; transition:background .35s ease, padding .35s ease, box-shadow .35s ease;
   }
-  header.site.scrolled{background:rgba(251,246,239,.92); backdrop-filter:blur(10px); padding:12px 0; box-shadow:0 6px 24px -10px rgba(61,11,28,.18);}
+  header.site.scrolled{background:rgba(248,248,244,.95); backdrop-filter:blur(10px); padding:6px 0; box-shadow:0 6px 24px -10px rgba(84,31,81,.18);}
   .nav-wrap{display:flex;align-items:center;justify-content:space-between;}
-  .brand{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-weight:700;font-size:21px;color:#fff;letter-spacing:.3px;}
-  header.site.scrolled .brand{color:var(--vinho-escuro);}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:700;font-size:18px;color:#fff;letter-spacing:.3px;}
+  header.site.scrolled .brand{color:var(--vinho);}
   .brand .ring{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--dourado);display:flex;align-items:center;justify-content:center;color:var(--dourado);font-size:14px;}
   nav.links{display:flex;gap:32px;align-items:center;}
   nav.links a{color:rgba(255,255,255,.88);font-size:14.5px;font-weight:500;position:relative;padding-bottom:4px;}
   header.site.scrolled nav.links a{color:var(--carvao);}
-  nav.links a::after{content:'';position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--dourado);transition:width .25s ease;}
-  nav.links a:hover::after{width:100%;}
+  nav.links a:not(.btn)::after{content:'';position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--dourado);transition:width .25s ease;}
+  nav.links a:not(.btn):hover::after{width:100%;}
+  nav.links a.btn{padding:10px 20px !important; color:var(--vinho); background:#fff; border-color:var(--linha);}
+  header.site.scrolled nav.links a.btn{color:var(--vinho);}
+  nav.links a.btn:hover{background:var(--rosa-suave); border-color:var(--vinho);}
   .nav-cta{display:none;}
   .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;}
   header.site.scrolled .hamburger{color:var(--vinho-escuro);}
@@ -89,56 +99,56 @@
   .mobile-menu{position:fixed;inset:0;background:var(--vinho-escuro);z-index:60;display:flex;flex-direction:column;padding:28px 24px;transform:translateY(-100%);transition:transform .35s ease;}
   .mobile-menu.open{transform:translateY(0);}
   .mobile-menu .mclose{align-self:flex-end;background:none;border:none;color:#fff;font-size:24px;}
-  .mobile-menu a{color:#fff;font-family:'Playfair Display',serif;font-size:24px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.12);}
+  .mobile-menu a{color:#fff;font-family:'Inter',sans-serif;font-size:22px;font-weight:600;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.12);}
 
   /* ---------- HERO ---------- */
   .hero{
     min-height:100vh; display:flex; align-items:center; position:relative; overflow:hidden;
     background:
-      linear-gradient(180deg, rgba(45,9,21,.78) 0%, rgba(62,11,28,.72) 45%, rgba(45,9,21,.92) 100%),
-      url('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1800&auto=format&fit=crop') center/cover no-repeat;
+      linear-gradient(180deg, rgba(84,31,81,.80) 0%, rgba(58,21,56,.75) 45%, rgba(84,31,81,.92) 100%),
+      url('https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782418025/da4fb506-2e1d-41f8-9149-fb6ca9326b44.png') center/cover no-repeat;
   }
   .hero::after{
     content:''; position:absolute; inset:0;
-    background:radial-gradient(circle at 18% 20%, rgba(199,151,58,.18), transparent 45%);
+    background:radial-gradient(circle at 18% 20%, rgba(201,212,84,.15), transparent 45%);
     pointer-events:none;
   }
   .hero-inner{position:relative;z-index:2;padding-top:120px;padding-bottom:80px;}
   .hero .eyebrow{color:var(--dourado-claro);}
   .hero .eyebrow::before{background:var(--dourado-claro);}
   .hero h1{color:#fff;font-size:clamp(38px,6vw,64px);line-height:1.12;max-width:780px;}
-  .hero h1 em{font-style:italic;color:var(--dourado-claro);}
+  .hero h1 em{font-style:italic;color:var(--dourado);}
   .hero .sub{color:rgba(255,255,255,.82);font-size:18px;max-width:560px;margin-top:22px;line-height:1.65;}
   .hero .actions{display:flex;gap:16px;margin-top:38px;flex-wrap:wrap;}
   .hero-stats{display:flex;gap:46px;margin-top:64px;flex-wrap:wrap;}
-  .hero-stats div b{display:block;font-family:'Playfair Display',serif;font-size:30px;color:#fff;}
+  .hero-stats div b{display:block;font-family:'Inter',sans-serif;font-weight:800;font-size:30px;color:#fff;}
   .hero-stats div span{color:rgba(255,255,255,.65);font-size:13px;letter-spacing:.3px;text-transform:uppercase;}
   .ribbon-corner{position:absolute;top:0;right:0;width:160px;height:160px;opacity:.5;pointer-events:none;}
 
   .scroll-cue{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.7);font-size:12px;letter-spacing:2px;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;}
-  .scroll-cue .line{width:1px;height:34px;background:linear-gradient(to bottom, var(--dourado-claro), transparent);animation:pulseLine 2.2s ease-in-out infinite;}
+  .scroll-cue .line{width:1px;height:34px;background:linear-gradient(to bottom, var(--dourado), transparent);animation:pulseLine 2.2s ease-in-out infinite;}
   @keyframes pulseLine{0%,100%{opacity:.3;}50%{opacity:1;}}
 
   /* ---------- SOBRE ---------- */
   .sobre{background:var(--creme);}
   .sobre-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;align-items:center;}
-  .sobre-photo{position:relative;}
+  .sobre-photo{}
   .sobre-photo .frame{
     position:relative;border-radius:6px;overflow:hidden;box-shadow:var(--sombra);
-    aspect-ratio:4/5;
   }
-  .sobre-photo .frame img{width:100%;height:100%;object-fit:cover;}
+  .sobre-photo .frame img{width:100%;height:auto;object-fit:contain;display:block;}
   .sobre-photo .tag{
-    position:absolute;bottom:-22px;right:-22px;background:var(--vinho);color:#fff;
-    padding:18px 22px;border-radius:6px;box-shadow:var(--sombra);max-width:200px;
+    position:relative;bottom:0;right:0;background:var(--vinho);color:#fff;
+    padding:18px 22px;border-radius:6px;box-shadow:var(--sombra);max-width:220px;
+    margin-top:16px;
   }
-  .sobre-photo .tag b{display:block;font-family:'Playfair Display',serif;font-size:26px;color:var(--dourado-claro);}
+  .sobre-photo .tag b{display:block;font-family:'Inter',sans-serif;font-weight:800;font-size:26px;color:var(--dourado-claro);}
   .sobre-photo .tag span{font-size:12.5px;color:rgba(255,255,255,.85);letter-spacing:.2px;}
   .sobre-text h2{font-size:clamp(28px,3.6vw,38px);line-height:1.25;margin-bottom:18px;}
   .sobre-text p{color:var(--cinza);font-size:16px;line-height:1.75;margin-bottom:16px;}
   .destaques{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px;}
   .destaque-item{border-top:2px solid var(--dourado);padding-top:14px;}
-  .destaque-item b{display:block;font-family:'Playfair Display',serif;font-size:30px;color:var(--vinho);}
+  .destaque-item b{display:block;font-family:'Inter',sans-serif;font-weight:800;font-size:30px;color:var(--vinho);}
   .destaque-item span{font-size:13px;color:var(--cinza);}
 
   /* ---------- SERVICOS ---------- */
@@ -179,7 +189,7 @@
 
   /* ---------- DEPOIMENTOS ---------- */
   .depoimentos{background:var(--vinho-escuro);color:#fff;position:relative;overflow:hidden;}
-  .depoimentos::before{content:'\201C';position:absolute;top:-40px;left:50%;transform:translateX(-50%);font-family:'Playfair Display',serif;font-size:340px;color:rgba(255,255,255,.04);line-height:1;}
+  .depoimentos::before{content:'\201C';position:absolute;top:-40px;left:50%;transform:translateX(-50%);font-family:'Inter',sans-serif;font-size:340px;color:rgba(255,255,255,.04);line-height:1;}
   .depoimentos .section-head{margin:0 auto 48px;text-align:center;}
   .depoimentos .section-head p.lead{color:rgba(255,255,255,.65);}
   .dep-track{display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:10px;}
@@ -270,7 +280,7 @@
     .hero-stats{gap:30px;}
     .footer-grid{grid-template-columns:1fr;gap:30px;}
     .footer-bottom{flex-direction:column;text-align:center;}
-    .sobre-photo .tag{right:0;bottom:-18px;}
+    .sobre-photo .tag{margin-top:14px;}
     .exp-toolbar{flex-direction:column;align-items:stretch;}
   }
   @media (prefers-reduced-motion: reduce){
@@ -282,7 +292,7 @@
 
 <header class="site" id="siteHeader">
   <div class="container nav-wrap">
-    <a href="/" class="brand"><span class="ring"><i class="fa-solid fa-gem"></i></span> Reunna Eventos</a>
+    <a href="/" class="brand"><img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png" alt="Oficina Empreender SP" style="height:88px;width:88px;object-fit:contain;border-radius:50%;">Oficina Empreender SP</a>
     <nav class="links">
       <a href="#sobre">Sobre</a>
       <a href="#servicos">Serviços</a>
@@ -333,7 +343,7 @@
   <div class="container sobre-grid">
     <div class="sobre-photo">
       <div class="frame">
-        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=900&auto=format&fit=crop" alt="Organizadora de eventos">
+        <img src="https://res.cloudinary.com/dfzbvq3nf/image/upload/v1778847311/WhatsApp_Image_2026-05-15_at_08.08.34_muvcon.jpg" alt="Organizadora de eventos">
       </div>
       <div class="tag"><b>12 anos</b><span>criando experiências dentro de condomínios de alto padrão</span></div>
     </div>
@@ -476,7 +486,7 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <a href="/" class="brand"><span class="ring"><i class="fa-solid fa-gem"></i></span>Reunna Eventos</a>
+        <a href="/" class="brand"><img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png" alt="Oficina Empreender SP" style="height:88px;width:88px;object-fit:contain;border-radius:50%;">Oficina Empreender SP</a>
         <p>Eventos elegantes e estratégicos dentro de condomínios residenciais — conectando moradores e expositores.</p>
         <div class="socials">
           <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
