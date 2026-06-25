@@ -661,6 +661,9 @@ async function abrirModalExp(){
   ['id','nome','slug','descricao','foto','whatsapp','instagram','site','regiao','cidade','expiracao'].forEach(f=>$(`exp-${f}`).value='');
   $('exp-ativo').checked = true;
   $('exp-destaque').checked = false;
+  // limpar preview
+  const prev = $('prev-exp-foto'); if(prev){ prev.style.display='none'; prev.src=''; }
+  const stat = $('status-exp-foto'); if(stat){ stat.className='upload-status'; stat.textContent=''; }
   abrirModal('modalExp');
 }
 
@@ -680,6 +683,7 @@ async function editarExpositor(e){
   $('exp-expiracao').value = e.data_expiracao ? e.data_expiracao.split('/').reverse().join('-') : '';
   $('exp-ativo').checked = !!e.ativo;
   $('exp-destaque').checked = !!e.destaque;
+  mostrarPreviewExistente(e.foto_url, 'prev-exp-foto', 'status-exp-foto');
   // selecionar categoria e plano
   setTimeout(()=>{
     if(e.categoria_id) $('exp-categoria').value = e.categoria_id;
@@ -832,12 +836,15 @@ function abrirModalDep(){
   $('modalDepTit').textContent='Novo Depoimento';
   ['id','nome','cargo','texto','foto'].forEach(f=>$(`dep-${f}`).value='');
   $('dep-ativo').checked=true;
+  const prev=$('prev-dep-foto'); if(prev){prev.style.display='none';prev.src='';}
+  const stat=$('status-dep-foto'); if(stat){stat.className='upload-status';stat.textContent='';}
   abrirModal('modalDep');
 }
 function editarDepoimento(d){
   $('modalDepTit').textContent='Editar Depoimento';
   $('dep-id').value=d.id; $('dep-nome').value=d.nome||''; $('dep-cargo').value=d.cargo||'';
   $('dep-texto').value=d.texto||''; $('dep-foto').value=d.foto_url||''; $('dep-ativo').checked=!!d.ativo;
+  mostrarPreviewExistente(d.foto_url,'prev-dep-foto','status-dep-foto');
   abrirModal('modalDep');
 }
 async function salvarDepoimento(){
@@ -879,6 +886,8 @@ function abrirModalBlog(){
   $('modalBlogTit').textContent='Novo Post';
   ['id','titulo','slug','subtitulo','autor','imagem','conteudo'].forEach(f=>$(`blog-${f}`).value='');
   $('blog-ativo').checked=true;
+  const prev=$('prev-blog-imagem'); if(prev){prev.style.display='none';prev.src='';}
+  const stat=$('status-blog-imagem'); if(stat){stat.className='upload-status';stat.textContent='';}
   abrirModal('modalBlog');
 }
 function editarPost(p){
