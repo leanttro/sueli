@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ expositor.nome }} — Reunna Eventos</title>
+<meta name="description" content="{{ expositor.descricao or 'Conheça este expositor parceiro da Reunna Eventos.' }}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --vinho:#7D1538;--vinho-escuro:#3E0B1C;--vinho-suave:#A8345C;
+    --dourado:#C7973A;--dourado-claro:#E7C77E;--creme:#FBF6EF;
+    --rosa-suave:#F4E6EA;--carvao:#2B1F26;--cinza:#7C7079;
+    --linha:#E7DAD9;--branco:#FFFFFF;
+    --sombra:0 20px 50px -20px rgba(61,11,28,.35);--raio:4px;
+  }
+  *{box-sizing:border-box;}html{scroll-behavior:smooth;}
+  body{margin:0;font-family:'Inter',sans-serif;color:var(--carvao);background:var(--creme);-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{font-family:'Playfair Display',serif;margin:0;font-weight:600;}
+  p{margin:0;}a{text-decoration:none;color:inherit;}img{max-width:100%;display:block;}
+  .container{max-width:1180px;margin:0 auto;padding:0 24px;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:15px 30px;border-radius:var(--raio);font-weight:600;font-size:14.5px;border:1px solid transparent;transition:transform .25s,box-shadow .25s,background .25s,color .25s;letter-spacing:.2px;font-family:'Inter',sans-serif;cursor:pointer;}
+  .btn-primary{background:var(--vinho);color:#fff;}
+  .btn-primary:hover{background:var(--vinho-escuro);transform:translateY(-2px);box-shadow:var(--sombra);}
+  .btn-ghost{border-color:var(--linha);color:var(--vinho);background:#fff;}
+  .btn-ghost:hover{border-color:var(--vinho);background:var(--rosa-suave);}
+  .btn-gold{background:var(--dourado);color:var(--vinho-escuro);}
+  .btn-gold:hover{background:var(--dourado-claro);transform:translateY(-2px);}
+
+  /* HEADER */
+  header.site{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(251,246,239,.95);backdrop-filter:blur(10px);padding:14px 0;box-shadow:0 4px 20px -8px rgba(61,11,28,.15);}
+  .nav-wrap{display:flex;align-items:center;justify-content:space-between;}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Playfair Display',serif;font-weight:700;font-size:21px;color:var(--vinho-escuro);letter-spacing:.3px;}
+  .brand .ring{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--dourado);display:flex;align-items:center;justify-content:center;color:var(--dourado);font-size:14px;}
+  nav.links{display:flex;gap:32px;align-items:center;}
+  nav.links a{color:var(--carvao);font-size:14.5px;font-weight:500;position:relative;padding-bottom:4px;}
+  nav.links a::after{content:'';position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--dourado);transition:width .25s;}
+  nav.links a:hover::after{width:100%;}
+  .hamburger{display:none;background:none;border:none;color:var(--vinho-escuro);font-size:22px;cursor:pointer;}
+  .mobile-menu{position:fixed;inset:0;background:var(--vinho-escuro);z-index:60;display:flex;flex-direction:column;padding:28px 24px;transform:translateY(-100%);transition:transform .35s ease;}
+  .mobile-menu.open{transform:translateY(0);}
+  .mobile-menu .mclose{align-self:flex-end;background:none;border:none;color:#fff;font-size:24px;cursor:pointer;}
+  .mobile-menu a{color:#fff;font-family:'Playfair Display',serif;font-size:24px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.12);}
+
+  /* HERO EXPOSITOR */
+  .exp-hero{
+    margin-top:66px;
+    background:linear-gradient(160deg, var(--vinho-escuro) 0%, var(--vinho) 100%);
+    padding:64px 0 0;position:relative;overflow:hidden;
+  }
+  .exp-hero::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%, rgba(199,151,58,.2), transparent 50%);pointer-events:none;}
+  .exp-hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1fr auto;align-items:end;gap:40px;}
+  .exp-hero-text .volta{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.65);font-size:13.5px;margin-bottom:24px;transition:color .2s;}
+  .exp-hero-text .volta:hover{color:var(--dourado-claro);}
+  .exp-hero-text .cat-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(199,151,58,.2);color:var(--dourado-claro);border:1px solid rgba(199,151,58,.35);padding:6px 14px;border-radius:30px;font-size:12.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;margin-bottom:18px;}
+  .exp-hero-text h1{font-size:clamp(32px,5vw,52px);color:#fff;line-height:1.15;margin-bottom:16px;}
+  .exp-hero-text .desc{color:rgba(255,255,255,.78);font-size:16px;line-height:1.7;max-width:600px;margin-bottom:32px;}
+  .exp-hero-foto{width:280px;flex-shrink:0;align-self:flex-end;}
+  .exp-hero-foto img{width:100%;height:340px;object-fit:cover;border-radius:8px 8px 0 0;box-shadow:var(--sombra);}
+  .exp-hero-foto .foto-placeholder{width:100%;height:340px;background:rgba(255,255,255,.08);border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:56px;}
+
+  /* CONTEUDO */
+  .exp-content{padding:64px 0 96px;}
+  .exp-layout{display:grid;grid-template-columns:1fr 360px;gap:48px;align-items:flex-start;}
+
+  /* CARD LATERAL */
+  .exp-sidebar{position:sticky;top:90px;}
+  .contact-card{background:#fff;border-radius:10px;border:1px solid var(--linha);box-shadow:var(--sombra);overflow:hidden;}
+  .contact-card-header{background:var(--vinho);padding:22px 24px;}
+  .contact-card-header h3{color:#fff;font-size:18px;margin-bottom:4px;}
+  .contact-card-header p{color:rgba(255,255,255,.7);font-size:13.5px;}
+  .contact-card-body{padding:24px;}
+  .contact-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--linha);}
+  .contact-item:last-of-type{border-bottom:none;}
+  .contact-item .ic{width:40px;height:40px;border-radius:50%;background:var(--rosa-suave);color:var(--vinho);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .contact-item .ic.green{background:#e6f4ea;color:#1a7a38;}
+  .contact-item .ic.blue{background:#e8f0fe;color:#1a56d6;}
+  .contact-item .ic.gold{background:#fdf3e0;color:#a07020;}
+  .contact-item div b{display:block;font-size:13px;color:var(--cinza);font-weight:500;margin-bottom:2px;}
+  .contact-item div a, .contact-item div span{font-size:14.5px;font-weight:600;color:var(--carvao);}
+  .contact-item div a:hover{color:var(--vinho);}
+  .contact-card-footer{padding:0 24px 24px;display:flex;flex-direction:column;gap:10px;}
+  .contact-card-footer .btn{width:100%;}
+
+  /* BLOQUEADO */
+  .bloqueado-banner{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #f59e0b;border-radius:10px;padding:28px 30px;margin-bottom:32px;display:flex;align-items:flex-start;gap:18px;}
+  .bloqueado-banner .ico{font-size:32px;color:#b45309;flex-shrink:0;margin-top:2px;}
+  .bloqueado-banner h3{font-family:'Playfair Display',serif;font-size:19px;color:#92400e;margin-bottom:8px;}
+  .bloqueado-banner p{font-size:14.5px;color:#78350f;line-height:1.65;}
+  .bloqueado-banner .btn{margin-top:16px;}
+
+  .lock-card{background:#fff;border-radius:10px;border:1px solid var(--linha);box-shadow:var(--sombra);overflow:hidden;}
+  .lock-card-header{background:linear-gradient(135deg,#f59e0b,#d97706);padding:22px 24px;}
+  .lock-card-header h3{color:#fff;font-size:18px;margin-bottom:4px;}
+  .lock-card-header p{color:rgba(255,255,255,.85);font-size:13.5px;}
+  .lock-card-body{padding:24px;}
+  .lock-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--linha);}
+  .lock-item:last-of-type{border-bottom:none;}
+  .lock-item .ic{width:40px;height:40px;border-radius:50%;background:#fef3c7;color:#b45309;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .lock-item div b{display:block;font-size:13px;color:var(--cinza);font-weight:500;margin-bottom:2px;}
+  .lock-item div span{font-size:14px;font-weight:600;color:#92400e;font-style:italic;}
+  .lock-card-footer{padding:0 24px 24px;display:flex;flex-direction:column;gap:10px;}
+  .lock-card-footer .btn{width:100%;}
+
+  /* SOBRE */
+  .sobre-exp{margin-bottom:40px;}
+  .sobre-exp h2{font-size:26px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--linha);}
+  .sobre-exp p{color:var(--cinza);font-size:16px;line-height:1.8;}
+  .info-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--rosa-suave);color:var(--vinho);padding:8px 14px;border-radius:30px;font-size:13.5px;font-weight:500;}
+
+  @media(max-width:900px){
+    .exp-layout{grid-template-columns:1fr;}
+    .exp-sidebar{position:static;}
+    .exp-hero-inner{grid-template-columns:1fr;}
+    .exp-hero-foto{display:none;}
+  }
+  @media(max-width:680px){
+    nav.links{display:none;}.hamburger{display:block;}
+    .exp-content{padding:40px 0 72px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="container nav-wrap">
+    <a href="/" class="brand"><span class="ring"><i class="fa-solid fa-gem"></i></span> Reunna Eventos</a>
+    <nav class="links">
+      <a href="/#sobre">Sobre</a>
+      <a href="/#servicos">Serviços</a>
+      <a href="/#expositores">Expositores</a>
+      <a href="/blog">Blog</a>
+      <a href="/#contato" class="btn btn-ghost" style="padding:10px 20px;">Fale Conosco</a>
+    </nav>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mclose" id="mobileCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+  <a href="/#sobre">Sobre</a>
+  <a href="/#servicos">Serviços</a>
+  <a href="/#expositores">Expositores</a>
+  <a href="/blog">Blog</a>
+  <a href="/#contato">Fale Conosco</a>
+</div>
+
+<div class="exp-hero">
+  <div class="container exp-hero-inner">
+    <div class="exp-hero-text">
+      <a href="/#expositores" class="volta"><i class="fa-solid fa-arrow-left"></i> Voltar para expositores</a>
+      {% if expositor.categoria_nome %}
+      <div class="cat-tag"><i class="fa-solid fa-tag"></i> {{ expositor.categoria_nome }}</div>
+      {% endif %}
+      <h1>{{ expositor.nome }}</h1>
+      {% if expositor.descricao %}
+      <p class="desc">{{ expositor.descricao }}</p>
+      {% endif %}
+      {% if not bloqueado and expositor.whatsapp %}
+      <a href="https://wa.me/55{{ expositor.whatsapp | replace(' ','') | replace('-','') | replace('(','') | replace(')','') }}" target="_blank" rel="noopener" class="btn btn-gold"><i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp</a>
+      {% endif %}
+    </div>
+    <div class="exp-hero-foto">
+      {% if expositor.foto_url %}
+      <img src="{{ expositor.foto_url }}" alt="{{ expositor.nome }}">
+      {% else %}
+      <div class="foto-placeholder"><i class="fa-solid fa-store"></i></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<section class="exp-content">
+  <div class="container exp-layout">
+
+    <div class="exp-main">
+
+      {% if bloqueado %}
+      <div class="bloqueado-banner">
+        <div class="ico"><i class="fa-solid fa-lock"></i></div>
+        <div>
+          <h3>Período gratuito encerrado</h3>
+          <p>As informações de contato deste expositor estão temporariamente ocultas. Entre em contato com a Reunna Eventos para saber como reativar ou atualizar o cadastro.</p>
+          <a href="/#contato" class="btn btn-primary" style="margin-top:16px;display:inline-flex;"><i class="fa-solid fa-envelope"></i> Falar com a organizadora</a>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if expositor.descricao %}
+      <div class="sobre-exp">
+        <h2>Sobre o expositor</h2>
+        <p>{{ expositor.descricao }}</p>
+      </div>
+      {% endif %}
+
+      <div class="info-chips">
+        {% if expositor.categoria_nome %}
+        <span class="chip"><i class="fa-solid fa-tag"></i> {{ expositor.categoria_nome }}</span>
+        {% endif %}
+        {% if not bloqueado and expositor.regiao %}
+        <span class="chip"><i class="fa-solid fa-location-dot"></i> {{ expositor.regiao }}</span>
+        {% endif %}
+        {% if expositor.cidade %}
+        <span class="chip"><i class="fa-solid fa-city"></i> {{ expositor.cidade }}</span>
+        {% endif %}
+        {% if expositor.destaque %}
+        <span class="chip" style="background:var(--dourado);color:var(--vinho-escuro);"><i class="fa-solid fa-star"></i> Expositor Destaque</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="exp-sidebar">
+      {% if not bloqueado %}
+      <div class="contact-card">
+        <div class="contact-card-header">
+          <h3>Contato</h3>
+          <p>Fale diretamente com este expositor</p>
+        </div>
+        <div class="contact-card-body">
+          {% if expositor.whatsapp %}
+          <div class="contact-item">
+            <div class="ic green"><i class="fa-brands fa-whatsapp"></i></div>
+            <div><b>WhatsApp</b><a href="https://wa.me/55{{ expositor.whatsapp | replace(' ','') | replace('-','') | replace('(','') | replace(')','') }}" target="_blank" rel="noopener">{{ expositor.whatsapp }}</a></div>
+          </div>
+          {% endif %}
+          {% if expositor.instagram %}
+          <div class="contact-item">
+            <div class="ic blue"><i class="fa-brands fa-instagram"></i></div>
+            <div><b>Instagram</b><a href="https://instagram.com/{{ expositor.instagram | replace('@','') }}" target="_blank" rel="noopener">{{ expositor.instagram }}</a></div>
+          </div>
+          {% endif %}
+          {% if expositor.site_url %}
+          <div class="contact-item">
+            <div class="ic gold"><i class="fa-solid fa-globe"></i></div>
+            <div><b>Site</b><a href="{{ expositor.site_url }}" target="_blank" rel="noopener">Acessar site</a></div>
+          </div>
+          {% endif %}
+          {% if expositor.regiao %}
+          <div class="contact-item">
+            <div class="ic"><i class="fa-solid fa-location-dot"></i></div>
+            <div><b>Região</b><span>{{ expositor.regiao }}</span></div>
+          </div>
+          {% endif %}
+        </div>
+        <div class="contact-card-footer">
+          {% if expositor.whatsapp %}
+          <a href="https://wa.me/55{{ expositor.whatsapp | replace(' ','') | replace('-','') | replace('(','') | replace(')','') }}" target="_blank" rel="noopener" class="btn btn-gold"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+          {% endif %}
+          {% if expositor.instagram %}
+          <a href="https://instagram.com/{{ expositor.instagram | replace('@','') }}" target="_blank" rel="noopener" class="btn btn-ghost"><i class="fa-brands fa-instagram"></i> Instagram</a>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div class="lock-card">
+        <div class="lock-card-header">
+          <h3><i class="fa-solid fa-lock"></i> Informações bloqueadas</h3>
+          <p>O período gratuito deste expositor expirou</p>
+        </div>
+        <div class="lock-card-body">
+          <div class="lock-item">
+            <div class="ic"><i class="fa-brands fa-whatsapp"></i></div>
+            <div><b>WhatsApp</b><span>Disponível após reativação</span></div>
+          </div>
+          <div class="lock-item">
+            <div class="ic"><i class="fa-brands fa-instagram"></i></div>
+            <div><b>Instagram</b><span>Disponível após reativação</span></div>
+          </div>
+          <div class="lock-item">
+            <div class="ic"><i class="fa-solid fa-location-dot"></i></div>
+            <div><b>Região</b><span>Disponível após reativação</span></div>
+          </div>
+        </div>
+        <div class="lock-card-footer">
+          <a href="/#contato" class="btn btn-primary"><i class="fa-solid fa-envelope"></i> Falar com a organizadora</a>
+          <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" class="btn btn-ghost"><i class="fa-brands fa-whatsapp"></i> WhatsApp da organizadora</a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<footer style="background:var(--vinho-escuro);color:rgba(255,255,255,.75);padding:40px 0;">
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+    <a href="/" class="brand" style="color:#fff;"><span class="ring"><i class="fa-solid fa-gem"></i></span> Reunna Eventos</a>
+    <span style="font-size:13px;">&copy; <span id="anoAtual"></span> Reunna Eventos. Todos os direitos reservados.</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('anoAtual').textContent = new Date().getFullYear();
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const mobileMenu   = document.getElementById('mobileMenu');
+const mobileCloseBtn = document.getElementById('mobileCloseBtn');
+hamburgerBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+mobileCloseBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
+mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+</script>
+</body>
+</html>

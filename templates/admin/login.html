@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Reunna Eventos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root{
+    --vinho:#7D1538;--vinho-escuro:#3E0B1C;--vinho-suave:#A8345C;
+    --dourado:#C7973A;--dourado-claro:#E7C77E;--creme:#FBF6EF;
+    --rosa-suave:#F4E6EA;--carvao:#2B1F26;--cinza:#7C7079;
+    --linha:#E7DAD9;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Inter',sans-serif;background:var(--vinho-escuro);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;-webkit-font-smoothing:antialiased;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(199,151,58,.12),transparent 55%),radial-gradient(ellipse at 70% 70%,rgba(125,21,56,.4),transparent 55%);pointer-events:none;}
+
+  .login-card{background:#fff;border-radius:12px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 40px 80px -20px rgba(0,0,0,.5);position:relative;z-index:2;}
+
+  .login-header{background:linear-gradient(145deg,var(--vinho-escuro),var(--vinho));padding:36px 36px 32px;text-align:center;position:relative;overflow:hidden;}
+  .login-header::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 20%,rgba(199,151,58,.2),transparent 50%);pointer-events:none;}
+  .brand{display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:#fff;margin-bottom:10px;position:relative;z-index:1;}
+  .brand .ring{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--dourado);display:flex;align-items:center;justify-content:center;color:var(--dourado);font-size:15px;}
+  .login-header p{color:rgba(255,255,255,.65);font-size:13.5px;position:relative;z-index:1;}
+
+  .login-body{padding:32px 36px 36px;}
+  .field{margin-bottom:20px;}
+  .field label{display:block;font-size:13px;font-weight:600;color:var(--carvao);margin-bottom:7px;letter-spacing:.1px;}
+  .field-wrap{position:relative;}
+  .field-wrap i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza);font-size:14px;pointer-events:none;}
+  .field input{width:100%;padding:13px 14px 13px 40px;border:1.5px solid var(--linha);border-radius:6px;font-size:15px;font-family:'Inter',sans-serif;color:var(--carvao);background:#fafafa;transition:border-color .2s,box-shadow .2s;outline:none;}
+  .field input:focus{border-color:var(--vinho);box-shadow:0 0 0 3px rgba(125,21,56,.1);background:#fff;}
+  .field input::placeholder{color:#bbb;}
+
+  .btn-login{width:100%;padding:15px;background:var(--vinho);color:#fff;border:none;border-radius:6px;font-size:15.5px;font-weight:700;font-family:'Inter',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .25s,transform .2s,box-shadow .2s;letter-spacing:.2px;margin-top:8px;}
+  .btn-login:hover:not(:disabled){background:var(--vinho-escuro);transform:translateY(-1px);box-shadow:0 8px 20px -6px rgba(61,11,28,.4);}
+  .btn-login:disabled{opacity:.7;cursor:not-allowed;}
+
+  .erro{background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:12px 16px;font-size:13.5px;color:#b91c1c;display:flex;align-items:center;gap:10px;margin-bottom:18px;display:none;}
+  .erro.show{display:flex;}
+  .erro i{flex-shrink:0;}
+
+  .login-footer{text-align:center;padding:0 36px 24px;}
+  .login-footer a{font-size:13px;color:var(--cinza);display:inline-flex;align-items:center;gap:6px;}
+  .login-footer a:hover{color:var(--vinho);}
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="login-header">
+    <div class="brand">
+      <span class="ring"><i class="fa-solid fa-gem"></i></span>
+      Reunna Eventos
+    </div>
+    <p>Painel Administrativo</p>
+  </div>
+
+  <div class="login-body">
+    <div class="erro" id="erroMsg"><i class="fa-solid fa-circle-exclamation"></i> <span id="erroTexto">E-mail ou senha inválidos.</span></div>
+
+    <div class="field">
+      <label for="email">E-mail</label>
+      <div class="field-wrap">
+        <i class="fa-solid fa-envelope"></i>
+        <input type="email" id="email" placeholder="seu@email.com" autocomplete="email">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="senha">Senha</label>
+      <div class="field-wrap">
+        <i class="fa-solid fa-lock"></i>
+        <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password">
+      </div>
+    </div>
+
+    <button class="btn-login" id="btnLogin">
+      <i class="fa-solid fa-right-to-bracket"></i> Entrar
+    </button>
+  </div>
+
+  <div class="login-footer">
+    <a href="/"><i class="fa-solid fa-arrow-left"></i> Voltar ao site</a>
+  </div>
+</div>
+
+<script>
+const emailEl = document.getElementById('email');
+const senhaEl = document.getElementById('senha');
+const btnLogin = document.getElementById('btnLogin');
+const erroMsg  = document.getElementById('erroMsg');
+const erroTexto = document.getElementById('erroTexto');
+
+function mostrarErro(msg) {
+  erroTexto.textContent = msg;
+  erroMsg.classList.add('show');
+}
+function ocultarErro() {
+  erroMsg.classList.remove('show');
+}
+
+async function fazerLogin() {
+  ocultarErro();
+  const email = emailEl.value.trim();
+  const senha = senhaEl.value;
+  if (!email || !senha) {
+    mostrarErro('Por favor, preencha e-mail e senha.');
+    return;
+  }
+  btnLogin.disabled = true;
+  btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Entrando…';
+  try {
+    const res = await fetch('/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, senha })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      window.location.href = '/admin';
+    } else {
+      mostrarErro(data.mensagem || 'E-mail ou senha inválidos.');
+    }
+  } catch(e) {
+    mostrarErro('Erro de conexão. Tente novamente.');
+  } finally {
+    btnLogin.disabled = false;
+    btnLogin.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Entrar';
+  }
+}
+
+btnLogin.addEventListener('click', fazerLogin);
+[emailEl, senhaEl].forEach(el => el.addEventListener('keydown', e => { if(e.key === 'Enter') fazerLogin(); }));
+</script>
+</body>
+</html>

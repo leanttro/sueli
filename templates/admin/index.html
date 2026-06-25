@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Admin — Reunna Eventos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root{
+  --vinho:#7D1538;--vinho-escuro:#3E0B1C;--dourado:#C7973A;--dourado-claro:#E7C77E;
+  --creme:#FBF6EF;--rosa-suave:#F4E6EA;--carvao:#2B1F26;--cinza:#7C7079;
+  --linha:#E7DAD9;--sb-w:240px;--top-h:60px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#f5f0f3;color:var(--carvao);-webkit-font-smoothing:antialiased;min-height:100vh;}
+a{text-decoration:none;color:inherit;}img{max-width:100%;display:block;}
+h1,h2,h3{font-family:'Playfair Display',serif;font-weight:700;}
+input,select,textarea,button{font-family:'Inter',sans-serif;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);background:var(--vinho-escuro);z-index:40;display:flex;flex-direction:column;overflow-y:auto;}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-brand .ring{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--dourado);display:flex;align-items:center;justify-content:center;color:var(--dourado);font-size:13px;flex-shrink:0;}
+.sb-brand span{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;color:#fff;line-height:1.2;}
+.sb-nav{flex:1;padding:16px 0;}
+.sb-label{font-size:10.5px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.35);text-transform:uppercase;padding:16px 20px 6px;}
+.sb-link{display:flex;align-items:center;gap:12px;padding:11px 20px;color:rgba(255,255,255,.7);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s,color .2s;border:none;background:none;width:100%;text-align:left;}
+.sb-link i{width:18px;text-align:center;font-size:15px;flex-shrink:0;}
+.sb-link:hover{background:rgba(255,255,255,.08);color:#fff;}
+.sb-link.active{background:rgba(199,151,58,.15);color:var(--dourado-claro);}
+.sb-link.active i{color:var(--dourado);}
+.sb-link.danger{color:rgba(255,100,100,.8);}
+.sb-link.danger:hover{background:rgba(255,100,100,.1);color:#ff8080;}
+
+/* TOPBAR */
+.topbar{position:fixed;top:0;left:var(--sb-w);right:0;height:var(--top-h);background:#fff;border-bottom:1px solid var(--linha);z-index:30;display:flex;align-items:center;padding:0 28px;justify-content:space-between;}
+.topbar-title{font-size:17px;font-weight:700;color:var(--carvao);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.badge-notif{background:var(--vinho);color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;display:none;}
+.badge-notif.show{display:inline-block;}
+
+/* MAIN */
+.main{margin-left:var(--sb-w);padding-top:var(--top-h);}
+.section{display:none;padding:28px;}
+.section.active{display:block;}
+
+/* CARDS DASHBOARD */
+.dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;}
+.dash-card{background:#fff;border-radius:8px;padding:22px 24px;border:1px solid var(--linha);position:relative;overflow:hidden;}
+.dash-card::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--vinho);}
+.dash-card .val{font-size:32px;font-weight:700;color:var(--vinho);font-family:'Playfair Display',serif;line-height:1;}
+.dash-card .lbl{font-size:13px;color:var(--cinza);margin-top:6px;}
+.dash-card .ico{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:28px;color:var(--rosa-suave);}
+
+/* TABELAS */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.section-header h2{font-size:22px;color:var(--carvao);}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:5px;font-weight:600;font-size:13.5px;border:1px solid transparent;cursor:pointer;transition:background .2s,transform .2s;white-space:nowrap;}
+.btn-primary{background:var(--vinho);color:#fff;border-color:var(--vinho);}
+.btn-primary:hover{background:var(--vinho-escuro);}
+.btn-sm{padding:6px 13px;font-size:12.5px;}
+.btn-ghost{background:#fff;color:var(--carvao);border-color:var(--linha);}
+.btn-ghost:hover{border-color:var(--cinza);}
+.btn-danger{background:#fef2f2;color:#b91c1c;border-color:#fecaca;}
+.btn-danger:hover{background:#fee2e2;}
+.btn-warn{background:#fffbeb;color:#92400e;border-color:#fde68a;}
+.btn-warn:hover{background:#fef3c7;}
+
+.table-wrap{background:#fff;border-radius:8px;border:1px solid var(--linha);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead th{background:#faf6f8;padding:11px 16px;text-align:left;font-size:12px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--linha);}
+tbody td{padding:12px 16px;font-size:14px;color:var(--carvao);border-bottom:1px solid #faf6f8;vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#fdfafb;}
+.td-acoes{display:flex;gap:8px;flex-wrap:wrap;}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.tag-green{background:#e6f4ea;color:#1a7a38;}
+.tag-red{background:#fef2f2;color:#b91c1c;}
+.tag-yellow{background:#fffbeb;color:#92400e;}
+.tag-blue{background:#e8f0fe;color:#1a56d6;}
+.tag-gray{background:#f3f4f6;color:#4b5563;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 16px;}
+.overlay.open{display:flex;}
+.modal{background:#fff;border-radius:10px;width:100%;max-width:620px;box-shadow:0 40px 80px -20px rgba(0,0,0,.35);margin:auto;}
+.modal-header{padding:22px 26px;border-bottom:1px solid var(--linha);display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-size:19px;color:var(--carvao);}
+.modal-close{background:none;border:none;font-size:20px;color:var(--cinza);cursor:pointer;padding:4px;}
+.modal-close:hover{color:var(--carvao);}
+.modal-body{padding:24px 26px;}
+.modal-footer{padding:16px 26px;border-top:1px solid var(--linha);display:flex;justify-content:flex-end;gap:10px;}
+
+/* FORM */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.form-row.full{grid-template-columns:1fr;}
+.field-group{display:flex;flex-direction:column;gap:5px;}
+.field-group label{font-size:12.5px;font-weight:600;color:var(--carvao);}
+.field-group input,
+.field-group select,
+.field-group textarea{padding:10px 13px;border:1.5px solid var(--linha);border-radius:5px;font-size:14px;color:var(--carvao);background:#fafafa;transition:border-color .2s;outline:none;width:100%;}
+.field-group input:focus,
+.field-group select:focus,
+.field-group textarea:focus{border-color:var(--vinho);background:#fff;}
+.field-group textarea{resize:vertical;min-height:100px;}
+.checkbox-row{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer;}
+.checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--vinho);}
+.form-checks{display:flex;gap:24px;margin-bottom:16px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:var(--vinho-escuro);color:#fff;padding:14px 22px;border-radius:8px;font-size:14px;font-weight:500;display:flex;align-items:center;gap:10px;z-index:200;transform:translateY(80px);opacity:0;transition:transform .3s,opacity .3s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{background:#166534;}
+.toast.error{background:#991b1b;}
+
+/* LOADING */
+.loading{padding:48px;text-align:center;color:var(--cinza);}
+.loading i{font-size:24px;animation:spin 1s linear infinite;display:block;margin-bottom:12px;color:var(--vinho);}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{padding:48px;text-align:center;color:var(--cinza);}
+.empty i{font-size:32px;display:block;margin-bottom:12px;color:var(--dourado);}
+
+/* CONTATOS */
+.msg-card{background:#fff;border-radius:8px;border:1px solid var(--linha);padding:20px 22px;margin-bottom:12px;position:relative;}
+.msg-card.nao-lido{border-left:3px solid var(--vinho);}
+.msg-card .msg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:10px;}
+.msg-card .msg-nome{font-weight:700;font-size:15px;}
+.msg-card .msg-info{font-size:13px;color:var(--cinza);margin-top:3px;}
+.msg-card .msg-texto{font-size:14.5px;color:#4a3f47;line-height:1.65;}
+.msg-card .msg-acoes{display:flex;gap:8px;margin-top:14px;}
+
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%);transition:transform .3s;}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .topbar{left:0;}
+  .dash-cards{grid-template-columns:repeat(2,1fr);}
+  .form-row{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .dash-cards{grid-template-columns:1fr;}
+  .section{padding:16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-brand">
+    <div class="ring"><i class="fa-solid fa-gem"></i></div>
+    <span>Reunna<br>Eventos</span>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-label">Geral</div>
+    <button class="sb-link active" data-section="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
+    <button class="sb-link" data-section="expositores"><i class="fa-solid fa-store"></i> Expositores</button>
+    <button class="sb-link" data-section="categorias"><i class="fa-solid fa-tags"></i> Categorias</button>
+
+    <div class="sb-label">Conteúdo</div>
+    <button class="sb-link" data-section="servicos"><i class="fa-solid fa-sparkles"></i> Serviços</button>
+    <button class="sb-link" data-section="depoimentos"><i class="fa-solid fa-quote-left"></i> Depoimentos</button>
+    <button class="sb-link" data-section="blog"><i class="fa-solid fa-newspaper"></i> Blog</button>
+
+    <div class="sb-label">Mensagens</div>
+    <button class="sb-link" data-section="contatos"><i class="fa-solid fa-envelope"></i> Contatos <span class="badge-notif" id="badgeContatos">0</span></button>
+
+    <div class="sb-label">Sistema</div>
+    <button class="sb-link" data-section="planos"><i class="fa-solid fa-crown"></i> Planos</button>
+    <a class="sb-link danger" href="/admin/logout"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
+  </nav>
+</aside>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <button id="menuToggle" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--carvao);display:none;" onclick="document.getElementById('sidebar').classList.toggle('open')">
+      <i class="fa-solid fa-bars"></i>
+    </button>
+    <span class="topbar-title" id="topbarTitle">Dashboard</span>
+  </div>
+  <div class="topbar-right">
+    <a href="/" target="_blank" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver site</a>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div class="section active" id="sec-dashboard">
+    <div class="dash-cards" id="dashCards">
+      <div class="dash-card"><div class="val" id="dc-exp">—</div><div class="lbl">Expositores</div><i class="fa-solid fa-store ico"></i></div>
+      <div class="dash-card"><div class="val" id="dc-cat">—</div><div class="lbl">Categorias</div><i class="fa-solid fa-tags ico"></i></div>
+      <div class="dash-card"><div class="val" id="dc-blog">—</div><div class="lbl">Posts no Blog</div><i class="fa-solid fa-newspaper ico"></i></div>
+      <div class="dash-card" style="--vinho:#b45309;"><div class="val" id="dc-msg" style="color:#b45309;">—</div><div class="lbl">Mensagens novas</div><i class="fa-solid fa-envelope ico"></i></div>
+    </div>
+    <div class="section-header"><h2>Últimos Expositores</h2></div>
+    <div class="table-wrap" id="dashTabela"><div class="loading"><i class="fa-solid fa-spinner"></i> Carregando…</div></div>
+  </div>
+
+  <!-- EXPOSITORES -->
+  <div class="section" id="sec-expositores">
+    <div class="section-header">
+      <h2>Expositores</h2>
+      <button class="btn btn-primary" onclick="abrirModalExp()"><i class="fa-solid fa-plus"></i> Novo Expositor</button>
+    </div>
+    <div class="table-wrap" id="tabelaExpositores"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- CATEGORIAS -->
+  <div class="section" id="sec-categorias">
+    <div class="section-header">
+      <h2>Categorias</h2>
+      <button class="btn btn-primary" onclick="abrirModalCat()"><i class="fa-solid fa-plus"></i> Nova Categoria</button>
+    </div>
+    <div class="table-wrap" id="tabelaCategorias"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- SERVIÇOS -->
+  <div class="section" id="sec-servicos">
+    <div class="section-header">
+      <h2>Serviços</h2>
+      <button class="btn btn-primary" onclick="abrirModalServ()"><i class="fa-solid fa-plus"></i> Novo Serviço</button>
+    </div>
+    <div class="table-wrap" id="tabelaServicos"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- DEPOIMENTOS -->
+  <div class="section" id="sec-depoimentos">
+    <div class="section-header">
+      <h2>Depoimentos</h2>
+      <button class="btn btn-primary" onclick="abrirModalDep()"><i class="fa-solid fa-plus"></i> Novo Depoimento</button>
+    </div>
+    <div class="table-wrap" id="tabelaDepoimentos"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- BLOG -->
+  <div class="section" id="sec-blog">
+    <div class="section-header">
+      <h2>Blog</h2>
+      <button class="btn btn-primary" onclick="abrirModalBlog()"><i class="fa-solid fa-plus"></i> Novo Post</button>
+    </div>
+    <div class="table-wrap" id="tabelaBlog"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- CONTATOS -->
+  <div class="section" id="sec-contatos">
+    <div class="section-header"><h2>Contatos Recebidos</h2></div>
+    <div id="listaContatos"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- PLANOS -->
+  <div class="section" id="sec-planos">
+    <div class="section-header"><h2>Planos</h2></div>
+    <div class="table-wrap" id="tabelaPlanos"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL EXPOSITOR -->
+<div class="overlay" id="modalExp">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalExpTit">Novo Expositor</h3>
+      <button class="modal-close" onclick="fecharModal('modalExp')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="exp-id">
+      <div class="form-row">
+        <div class="field-group"><label>Nome*</label><input id="exp-nome" oninput="gerarSlug('exp-nome','exp-slug')" placeholder="Nome do expositor"></div>
+        <div class="field-group"><label>Slug*</label><input id="exp-slug" placeholder="gerado-automaticamente"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Categoria</label><select id="exp-categoria"><option value="">— Selecione —</option></select></div>
+        <div class="field-group"><label>Plano</label><select id="exp-plano"><option value="">— Selecione —</option></select></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Descrição</label><textarea id="exp-descricao" placeholder="Texto sobre o expositor…"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Foto URL</label><input id="exp-foto" placeholder="https://…"></div>
+        <div class="field-group"><label>WhatsApp</label><input id="exp-whatsapp" placeholder="11999999999"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Instagram</label><input id="exp-instagram" placeholder="@usuario"></div>
+        <div class="field-group"><label>Site URL</label><input id="exp-site" placeholder="https://…"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Região</label><input id="exp-regiao" placeholder="Zona Sul"></div>
+        <div class="field-group"><label>Cidade</label><input id="exp-cidade" placeholder="São Paulo"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Data Expiração</label><input id="exp-expiracao" type="date"></div>
+        <div class="field-group" style="justify-content:flex-end;padding-bottom:4px;">
+          <div class="form-checks">
+            <label class="checkbox-row"><input type="checkbox" id="exp-ativo" checked> Ativo</label>
+            <label class="checkbox-row"><input type="checkbox" id="exp-destaque"> Destaque</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalExp')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarExp" onclick="salvarExpositor()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CATEGORIA -->
+<div class="overlay" id="modalCat">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 id="modalCatTit">Nova Categoria</h3>
+      <button class="modal-close" onclick="fecharModal('modalCat')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cat-id">
+      <div class="form-row">
+        <div class="field-group"><label>Nome*</label><input id="cat-nome" oninput="gerarSlug('cat-nome','cat-slug')" placeholder="Nome da categoria"></div>
+        <div class="field-group"><label>Slug*</label><input id="cat-slug" placeholder="gerado-automaticamente"></div>
+      </div>
+      <div class="form-row full">
+        <label class="checkbox-row"><input type="checkbox" id="cat-ativo" checked> Ativa</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalCat')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarCategoria()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SERVIÇO -->
+<div class="overlay" id="modalServ">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalServTit">Novo Serviço</h3>
+      <button class="modal-close" onclick="fecharModal('modalServ')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="serv-id">
+      <div class="form-row">
+        <div class="field-group"><label>Título*</label><input id="serv-titulo" oninput="gerarSlug('serv-titulo','serv-slug')" placeholder="Nome do serviço"></div>
+        <div class="field-group"><label>Slug*</label><input id="serv-slug" placeholder="gerado-automaticamente"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Descrição</label><textarea id="serv-descricao" placeholder="Descrição do serviço…"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Ícone URL</label><input id="serv-icone" placeholder="https://…"></div>
+        <div class="field-group"><label>Foto URL</label><input id="serv-foto" placeholder="https://…"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Ordem</label><input id="serv-ordem" type="number" value="0" min="0"></div>
+        <div class="field-group" style="justify-content:flex-end;padding-bottom:4px;">
+          <label class="checkbox-row"><input type="checkbox" id="serv-ativo" checked> Ativo</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalServ')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarServico()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DEPOIMENTO -->
+<div class="overlay" id="modalDep">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <h3 id="modalDepTit">Novo Depoimento</h3>
+      <button class="modal-close" onclick="fecharModal('modalDep')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="dep-id">
+      <div class="form-row">
+        <div class="field-group"><label>Nome*</label><input id="dep-nome" placeholder="Nome da pessoa"></div>
+        <div class="field-group"><label>Cargo/Empresa</label><input id="dep-cargo" placeholder="Cargo ou empresa"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Texto*</label><textarea id="dep-texto" placeholder="Depoimento…"></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Foto URL</label><input id="dep-foto" placeholder="https://…"></div>
+        <div class="field-group" style="justify-content:flex-end;padding-bottom:4px;">
+          <label class="checkbox-row"><input type="checkbox" id="dep-ativo" checked> Ativo</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalDep')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarDepoimento()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BLOG -->
+<div class="overlay" id="modalBlog">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <h3 id="modalBlogTit">Novo Post</h3>
+      <button class="modal-close" onclick="fecharModal('modalBlog')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="blog-id">
+      <div class="form-row">
+        <div class="field-group"><label>Título*</label><input id="blog-titulo" oninput="gerarSlug('blog-titulo','blog-slug')" placeholder="Título do post"></div>
+        <div class="field-group"><label>Slug*</label><input id="blog-slug" placeholder="gerado-automaticamente"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Subtítulo</label><input id="blog-subtitulo" placeholder="Resumo ou chamada do post"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Autor</label><input id="blog-autor" placeholder="Nome do autor"></div>
+        <div class="field-group"><label>Imagem URL</label><input id="blog-imagem" placeholder="https://…"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Conteúdo (HTML)</label><textarea id="blog-conteudo" style="min-height:180px;" placeholder="<p>Conteúdo do post em HTML…</p>"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <label class="checkbox-row"><input type="checkbox" id="blog-ativo" checked> Publicado</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalBlog')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPost()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── UTILITÁRIOS ──────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+let categoriasList = [];
+let planosList = [];
+
+function toast(msg, tipo='success'){
+  const t = $('toast');
+  t.className = `toast ${tipo}`;
+  t.innerHTML = `<i class="fa-solid fa-${tipo==='success'?'check-circle':'circle-exclamation'}"></i> ${msg}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3200);
+}
+
+function gerarSlug(fromId, toId){
+  const val = $(fromId).value;
+  $(toId).value = val.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-');
+}
+
+function abrirModal(id){ $(id).classList.add('open'); }
+function fecharModal(id){ $(id).classList.remove('open'); }
+
+async function api(url, method='GET', body=null){
+  const opts = { method, headers:{'Content-Type':'application/json'} };
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if(!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+function confirmar(msg){ return window.confirm(msg); }
+
+// ─── NAVEGAÇÃO ────────────────────────────────────────────────
+const titulos = {
+  dashboard:'Dashboard', expositores:'Expositores', categorias:'Categorias',
+  servicos:'Serviços', depoimentos:'Depoimentos', blog:'Blog',
+  contatos:'Contatos', planos:'Planos'
+};
+const loaders = {
+  expositores: carregarExpositores,
+  categorias: carregarCategorias,
+  servicos: carregarServicos,
+  depoimentos: carregarDepoimentos,
+  blog: carregarBlog,
+  contatos: carregarContatos,
+  planos: carregarPlanos,
+};
+
+document.querySelectorAll('.sb-link[data-section]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sec = btn.dataset.section;
+    document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    $(`sec-${sec}`).classList.add('active');
+    $('topbarTitle').textContent = titulos[sec] || sec;
+    document.getElementById('sidebar').classList.remove('open');
+    if(loaders[sec]) loaders[sec]();
+  });
+});
+
+// ─── DASHBOARD ────────────────────────────────────────────────
+async function carregarDashboard(){
+  try{
+    const [exps, cats, posts, contatos] = await Promise.all([
+      api('/api/admin/expositores'), api('/api/admin/categorias'),
+      api('/api/admin/blog'), api('/api/admin/contatos')
+    ]);
+    $('dc-exp').textContent  = exps.length;
+    $('dc-cat').textContent  = cats.length;
+    $('dc-blog').textContent = posts.length;
+    const naoLidos = contatos.filter(c=>!c.lido).length;
+    $('dc-msg').textContent  = naoLidos;
+    if(naoLidos > 0){ $('badgeContatos').textContent = naoLidos; $('badgeContatos').classList.add('show'); }
+
+    const ultimos = exps.slice(0,6);
+    $('dashTabela').innerHTML = ultimos.length ? `
+      <table><thead><tr>
+        <th>Nome</th><th>Categoria</th><th>Plano</th><th>Status</th><th>Criado em</th>
+      </tr></thead><tbody>
+      ${ultimos.map(e=>`<tr>
+        <td><b>${e.nome}</b></td>
+        <td>${e.categoria_nome||'—'}</td>
+        <td>${e.plano_nome||'—'}</td>
+        <td>${e.bloqueado?'<span class="tag tag-red">Bloqueado</span>':'<span class="tag tag-green">Ativo</span>'}</td>
+        <td>${e.criado_em||'—'}</td>
+      </tr>`).join('')}
+      </tbody></table>` : '<div class="empty"><i class="fa-solid fa-store"></i>Nenhum expositor ainda.</div>';
+  }catch(e){ console.error(e); }
+}
+
+// ─── EXPOSITORES ──────────────────────────────────────────────
+async function carregarExpositores(){
+  $('tabelaExpositores').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/expositores');
+    if(!data.length){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-store"></i>Nenhum expositor cadastrado.</div>'; return; }
+    $('tabelaExpositores').innerHTML = `<table><thead><tr>
+      <th>Nome</th><th>Categoria</th><th>Plano</th><th>Região</th><th>Status</th><th>Expiração</th><th>Ações</th>
+    </tr></thead><tbody>
+    ${data.map(e=>`<tr>
+      <td><b>${e.nome}</b></td>
+      <td>${e.categoria_nome||'—'}</td>
+      <td>${e.plano_nome||'—'}</td>
+      <td>${e.regiao||'—'}</td>
+      <td>${e.bloqueado?'<span class="tag tag-red">Bloqueado</span>':e.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+      <td>${e.data_expiracao||'—'}</td>
+      <td><div class="td-acoes">
+        <button class="btn btn-ghost btn-sm" onclick='editarExpositor(${JSON.stringify(e)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="excluirExpositor(${e.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Erro ao carregar.</div>'; }
+}
+
+async function carregarOpcoesModal(){
+  if(!categoriasList.length){
+    try{ categoriasList = await api('/api/admin/categorias'); }catch(e){}
+  }
+  if(!planosList.length){
+    try{ planosList = await api('/api/admin/planos'); }catch(e){}
+  }
+  $('exp-categoria').innerHTML = '<option value="">— Categoria —</option>' +
+    categoriasList.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
+  $('exp-plano').innerHTML = '<option value="">— Plano —</option>' +
+    planosList.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+}
+
+async function abrirModalExp(){
+  await carregarOpcoesModal();
+  $('modalExpTit').textContent = 'Novo Expositor';
+  ['id','nome','slug','descricao','foto','whatsapp','instagram','site','regiao','cidade','expiracao'].forEach(f=>$(`exp-${f}`).value='');
+  $('exp-ativo').checked = true;
+  $('exp-destaque').checked = false;
+  abrirModal('modalExp');
+}
+
+async function editarExpositor(e){
+  await carregarOpcoesModal();
+  $('modalExpTit').textContent = 'Editar Expositor';
+  $('exp-id').value = e.id;
+  $('exp-nome').value = e.nome||'';
+  $('exp-slug').value = e.slug||'';
+  $('exp-descricao').value = e.descricao||'';
+  $('exp-foto').value = e.foto_url||'';
+  $('exp-whatsapp').value = e.whatsapp||'';
+  $('exp-instagram').value = e.instagram||'';
+  $('exp-site').value = e.site_url||'';
+  $('exp-regiao').value = e.regiao||'';
+  $('exp-cidade').value = e.cidade||'';
+  $('exp-expiracao').value = e.data_expiracao ? e.data_expiracao.split('/').reverse().join('-') : '';
+  $('exp-ativo').checked = !!e.ativo;
+  $('exp-destaque').checked = !!e.destaque;
+  // selecionar categoria e plano
+  setTimeout(()=>{
+    if(e.categoria_id) $('exp-categoria').value = e.categoria_id;
+    if(e.plano_id) $('exp-plano').value = e.plano_id;
+  },50);
+  abrirModal('modalExp');
+}
+
+async function salvarExpositor(){
+  const id = $('exp-id').value;
+  const body = {
+    nome: $('exp-nome').value, slug: $('exp-slug').value,
+    descricao: $('exp-descricao').value, foto_url: $('exp-foto').value,
+    whatsapp: $('exp-whatsapp').value, instagram: $('exp-instagram').value,
+    site_url: $('exp-site').value, regiao: $('exp-regiao').value, cidade: $('exp-cidade').value,
+    data_expiracao: $('exp-expiracao').value,
+    ativo: $('exp-ativo').checked, destaque: $('exp-destaque').checked,
+    categoria_id: $('exp-categoria').value || null,
+    plano_id: $('exp-plano').value || null,
+  };
+  if(!body.nome || !body.slug){ toast('Nome e slug são obrigatórios.','error'); return; }
+  try{
+    if(id){ await api(`/api/admin/expositores/${id}`,'PUT',body); }
+    else   { await api('/api/admin/expositores','POST',body); }
+    fecharModal('modalExp');
+    toast(id ? 'Expositor atualizado!' : 'Expositor criado!');
+    carregarExpositores();
+  }catch(e){ toast('Erro ao salvar: '+e.message,'error'); }
+}
+
+async function excluirExpositor(id){
+  if(!confirmar('Excluir este expositor?')) return;
+  try{ await api(`/api/admin/expositores/${id}`,'DELETE'); toast('Excluído!'); carregarExpositores(); }
+  catch(e){ toast('Erro ao excluir.','error'); }
+}
+
+// ─── CATEGORIAS ───────────────────────────────────────────────
+async function carregarCategorias(){
+  $('tabelaCategorias').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/categorias');
+    if(!data.length){ $('tabelaCategorias').innerHTML = '<div class="empty"><i class="fa-solid fa-tags"></i>Nenhuma categoria.</div>'; return; }
+    $('tabelaCategorias').innerHTML = `<table><thead><tr><th>Nome</th><th>Slug</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(c=>`<tr>
+      <td><b>${c.nome}</b></td><td>${c.slug}</td>
+      <td>${c.ativo?'<span class="tag tag-green">Ativa</span>':'<span class="tag tag-gray">Inativa</span>'}</td>
+      <td><div class="td-acoes">
+        <button class="btn btn-ghost btn-sm" onclick='editarCategoria(${JSON.stringify(c)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="excluirCategoria(${c.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaCategorias').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+
+function abrirModalCat(){
+  $('modalCatTit').textContent = 'Nova Categoria';
+  $('cat-id').value=''; $('cat-nome').value=''; $('cat-slug').value=''; $('cat-ativo').checked=true;
+  abrirModal('modalCat');
+}
+function editarCategoria(c){
+  $('modalCatTit').textContent = 'Editar Categoria';
+  $('cat-id').value=c.id; $('cat-nome').value=c.nome; $('cat-slug').value=c.slug; $('cat-ativo').checked=!!c.ativo;
+  abrirModal('modalCat');
+}
+async function salvarCategoria(){
+  const id = $('cat-id').value;
+  const body = { nome:$('cat-nome').value, slug:$('cat-slug').value, ativo:$('cat-ativo').checked };
+  if(!body.nome||!body.slug){ toast('Nome e slug obrigatórios.','error'); return; }
+  try{
+    if(id) await api(`/api/admin/categorias/${id}`,'PUT',body);
+    else   await api('/api/admin/categorias','POST',body);
+    fecharModal('modalCat'); toast(id?'Categoria atualizada!':'Categoria criada!');
+    categoriasList = []; carregarCategorias();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+async function excluirCategoria(id){
+  if(!confirmar('Excluir categoria?')) return;
+  try{ await api(`/api/admin/categorias/${id}`,'DELETE'); toast('Excluída!'); categoriasList=[]; carregarCategorias(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── SERVIÇOS ─────────────────────────────────────────────────
+async function carregarServicos(){
+  $('tabelaServicos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/servicos');
+    if(!data.length){ $('tabelaServicos').innerHTML = '<div class="empty"><i class="fa-solid fa-sparkles"></i>Nenhum serviço.</div>'; return; }
+    $('tabelaServicos').innerHTML = `<table><thead><tr><th>Título</th><th>Slug</th><th>Ordem</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(s=>`<tr>
+      <td><b>${s.titulo}</b></td><td>${s.slug}</td><td>${s.ordem??0}</td>
+      <td>${s.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+      <td><div class="td-acoes">
+        <button class="btn btn-ghost btn-sm" onclick='editarServico(${JSON.stringify(s)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="excluirServico(${s.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaServicos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function abrirModalServ(){
+  $('modalServTit').textContent='Novo Serviço';
+  ['id','titulo','slug','descricao','icone','foto'].forEach(f=>$(`serv-${f}`).value='');
+  $('serv-ordem').value='0'; $('serv-ativo').checked=true;
+  abrirModal('modalServ');
+}
+function editarServico(s){
+  $('modalServTit').textContent='Editar Serviço';
+  $('serv-id').value=s.id; $('serv-titulo').value=s.titulo||''; $('serv-slug').value=s.slug||'';
+  $('serv-descricao').value=s.descricao||''; $('serv-icone').value=s.icone_url||'';
+  $('serv-foto').value=s.foto_url||''; $('serv-ordem').value=s.ordem??0; $('serv-ativo').checked=!!s.ativo;
+  abrirModal('modalServ');
+}
+async function salvarServico(){
+  const id=$('serv-id').value;
+  const body={titulo:$('serv-titulo').value,slug:$('serv-slug').value,descricao:$('serv-descricao').value,
+    icone_url:$('serv-icone').value,foto_url:$('serv-foto').value,ordem:parseInt($('serv-ordem').value)||0,ativo:$('serv-ativo').checked};
+  if(!body.titulo||!body.slug){ toast('Título e slug obrigatórios.','error'); return; }
+  try{
+    if(id) await api(`/api/admin/servicos/${id}`,'PUT',body);
+    else   await api('/api/admin/servicos','POST',body);
+    fecharModal('modalServ'); toast(id?'Serviço atualizado!':'Serviço criado!'); carregarServicos();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+async function excluirServico(id){
+  if(!confirmar('Excluir serviço?')) return;
+  try{ await api(`/api/admin/servicos/${id}`,'DELETE'); toast('Excluído!'); carregarServicos(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── DEPOIMENTOS ──────────────────────────────────────────────
+async function carregarDepoimentos(){
+  $('tabelaDepoimentos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/depoimentos');
+    if(!data.length){ $('tabelaDepoimentos').innerHTML = '<div class="empty"><i class="fa-solid fa-quote-left"></i>Nenhum depoimento.</div>'; return; }
+    $('tabelaDepoimentos').innerHTML = `<table><thead><tr><th>Nome</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(d=>`<tr>
+      <td><b>${d.nome}</b></td><td>${d.cargo||'—'}</td>
+      <td>${d.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+      <td><div class="td-acoes">
+        <button class="btn btn-ghost btn-sm" onclick='editarDepoimento(${JSON.stringify(d)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="excluirDepoimento(${d.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaDepoimentos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function abrirModalDep(){
+  $('modalDepTit').textContent='Novo Depoimento';
+  ['id','nome','cargo','texto','foto'].forEach(f=>$(`dep-${f}`).value='');
+  $('dep-ativo').checked=true;
+  abrirModal('modalDep');
+}
+function editarDepoimento(d){
+  $('modalDepTit').textContent='Editar Depoimento';
+  $('dep-id').value=d.id; $('dep-nome').value=d.nome||''; $('dep-cargo').value=d.cargo||'';
+  $('dep-texto').value=d.texto||''; $('dep-foto').value=d.foto_url||''; $('dep-ativo').checked=!!d.ativo;
+  abrirModal('modalDep');
+}
+async function salvarDepoimento(){
+  const id=$('dep-id').value;
+  const body={nome:$('dep-nome').value,cargo:$('dep-cargo').value,texto:$('dep-texto').value,foto_url:$('dep-foto').value,ativo:$('dep-ativo').checked};
+  if(!body.nome||!body.texto){ toast('Nome e texto obrigatórios.','error'); return; }
+  try{
+    if(id) await api(`/api/admin/depoimentos/${id}`,'PUT',body);
+    else   await api('/api/admin/depoimentos','POST',body);
+    fecharModal('modalDep'); toast(id?'Depoimento atualizado!':'Depoimento criado!'); carregarDepoimentos();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+async function excluirDepoimento(id){
+  if(!confirmar('Excluir depoimento?')) return;
+  try{ await api(`/api/admin/depoimentos/${id}`,'DELETE'); toast('Excluído!'); carregarDepoimentos(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── BLOG ─────────────────────────────────────────────────────
+async function carregarBlog(){
+  $('tabelaBlog').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/blog');
+    if(!data.length){ $('tabelaBlog').innerHTML = '<div class="empty"><i class="fa-solid fa-newspaper"></i>Nenhum post.</div>'; return; }
+    $('tabelaBlog').innerHTML = `<table><thead><tr><th>Título</th><th>Autor</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(p=>`<tr>
+      <td><b>${p.titulo}</b></td><td>${p.autor||'—'}</td><td>${p.criado_em||'—'}</td>
+      <td>${p.ativo?'<span class="tag tag-green">Publicado</span>':'<span class="tag tag-gray">Rascunho</span>'}</td>
+      <td><div class="td-acoes">
+        <a class="btn btn-ghost btn-sm" href="/blog/${p.slug}" target="_blank"><i class="fa-solid fa-eye"></i></a>
+        <button class="btn btn-ghost btn-sm" onclick='editarPost(${JSON.stringify(p)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="excluirPost(${p.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaBlog').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function abrirModalBlog(){
+  $('modalBlogTit').textContent='Novo Post';
+  ['id','titulo','slug','subtitulo','autor','imagem','conteudo'].forEach(f=>$(`blog-${f}`).value='');
+  $('blog-ativo').checked=true;
+  abrirModal('modalBlog');
+}
+function editarPost(p){
+  $('modalBlogTit').textContent='Editar Post';
+  $('blog-id').value=p.id; $('blog-titulo').value=p.titulo||''; $('blog-slug').value=p.slug||'';
+  $('blog-subtitulo').value=p.subtitulo||''; $('blog-autor').value=p.autor||'';
+  $('blog-imagem').value=p.imagem_url||''; $('blog-conteudo').value=p.conteudo||''; $('blog-ativo').checked=!!p.ativo;
+  abrirModal('modalBlog');
+}
+async function salvarPost(){
+  const id=$('blog-id').value;
+  const body={titulo:$('blog-titulo').value,slug:$('blog-slug').value,subtitulo:$('blog-subtitulo').value,
+    autor:$('blog-autor').value,imagem_url:$('blog-imagem').value,conteudo:$('blog-conteudo').value,ativo:$('blog-ativo').checked};
+  if(!body.titulo||!body.slug){ toast('Título e slug obrigatórios.','error'); return; }
+  try{
+    if(id) await api(`/api/admin/blog/${id}`,'PUT',body);
+    else   await api('/api/admin/blog','POST',body);
+    fecharModal('modalBlog'); toast(id?'Post atualizado!':'Post publicado!'); carregarBlog();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+async function excluirPost(id){
+  if(!confirmar('Excluir este post?')) return;
+  try{ await api(`/api/admin/blog/${id}`,'DELETE'); toast('Excluído!'); carregarBlog(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── CONTATOS ─────────────────────────────────────────────────
+async function carregarContatos(){
+  $('listaContatos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/contatos');
+    if(!data.length){ $('listaContatos').innerHTML = '<div class="empty"><i class="fa-solid fa-envelope-open"></i>Nenhuma mensagem recebida.</div>'; return; }
+    $('listaContatos').innerHTML = data.map(c=>`
+      <div class="msg-card ${c.lido?'':'nao-lido'}" id="msg-${c.id}">
+        <div class="msg-head">
+          <div>
+            <div class="msg-nome">${c.nome} ${!c.lido?'<span class="tag tag-yellow" style="font-size:11px;padding:2px 8px;">Nova</span>':''}</div>
+            <div class="msg-info"><i class="fa-solid fa-envelope" style="font-size:11px;"></i> ${c.email} ${c.telefone?`&nbsp;·&nbsp;<i class="fa-solid fa-phone" style="font-size:11px;"></i> ${c.telefone}`:''} &nbsp;·&nbsp; ${c.criado_em||''}</div>
+          </div>
+        </div>
+        <div class="msg-texto">${c.mensagem}</div>
+        <div class="msg-acoes">
+          ${!c.lido?`<button class="btn btn-warn btn-sm" onclick="marcarLido(${c.id})"><i class="fa-solid fa-check"></i> Marcar lido</button>`:''}
+          <button class="btn btn-danger btn-sm" onclick="excluirContato(${c.id})"><i class="fa-solid fa-trash"></i> Excluir</button>
+          <a class="btn btn-ghost btn-sm" href="mailto:${c.email}"><i class="fa-solid fa-reply"></i> Responder</a>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){ $('listaContatos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+async function marcarLido(id){
+  try{ await api(`/api/admin/contatos/${id}/lido`,'POST'); toast('Marcado como lido!'); carregarContatos(); }
+  catch(e){ toast('Erro.','error'); }
+}
+async function excluirContato(id){
+  if(!confirmar('Excluir esta mensagem?')) return;
+  try{ await api(`/api/admin/contatos/${id}`,'DELETE'); toast('Mensagem excluída!'); carregarContatos(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── PLANOS ───────────────────────────────────────────────────
+async function carregarPlanos(){
+  $('tabelaPlanos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/planos');
+    if(!data.length){ $('tabelaPlanos').innerHTML = '<div class="empty"><i class="fa-solid fa-crown"></i>Nenhum plano.</div>'; return; }
+    $('tabelaPlanos').innerHTML = `<table><thead><tr><th>Nome</th><th>Descrição</th><th>Duração (dias)</th><th>Status</th></tr></thead><tbody>
+    ${data.map(p=>`<tr>
+      <td><b>${p.nome}</b></td>
+      <td>${p.descricao||'—'}</td>
+      <td>${p.duracao_dias??'—'}</td>
+      <td>${p.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaPlanos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+
+// ─── FECHAR OVERLAY AO CLICAR FORA ───────────────────────────
+document.querySelectorAll('.overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if(e.target === ov) ov.classList.remove('open'); });
+});
+
+// ─── MOBILE MENU TOGGLE ───────────────────────────────────────
+if(window.innerWidth <= 900){
+  const mt = document.getElementById('menuToggle');
+  if(mt) mt.style.display = 'block';
+}
+
+// ─── INIT ────────────────────────────────────────────────────
+carregarDashboard();
+</script>
+</body>
+</html>
