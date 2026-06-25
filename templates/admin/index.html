@@ -6,31 +6,31 @@
 <title>Painel Admin — Reunna Eventos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png">
 <style>
 :root{
-  --vinho:#7D1538;--vinho-escuro:#3E0B1C;--dourado:#C7973A;--dourado-claro:#E7C77E;
-  --creme:#FBF6EF;--rosa-suave:#F4E6EA;--carvao:#2B1F26;--cinza:#7C7079;
-  --linha:#E7DAD9;--sb-w:240px;--top-h:60px;
+  --vinho:#541f51;--vinho-escuro:#3a1538;--dourado:#c9d454;--dourado-claro:#dde87a;
+  --creme:#f8f8f4;--rosa-suave:#f2f0f8;--carvao:#2B1F26;--cinza:#7C7079;
+  --linha:#ddd8e8;--sb-w:240px;--top-h:60px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:#f5f0f3;color:var(--carvao);-webkit-font-smoothing:antialiased;min-height:100vh;}
+body{font-family:'Inter',sans-serif;background:#f4f0f8;color:var(--carvao);-webkit-font-smoothing:antialiased;min-height:100vh;}
 a{text-decoration:none;color:inherit;}img{max-width:100%;display:block;}
-h1,h2,h3{font-family:'Playfair Display',serif;font-weight:700;}
+h1,h2,h3{font-family:'Inter',sans-serif;font-weight:700;}
 input,select,textarea,button{font-family:'Inter',sans-serif;}
 
 /* SIDEBAR */
 .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sb-w);background:var(--vinho-escuro);z-index:40;display:flex;flex-direction:column;overflow-y:auto;}
-.sb-brand{display:flex;align-items:center;gap:10px;padding:20px 20px 16px;border-bottom:1px solid rgba(255,255,255,.1);}
-.sb-brand .ring{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--dourado);display:flex;align-items:center;justify-content:center;color:var(--dourado);font-size:13px;flex-shrink:0;}
-.sb-brand span{font-family:'Playfair Display',serif;font-weight:700;font-size:16px;color:#fff;line-height:1.2;}
+.sb-brand{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.1);}
+.sb-brand span{font-family:'Inter',sans-serif;font-weight:700;font-size:14px;color:#fff;line-height:1.3;}
 .sb-nav{flex:1;padding:16px 0;}
 .sb-label{font-size:10.5px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.35);text-transform:uppercase;padding:16px 20px 6px;}
 .sb-link{display:flex;align-items:center;gap:12px;padding:11px 20px;color:rgba(255,255,255,.7);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s,color .2s;border:none;background:none;width:100%;text-align:left;}
 .sb-link i{width:18px;text-align:center;font-size:15px;flex-shrink:0;}
 .sb-link:hover{background:rgba(255,255,255,.08);color:#fff;}
-.sb-link.active{background:rgba(199,151,58,.15);color:var(--dourado-claro);}
+.sb-link.active{background:rgba(201,212,84,.15);color:var(--dourado-claro);}
 .sb-link.active i{color:var(--dourado);}
 .sb-link.danger{color:rgba(255,100,100,.8);}
 .sb-link.danger:hover{background:rgba(255,100,100,.1);color:#ff8080;}
@@ -51,7 +51,7 @@ input,select,textarea,button{font-family:'Inter',sans-serif;}
 .dash-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px;}
 .dash-card{background:#fff;border-radius:8px;padding:22px 24px;border:1px solid var(--linha);position:relative;overflow:hidden;}
 .dash-card::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--vinho);}
-.dash-card .val{font-size:32px;font-weight:700;color:var(--vinho);font-family:'Playfair Display',serif;line-height:1;}
+.dash-card .val{font-size:32px;font-weight:800;color:var(--vinho);font-family:'Inter',sans-serif;line-height:1;}
 .dash-card .lbl{font-size:13px;color:var(--cinza);margin-top:6px;}
 .dash-card .ico{position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:28px;color:var(--rosa-suave);}
 
@@ -132,7 +132,17 @@ tbody tr:hover td{background:#fdfafb;}
 .msg-card .msg-texto{font-size:14.5px;color:#4a3f47;line-height:1.65;}
 .msg-card .msg-acoes{display:flex;gap:8px;margin-top:14px;}
 
-@media(max-width:900px){
+/* UPLOAD DE IMAGEM */
+.upload-box{border:2px dashed var(--linha);border-radius:6px;overflow:hidden;background:#fafafa;transition:border-color .2s;}
+.upload-box:hover{border-color:var(--vinho);}
+.upload-area{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px 12px;cursor:pointer;color:var(--cinza);}
+.upload-area i{font-size:22px;color:var(--vinho);}
+.upload-area span{font-size:13px;font-weight:500;}
+.upload-preview{width:100%;max-height:140px;object-fit:contain;background:#f0f0f0;}
+.upload-status{font-size:12px;padding:4px 10px;text-align:center;}
+.upload-status.ok{color:#166534;background:#e6f4ea;}
+.upload-status.err{color:#991b1b;background:#fef2f2;}
+.upload-status.loading{color:var(--vinho);}
   .sidebar{transform:translateX(-100%);transition:transform .3s;}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;}
@@ -151,8 +161,8 @@ tbody tr:hover td{background:#fdfafb;}
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-brand">
-    <div class="ring"><i class="fa-solid fa-gem"></i></div>
-    <span>Reunna<br>Eventos</span>
+    <img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png" alt="Logo" style="width:48px;height:48px;border-radius:50%;object-fit:contain;flex-shrink:0;">
+    <span>Oficina<br>Empreender SP</span>
   </div>
   <nav class="sb-nav">
     <div class="sb-label">Geral</div>
@@ -284,7 +294,19 @@ tbody tr:hover td{background:#fdfafb;}
         <div class="field-group"><label>Descrição</label><textarea id="exp-descricao" placeholder="Texto sobre o expositor…"></textarea></div>
       </div>
       <div class="form-row">
-        <div class="field-group"><label>Foto URL</label><input id="exp-foto" placeholder="https://…"></div>
+        <div class="field-group">
+          <label>Foto</label>
+          <div class="upload-box" id="upload-exp-foto">
+            <input type="hidden" id="exp-foto">
+            <div class="upload-area" onclick="document.getElementById('file-exp-foto').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-exp-foto" accept="image/*" style="display:none" onchange="uploadImagem(this,'exp-foto','prev-exp-foto')">
+            <img id="prev-exp-foto" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-exp-foto"></div>
+          </div>
+        </div>
         <div class="field-group"><label>WhatsApp</label><input id="exp-whatsapp" placeholder="11999999999"></div>
       </div>
       <div class="form-row">
@@ -387,7 +409,19 @@ tbody tr:hover td{background:#fdfafb;}
         <div class="field-group"><label>Texto*</label><textarea id="dep-texto" placeholder="Depoimento…"></textarea></div>
       </div>
       <div class="form-row">
-        <div class="field-group"><label>Foto URL</label><input id="dep-foto" placeholder="https://…"></div>
+        <div class="field-group">
+          <label>Foto</label>
+          <div class="upload-box" id="upload-dep-foto">
+            <input type="hidden" id="dep-foto">
+            <div class="upload-area" onclick="document.getElementById('file-dep-foto').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-dep-foto" accept="image/*" style="display:none" onchange="uploadImagem(this,'dep-foto','prev-dep-foto')">
+            <img id="prev-dep-foto" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-dep-foto"></div>
+          </div>
+        </div>
         <div class="field-group" style="justify-content:flex-end;padding-bottom:4px;">
           <label class="checkbox-row"><input type="checkbox" id="dep-ativo" checked> Ativo</label>
         </div>
@@ -418,7 +452,19 @@ tbody tr:hover td{background:#fdfafb;}
       </div>
       <div class="form-row">
         <div class="field-group"><label>Autor</label><input id="blog-autor" placeholder="Nome do autor"></div>
-        <div class="field-group"><label>Imagem URL</label><input id="blog-imagem" placeholder="https://…"></div>
+        <div class="field-group">
+          <label>Imagem</label>
+          <div class="upload-box">
+            <input type="hidden" id="blog-imagem">
+            <div class="upload-area" onclick="document.getElementById('file-blog-imagem').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-blog-imagem" accept="image/*" style="display:none" onchange="uploadImagem(this,'blog-imagem','prev-blog-imagem')">
+            <img id="prev-blog-imagem" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-blog-imagem"></div>
+          </div>
+        </div>
       </div>
       <div class="form-row full">
         <div class="field-group"><label>Conteúdo (HTML)</label><textarea id="blog-conteudo" style="min-height:180px;" placeholder="<p>Conteúdo do post em HTML…</p>"></textarea></div>
@@ -435,6 +481,50 @@ tbody tr:hover td{background:#fdfafb;}
 </div>
 
 <script>
+// ─── UPLOAD CLOUDINARY ────────────────────────────────────────
+const CLOUDINARY_CLOUD = 'dhu1cqvrb';
+const CLOUDINARY_PRESET = 'oficina_unsigned'; // crie um upload preset "unsigned" no Cloudinary
+
+async function uploadImagem(input, hiddenId, previewId) {
+  const file = input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('status-' + hiddenId);
+  const prevEl   = document.getElementById(previewId);
+
+  statusEl.className = 'upload-status loading';
+  statusEl.textContent = '⏳ Enviando...';
+  prevEl.style.display = 'none';
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', CLOUDINARY_PRESET);
+
+  try {
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd });
+    const data = await res.json();
+    if (data.secure_url) {
+      document.getElementById(hiddenId).value = data.secure_url;
+      prevEl.src = data.secure_url;
+      prevEl.style.display = 'block';
+      statusEl.className = 'upload-status ok';
+      statusEl.textContent = '✅ Imagem enviada!';
+    } else {
+      throw new Error(data.error?.message || 'Falha no upload');
+    }
+  } catch(e) {
+    statusEl.className = 'upload-status err';
+    statusEl.textContent = '❌ Erro: ' + e.message;
+  }
+}
+
+function mostrarPreviewExistente(url, previewId, statusId) {
+  if (!url) return;
+  const prev = document.getElementById(previewId);
+  const stat = document.getElementById(statusId);
+  if (prev) { prev.src = url; prev.style.display = 'block'; }
+  if (stat) { stat.className = 'upload-status ok'; stat.textContent = '✅ Imagem atual'; }
+}
+
 // ─── UTILITÁRIOS ──────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 let categoriasList = [];
@@ -796,6 +886,7 @@ function editarPost(p){
   $('blog-id').value=p.id; $('blog-titulo').value=p.titulo||''; $('blog-slug').value=p.slug||'';
   $('blog-subtitulo').value=p.subtitulo||''; $('blog-autor').value=p.autor||'';
   $('blog-imagem').value=p.imagem_url||''; $('blog-conteudo').value=p.conteudo||''; $('blog-ativo').checked=!!p.ativo;
+  mostrarPreviewExistente(p.imagem_url,'prev-blog-imagem','status-blog-imagem');
   abrirModal('modalBlog');
 }
 async function salvarPost(){
