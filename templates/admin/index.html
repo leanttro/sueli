@@ -143,6 +143,11 @@ tbody tr:hover td{background:#fdfafb;}
 .upload-status.ok{color:#166534;background:#e6f4ea;}
 .upload-status.err{color:#991b1b;background:#fef2f2;}
 .upload-status.loading{color:var(--vinho);}
+
+#menuToggle{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--carvao);padding:4px;}
+
+@media(max-width:900px){
+  #menuToggle{display:block !important;}
   .sidebar{transform:translateX(-100%);transition:transform .3s;}
   .sidebar.open{transform:translateX(0);}
   .main{margin-left:0;}
@@ -187,7 +192,7 @@ tbody tr:hover td{background:#fdfafb;}
 <!-- TOPBAR -->
 <div class="topbar">
   <div style="display:flex;align-items:center;gap:14px;">
-    <button id="menuToggle" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--carvao);display:none;" onclick="document.getElementById('sidebar').classList.toggle('open')">
+    <button id="menuToggle" onclick="document.getElementById('sidebar').classList.toggle('open')">
       <i class="fa-solid fa-bars"></i>
     </button>
     <span class="topbar-title" id="topbarTitle">Dashboard</span>
@@ -971,11 +976,7 @@ document.querySelectorAll('.overlay').forEach(ov => {
   ov.addEventListener('click', e => { if(e.target === ov) ov.classList.remove('open'); });
 });
 
-// ─── MOBILE MENU TOGGLE ───────────────────────────────────────
-if(window.innerWidth <= 900){
-  const mt = document.getElementById('menuToggle');
-  if(mt) mt.style.display = 'block';
-}
+
 
 // ─── INIT ────────────────────────────────────────────────────
 carregarDashboard();
