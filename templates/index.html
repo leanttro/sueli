@@ -206,6 +206,58 @@
   .dep-autor b{display:block;font-size:14.5px;font-family:'Inter',sans-serif;font-weight:600;}
   .dep-autor span{font-size:12.5px;color:rgba(255,255,255,.6);}
 
+  .exp-obs{font-size:13px;color:var(--cinza);line-height:1.55;margin-bottom:14px;border-left:2px solid var(--dourado);padding-left:10px;font-style:italic;}
+
+  /* ---------- TRABALHE CONOSCO ---------- */
+  .trabalhe{background:var(--vinho-escuro);color:#fff;position:relative;}
+  .trabalhe .section-head h2{color:#fff;}
+  .trabalhe .section-head p.lead{color:rgba(255,255,255,.65);}
+  .trabalhe .eyebrow{color:var(--dourado-claro);}
+  .trabalhe .eyebrow::before{background:var(--dourado-claro);}
+  .feiras-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;}
+  @media(max-width:780px){.feiras-grid{grid-template-columns:1fr;}}
+  .feira-card{
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:10px;
+    padding:30px 28px;backdrop-filter:blur(4px);transition:transform .3s ease, box-shadow .3s ease;
+  }
+  .feira-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px -20px rgba(0,0,0,.5);}
+  .feira-badge{display:inline-flex;align-items:center;gap:6px;background:var(--dourado);color:var(--vinho-escuro);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:5px 12px;border-radius:30px;margin-bottom:16px;}
+  .feira-nome{font-size:21px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;}
+  .feira-local{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:18px;display:flex;align-items:center;gap:6px;}
+  .feira-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:20px;}
+  .feira-info-item{font-size:13px;}
+  .feira-info-item .label{color:rgba(255,255,255,.45);font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px;}
+  .feira-info-item .valor{color:#fff;font-weight:600;}
+  .feira-vagas{background:rgba(201,212,84,.15);border:1px solid rgba(201,212,84,.3);border-radius:6px;padding:12px 14px;margin-bottom:18px;}
+  .feira-vagas .vl{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--dourado-claro);font-weight:700;margin-bottom:6px;}
+  .feira-vagas ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;}
+  .feira-vagas ul li{background:rgba(201,212,84,.25);color:var(--dourado-claro);font-size:12.5px;font-weight:600;padding:4px 12px;border-radius:20px;}
+  .feira-obs{font-size:13.5px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:20px;border-left:2px solid var(--dourado);padding-left:10px;font-style:italic;}
+  .feira-taxa{font-size:14px;color:#fff;font-weight:700;margin-bottom:18px;}
+  .feira-taxa span{color:var(--dourado-claro);}
+  .feira-org{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);}
+  .feira-org .org-info{font-size:13px;}
+  .feira-org .org-info b{display:block;color:#fff;font-size:14px;}
+  .feira-org .org-info span{color:rgba(255,255,255,.55);}
+  .feira-whats{margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:6px;transition:background .2s ease;}
+  .feira-whats:hover{background:#1EB254;}
+  .feiras-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:rgba(255,255,255,.4);font-size:16px;}
+  .feiras-empty i{font-size:32px;color:var(--dourado);display:block;margin-bottom:14px;}
+
+  /* ---------- VAMOS CONVERSAR ---------- */
+  .vamos{background:var(--vinho);color:#fff;padding:64px 0;}
+  .vamos-inner{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
+  @media(max-width:780px){.vamos-inner{grid-template-columns:1fr;gap:36px;}}
+  .vamos h2{font-size:clamp(26px,3.8vw,38px);color:#fff;line-height:1.2;margin-bottom:16px;}
+  .vamos p{color:rgba(255,255,255,.75);font-size:15.5px;line-height:1.7;}
+  .vamos-acoes{display:flex;flex-direction:column;gap:16px;margin-top:28px;}
+  .vamos-acoes a{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:16px 20px;color:#fff;font-weight:600;font-size:15px;transition:background .25s ease, transform .25s ease;}
+  .vamos-acoes a:hover{background:rgba(255,255,255,.18);transform:translateX(4px);}
+  .vamos-acoes a i{font-size:20px;color:var(--dourado-claro);flex-shrink:0;}
+  .vamos-acoes a .ac-desc{font-size:12.5px;font-weight:400;color:rgba(255,255,255,.6);display:block;}
+  .vamos-img{border-radius:10px;overflow:hidden;box-shadow:0 24px 60px -20px rgba(0,0,0,.4);}
+  .vamos-img img{width:100%;height:100%;object-fit:cover;}
+
   /* ---------- BLOG ---------- */
   .blog-home{background:var(--creme);}
   .blog-head-row{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;gap:20px;flex-wrap:wrap;}
@@ -297,6 +349,7 @@
       <a href="#sobre">Sobre</a>
       <a href="#servicos">Serviços</a>
       <a href="#expositores">Expositores</a>
+      <a href="#trabalhe">Trabalhe Conosco</a>
       <a href="#depoimentos">Depoimentos</a>
       <a href="/blog">Blog</a>
       <a href="#contato" class="btn btn-ghost" style="padding:10px 20px;">Fale Conosco</a>
@@ -310,6 +363,7 @@
   <a href="#sobre">Sobre</a>
   <a href="#servicos">Serviços</a>
   <a href="#expositores">Expositores</a>
+  <a href="#trabalhe">Trabalhe Conosco</a>
   <a href="#depoimentos">Depoimentos</a>
   <a href="/blog">Blog</a>
   <a href="#contato">Fale Conosco</a>
@@ -389,20 +443,22 @@
       <div class="filtros">
         <select id="filtroCategoria" aria-label="Filtrar por categoria">
           <option value="">Todas as categorias</option>
-          <option value="pastel">Pastel</option>
-          <option value="hot-dog">Hot Dog / Hits</option>
-          <option value="arabe">Árabe</option>
-          <option value="macarrao">Macarrão</option>
-          <option value="churrasco">Churrasco</option>
-          <option value="crepe">Crepe</option>
-          <option value="pamonha">Pamonha</option>
-          <option value="milho">Milho</option>
-          <option value="artesanato">Artesanato</option>
-          <option value="loca-ceas">Loca Ceas</option>
+          <option value="pernil">Pernil</option>
+          <option value="locacoes">Locações</option>
+          <option value="fotos-filmagens">Fotos e Filmagens</option>
+          <option value="bebidas">Bebidas</option>
           <option value="buffets">Buffets</option>
           <option value="outros">Outros</option>
         </select>
-        <input type="text" id="filtroRegiao" placeholder="Filtrar por região (ex: Zona Sul)">
+        <select id="filtroRegiao" aria-label="Filtrar por região">
+          <option value="">Todas as regiões</option>
+          <option value="zona-sul">Zona Sul</option>
+          <option value="zona-oeste">Zona Oeste</option>
+          <option value="zona-leste">Zona Leste</option>
+          <option value="zona-norte">Zona Norte</option>
+          <option value="abc">ABC</option>
+          <option value="indiferente">Indiferente</option>
+        </select>
         <button class="btn btn-ghost" id="limparFiltros" type="button" style="padding:11px 18px;">Limpar</button>
       </div>
     </div>
@@ -410,6 +466,68 @@
       <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
       <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
       <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRABALHE CONOSCO -->
+<section class="trabalhe" id="trabalhe">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Vagas abertas</p>
+      <h2>Trabalhe Conosco</h2>
+      <p class="lead">Confira as feiras em andamento e as vagas disponíveis para expositores. As oportunidades são removidas automaticamente após a data do evento.</p>
+    </div>
+    <div class="feiras-grid" id="feirasGrid">
+      <!-- carregado via /api/feiras -->
+      <div class="feira-card" style="background:rgba(255,255,255,.04);">
+        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;background:rgba(255,255,255,.08);"></div>
+        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;background:rgba(255,255,255,.08);"></div>
+        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;background:rgba(255,255,255,.08);"></div>
+        <div class="skeleton" style="height:80px;width:100%;background:rgba(255,255,255,.08);"></div>
+      </div>
+      <div class="feira-card" style="background:rgba(255,255,255,.04);">
+        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;background:rgba(255,255,255,.08);"></div>
+        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;background:rgba(255,255,255,.08);"></div>
+        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;background:rgba(255,255,255,.08);"></div>
+        <div class="skeleton" style="height:80px;width:100%;background:rgba(255,255,255,.08);"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VAMOS CONVERSAR -->
+<section class="vamos" id="vamos-conversar">
+  <div class="container vamos-inner">
+    <div>
+      <h2>Vamos conversar?</h2>
+      <p>Seja para participar como expositor, organizar um evento no seu condomínio ou entender melhor como funciona, a gente está aqui. Escolha o canal que preferir.</p>
+      <div class="vamos-acoes">
+        <a href="https://wa.me/5511999999999" target="_blank" rel="noopener">
+          <i class="fa-brands fa-whatsapp"></i>
+          <div>
+            <span>Falar pelo WhatsApp</span>
+            <span class="ac-desc">Resposta rápida, seg. a sáb. das 9h às 19h</span>
+          </div>
+        </a>
+        <a href="#contato">
+          <i class="fa-solid fa-envelope"></i>
+          <div>
+            <span>Enviar uma mensagem</span>
+            <span class="ac-desc">Preencha o formulário de contato abaixo</span>
+          </div>
+        </a>
+        <a href="#trabalhe">
+          <i class="fa-solid fa-store"></i>
+          <div>
+            <span>Ver vagas para expositores</span>
+            <span class="ac-desc">Confira as feiras com vagas abertas</span>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="vamos-img" style="min-height:320px;">
+      <img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782418025/da4fb506-2e1d-41f8-9149-fb6ca9326b44.png" alt="Evento Oficina Empreender" loading="lazy" style="min-height:320px;object-fit:cover;width:100%;">
     </div>
   </div>
 </section>
@@ -510,6 +628,7 @@
         <a href="#sobre">Sobre</a>
         <a href="#servicos">Serviços</a>
         <a href="#expositores">Expositores</a>
+        <a href="#trabalhe">Trabalhe Conosco</a>
         <a href="/blog">Blog</a>
       </div>
       <div class="footer-col">
@@ -607,6 +726,7 @@ function cardExpositor(exp){
         <span class="exp-cat">${escapeHtml(exp.categoria_nome || 'Expositor')}</span>
         <h3>${escapeHtml(exp.nome)}</h3>
         ${regiaoBloco}
+        ${exp.observacoes ? `<p class="exp-obs">${escapeHtml(exp.observacoes)}</p>` : ''}
         <a href="/expositores/${exp.slug}" class="btn btn-ghost">Ver Perfil</a>
       </div>
     </article>
@@ -639,11 +759,7 @@ async function carregarExpositores(){
 }
 
 document.getElementById('filtroCategoria').addEventListener('change', carregarExpositores);
-let regiaoTimeout;
-document.getElementById('filtroRegiao').addEventListener('input', () => {
-  clearTimeout(regiaoTimeout);
-  regiaoTimeout = setTimeout(carregarExpositores, 400);
-});
+document.getElementById('filtroRegiao').addEventListener('change', carregarExpositores);
 document.getElementById('limparFiltros').addEventListener('click', () => {
   document.getElementById('filtroCategoria').value = '';
   document.getElementById('filtroRegiao').value = '';
@@ -763,11 +879,62 @@ function escapeHtml(str){
     .replaceAll('"','&quot;').replaceAll("'",'&#039;');
 }
 
+/* ---------- FEIRAS — Trabalhe Conosco ---------- */
+function cardFeira(f){
+  const vagas = (f.vagas_para || '').split(',').map(v => v.trim()).filter(Boolean);
+  const vagasPills = vagas.length
+    ? `<div class="feira-vagas"><div class="vl">Vagas para:</div><ul>${vagas.map(v => `<li>${escapeHtml(v)}</li>`).join('')}</ul></div>`
+    : '';
+  const obs = f.observacoes ? `<p class="feira-obs">${escapeHtml(f.observacoes)}</p>` : '';
+  const infra = f.infraestrutura ? `<div class="feira-info-item"><div class="label">Infraestrutura</div><div class="valor">${escapeHtml(f.infraestrutura)}</div></div>` : '';
+  const taxa = f.taxa ? `<div class="feira-info-item"><div class="label">Taxa</div><div class="valor">${escapeHtml(f.taxa)}</div></div>` : '';
+  const org = f.organizador ? `<div class="feira-info-item"><div class="label">Organizador</div><div class="valor">${escapeHtml(f.organizador)}</div></div>` : '';
+  const dataFmt = f.data_evento ? new Date(f.data_evento + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const dataHora = [dataFmt, f.horario].filter(Boolean).join(' · ');
+  const whatsMsg = encodeURIComponent(`Olá, tenho interesse na feira: ${f.nome}`);
+  const whatsLink = f.whatsapp
+    ? `<a href="https://wa.me/55${f.whatsapp.replace(/\D/g,'')}?text=${whatsMsg}" target="_blank" rel="noopener" class="feira-whats"><i class="fa-brands fa-whatsapp"></i> Falar com o organizador</a>`
+    : '';
+  return `
+    <article class="feira-card">
+      <span class="feira-badge"><i class="fa-solid fa-store"></i> Vagas abertas</span>
+      <h3 class="feira-nome">${escapeHtml(f.nome)}</h3>
+      ${f.local ? `<p class="feira-local"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(f.local)}</p>` : ''}
+      <div class="feira-info-grid">
+        ${dataHora ? `<div class="feira-info-item"><div class="label">Data e horário</div><div class="valor">${escapeHtml(dataHora)}</div></div>` : ''}
+        ${taxa}${infra}${org}
+      </div>
+      ${vagasPills}
+      ${obs}
+      ${whatsLink}
+    </article>
+  `;
+}
+
+async function carregarFeiras(){
+  const grid = document.getElementById('feirasGrid');
+  if(!grid) return;
+  try{
+    const res = await fetch('/api/feiras');
+    if(!res.ok) throw new Error('Falha ao buscar feiras');
+    const feiras = await res.json();
+    if(!feiras.length){
+      grid.innerHTML = '<div class="feiras-empty"><i class="fa-solid fa-calendar-check"></i><p>Nenhuma feira com vagas abertas no momento. <a href="#contato" style="color:var(--dourado-claro);text-decoration:underline;">Entre em contato</a> para saber das próximas datas.</p></div>';
+      return;
+    }
+    grid.innerHTML = feiras.map(cardFeira).join('');
+  }catch(err){
+    console.error(err);
+    grid.innerHTML = '<div class="feiras-empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar as feiras agora.</p></div>';
+  }
+}
+
 /* Init */
 carregarServicos();
 carregarCategorias().then(carregarExpositores);
 carregarDepoimentos();
 carregarBlogHome();
+carregarFeiras();
 </script>
 </body>
 </html>
