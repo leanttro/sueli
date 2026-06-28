@@ -830,6 +830,113 @@ def api_admin_planos():
 
 
 # ════════════════════════════════════════════════════════════
+#  API PÚBLICA — FEIRAS
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/feiras')
+def api_feiras():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            SELECT * FROM feiras
+            WHERE ativo = TRUE AND data_evento >= CURRENT_DATE
+            ORDER BY data_evento ASC
+        """)
+        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+        cur.close()
+        return jsonify(rows)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao buscar feiras'}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
+#  API ADMIN — FEIRAS
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/admin/feiras', methods=['GET', 'POST'])
+@login_required
+def api_admin_feiras():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        if request.method == 'GET':
+            cur.execute("SELECT * FROM feiras ORDER BY data_evento DESC")
+            rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+            cur.close()
+            return jsonify(rows)
+
+        data = request.get_json()
+        cur.execute("""
+            INSERT INTO feiras (nome, local, data_evento, horario, vagas_para,
+                infraestrutura, informacoes, observacoes, taxa, organizador,
+                whatsapp, ativo)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
+        """, (
+            data.get('nome',''), data.get('local',''),
+            data.get('data_evento') or None, data.get('horario',''),
+            data.get('vagas_para',''), data.get('infraestrutura',''),
+            data.get('informacoes',''), data.get('observacoes',''),
+            data.get('taxa',''), data.get('organizador',''),
+            data.get('whatsapp',''), data.get('ativo', True)
+        ))
+        new_id = cur.fetchone()['id']
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True, 'id': new_id})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/feiras/<int:feira_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_admin_feira(feira_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor()
+
+        if request.method == 'DELETE':
+            cur.execute("DELETE FROM feiras WHERE id = %s", (feira_id,))
+            conn.commit()
+            cur.close()
+            return jsonify({'ok': True})
+
+        data = request.get_json()
+        cur.execute("""
+            UPDATE feiras SET nome=%s, local=%s, data_evento=%s, horario=%s,
+                vagas_para=%s, infraestrutura=%s, informacoes=%s, observacoes=%s,
+                taxa=%s, organizador=%s, whatsapp=%s, ativo=%s
+            WHERE id=%s
+        """, (
+            data.get('nome',''), data.get('local',''),
+            data.get('data_evento') or None, data.get('horario',''),
+            data.get('vagas_para',''), data.get('infraestrutura',''),
+            data.get('informacoes',''), data.get('observacoes',''),
+            data.get('taxa',''), data.get('organizador',''),
+            data.get('whatsapp',''), data.get('ativo', True),
+            feira_id
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
 #  SITEMAP
 # ════════════════════════════════════════════════════════════
 
