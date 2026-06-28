@@ -679,13 +679,23 @@ async function carregarServicos(){
       grid.innerHTML = '<p style="color:var(--cinza);grid-column:1/-1;">Nenhum serviço cadastrado no momento.</p>';
       return;
     }
-    grid.innerHTML = servicos.map(s => `
-      <div class="servico-card">
-        <div class="servico-icone"><i class="fa-solid ${s.icone_url && s.icone_url.startsWith('fa-') ? s.icone_url : 'fa-calendar-star'}"></i></div>
-        <h3>${escapeHtml(s.titulo || '')}</h3>
-        <p>${escapeHtml(s.descricao || '')}</p>
-      </div>
-    `).join('');
+    grid.innerHTML = servicos.map(s => {
+      let iconeHtml = '';
+      if(s.foto_url){
+        iconeHtml = `<div class="servico-icone" style="width:54px;height:54px;border-radius:50%;overflow:hidden;background:var(--rosa-suave);margin-bottom:20px;"><img src="${s.foto_url}" alt="${escapeHtml(s.titulo||'')}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+      } else if(s.icone_url && s.icone_url.startsWith('fa-')){
+        iconeHtml = `<div class="servico-icone"><i class="fa-solid ${s.icone_url}"></i></div>`;
+      } else {
+        iconeHtml = `<div class="servico-icone"><i class="fa-solid fa-calendar-star"></i></div>`;
+      }
+      return `
+        <div class="servico-card">
+          ${iconeHtml}
+          <h3>${escapeHtml(s.titulo || '')}</h3>
+          <p>${escapeHtml(s.descricao || '')}</p>
+        </div>
+      `;
+    }).join('');
   }catch(err){
     console.error(err);
     grid.innerHTML = '<p style="color:var(--cinza);grid-column:1/-1;">Não foi possível carregar os serviços agora.</p>';
