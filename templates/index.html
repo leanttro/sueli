@@ -244,6 +244,31 @@
   .feiras-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:rgba(255,255,255,.4);font-size:16px;}
   .feiras-empty i{font-size:32px;color:var(--dourado);display:block;margin-bottom:14px;}
 
+  /* ---------- CARROSSEL ---------- */
+  .carrossel-wrap{position:relative;}
+  .carrossel-track-outer{overflow:hidden;}
+  .carrossel-track{display:flex;gap:28px;transition:transform .4s cubic-bezier(.4,0,.2,1);}
+  .carrossel-track .feira-card{min-width:calc(50% - 14px);flex-shrink:0;}
+  @media(max-width:780px){.carrossel-track .feira-card{min-width:calc(100% - 0px);}}
+  .carrossel-nav{display:flex;gap:12px;margin-top:24px;justify-content:center;}
+  .carrossel-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease, border-color .2s ease;}
+  .carrossel-btn:hover{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
+  .carrossel-btn:disabled{opacity:.3;cursor:default;}
+  .carrossel-dots{display:flex;gap:8px;align-items:center;}
+  .carrossel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;transition:background .2s ease,transform .2s ease;}
+  .carrossel-dot.ativo{background:var(--dourado);transform:scale(1.3);}
+  .cta-expositor-card{
+    min-width:calc(50% - 14px);flex-shrink:0;
+    background:rgba(201,212,84,.08);border:2px dashed rgba(201,212,84,.4);border-radius:10px;
+    padding:30px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;gap:16px;
+  }
+  @media(max-width:780px){.cta-expositor-card{min-width:calc(100% - 0px);}}
+  .cta-expositor-card i{font-size:32px;color:var(--dourado);}
+  .cta-expositor-card h3{font-size:18px;font-weight:700;color:#fff;margin:0;}
+  .cta-expositor-card p{font-size:14px;color:rgba(255,255,255,.65);margin:0;line-height:1.55;}
+  .cta-expositor-card a{margin-top:8px;}
+
   /* ---------- VAMOS CONVERSAR ---------- */
   .vamos{background:var(--vinho);color:#fff;padding:64px 0;}
   .vamos-inner{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
@@ -349,7 +374,6 @@
       <a href="#sobre">Sobre</a>
       <a href="#servicos">Serviços</a>
       <a href="#expositores">Expositores</a>
-      <a href="#eventos">Eventos</a>
       <a href="#trabalhe">Trabalhe Conosco</a>
       <a href="#depoimentos">Depoimentos</a>
       <a href="/blog">Blog</a>
@@ -364,7 +388,6 @@
   <a href="#sobre">Sobre</a>
   <a href="#servicos">Serviços</a>
   <a href="#expositores">Expositores</a>
-  <a href="#eventos">Eventos</a>
   <a href="#trabalhe">Trabalhe Conosco</a>
   <a href="#depoimentos">Depoimentos</a>
   <a href="/blog">Blog</a>
@@ -399,7 +422,7 @@
   <div class="container sobre-grid">
     <div class="sobre-photo">
       <div class="frame">
-        <!-- Foto de feira no condomínio será inserida aqui -->
+        <img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782744228/Image_Editing_4_1_rvckea.jpg" alt="Cada evento é planejado para aproximar pessoas" loading="lazy">
       </div>
     </div>
     <div class="sobre-text">
@@ -420,7 +443,7 @@
 <section class="servicos" id="servicos">
   <div class="container">
     <div class="section-head">
-      <p class="eyebrow">O que ofereço</p>
+      <p class="eyebrow">O que oferecemos</p>
       <h2>Serviços pensados para o seu condomínio</h2>
       <p class="lead">Cada formato pode ser adaptado ao perfil e ao espaço do seu condomínio, sempre com curadoria de expositores e produção completa.</p>
     </div>
@@ -466,30 +489,6 @@
   </div>
 </section>
 
-<!-- PRÓXIMOS EVENTOS -->
-<section class="trabalhe" id="eventos" style="background:var(--rosa-suave);">
-  <div class="container">
-    <div class="section-head">
-      <p class="eyebrow" style="color:var(--vinho);">Agenda</p>
-      <h2 style="color:var(--carvao);">Próximos Eventos</h2>
-      <p class="lead" style="color:var(--cinza);">Confira os eventos que estão por vir e garanta sua participação.</p>
-    </div>
-    <div class="feiras-grid" id="eventosGrid" style="--card-bg:var(--branco);--card-border:var(--linha);--card-text:var(--carvao);">
-      <div class="feira-card" style="background:#fff;border:1px solid var(--linha);">
-        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
-        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
-        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
-        <div class="skeleton" style="height:80px;width:100%;"></div>
-      </div>
-      <div class="feira-card" style="background:#fff;border:1px solid var(--linha);">
-        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
-        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
-        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
-        <div class="skeleton" style="height:80px;width:100%;"></div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- TRABALHE CONOSCO -->
 <section class="trabalhe" id="trabalhe">
@@ -499,56 +498,59 @@
       <h2>Trabalhe Conosco</h2>
       <p class="lead">Confira as feiras em andamento e as vagas disponíveis para expositores. As oportunidades são removidas automaticamente após a data do evento.</p>
     </div>
-    <div class="feiras-grid" id="feirasGrid">
-      <!-- carregado via /api/feiras -->
-      <div class="feira-card" style="background:rgba(255,255,255,.04);">
-        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;background:rgba(255,255,255,.08);"></div>
-        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;background:rgba(255,255,255,.08);"></div>
-        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;background:rgba(255,255,255,.08);"></div>
-        <div class="skeleton" style="height:80px;width:100%;background:rgba(255,255,255,.08);"></div>
+    <div class="carrossel-wrap" id="feirasCarrossel">
+      <div class="carrossel-track-outer">
+        <div class="carrossel-track" id="feirasGrid">
+          <!-- carregado via /api/feiras -->
+          <div class="feira-card" style="background:rgba(255,255,255,.04);">
+            <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;background:rgba(255,255,255,.08);"></div>
+            <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;background:rgba(255,255,255,.08);"></div>
+            <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;background:rgba(255,255,255,.08);"></div>
+            <div class="skeleton" style="height:80px;width:100%;background:rgba(255,255,255,.08);"></div>
+          </div>
+          <div class="feira-card" style="background:rgba(255,255,255,.04);">
+            <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;background:rgba(255,255,255,.08);"></div>
+            <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;background:rgba(255,255,255,.08);"></div>
+            <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;background:rgba(255,255,255,.08);"></div>
+            <div class="skeleton" style="height:80px;width:100%;background:rgba(255,255,255,.08);"></div>
+          </div>
+        </div>
       </div>
-      <div class="feira-card" style="background:rgba(255,255,255,.04);">
-        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;background:rgba(255,255,255,.08);"></div>
-        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;background:rgba(255,255,255,.08);"></div>
-        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;background:rgba(255,255,255,.08);"></div>
-        <div class="skeleton" style="height:80px;width:100%;background:rgba(255,255,255,.08);"></div>
+      <div class="carrossel-nav" id="feirasNav" style="display:none;">
+        <button class="carrossel-btn" id="feirasAnterior" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="carrossel-dots" id="feirasDots"></div>
+        <button class="carrossel-btn" id="feirasProximo" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
       </div>
     </div>
   </div>
 </section>
 
-<!-- VAMOS CONVERSAR -->
-<section class="vamos" id="vamos-conversar">
-  <div class="container vamos-inner">
-    <div>
-      <h2>Vamos conversar?</h2>
-      <p>Quer ajuda para o seu evento? Conte um pouco sobre o que você tem em mente. Retorno o contato em até 24h.</p>
-      <div class="vamos-acoes">
-        <a href="https://wa.me/5511999999999" target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i>
-          <div>
-            <span>Falar pelo WhatsApp</span>
-            <span class="ac-desc">Resposta rápida, seg. a sáb. das 9h às 19h</span>
-          </div>
-        </a>
-        <a href="#contato">
-          <i class="fa-solid fa-envelope"></i>
-          <div>
-            <span>Enviar uma mensagem</span>
-            <span class="ac-desc">Preencha o formulário de contato abaixo</span>
-          </div>
-        </a>
-        <a href="#trabalhe">
-          <i class="fa-solid fa-store"></i>
-          <div>
-            <span>Ver vagas para expositores</span>
-            <span class="ac-desc">Confira as feiras com vagas abertas</span>
-          </div>
-        </a>
+<!-- DUAL CTA -->
+<section class="vamos" id="cta-duplo">
+  <div class="container">
+    <div class="vamos-inner" style="grid-template-columns:1fr 1fr;gap:40px;align-items:stretch;">
+      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:40px 36px;display:flex;flex-direction:column;">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(201,212,84,.2);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--dourado-claro);margin-bottom:22px;flex-shrink:0;">
+          <i class="fa-solid fa-calendar-plus"></i>
+        </div>
+        <h2 style="font-size:clamp(22px,3vw,30px);color:#fff;line-height:1.2;margin-bottom:14px;">Quer realizar um evento?</h2>
+        <p style="color:rgba(255,255,255,.75);font-size:15px;line-height:1.7;margin-bottom:28px;flex:1;">Desenvolvemos experiências personalizadas para o perfil e a infraestrutura do seu condomínio. Da curadoria à execução, cuidamos de tudo.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" class="btn btn-gold"><i class="fa-brands fa-whatsapp"></i> Falar pelo WhatsApp</a>
+          <a href="#contato" class="btn btn-outline">Enviar mensagem</a>
+        </div>
       </div>
-    </div>
-    <div class="vamos-img" style="min-height:320px;">
-      <img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782418025/da4fb506-2e1d-41f8-9149-fb6ca9326b44.png" alt="Evento Oficina Empreender" loading="lazy" style="min-height:320px;object-fit:cover;width:100%;">
+      <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:40px 36px;display:flex;flex-direction:column;">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(201,212,84,.2);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--dourado-claro);margin-bottom:22px;flex-shrink:0;">
+          <i class="fa-solid fa-store"></i>
+        </div>
+        <h2 style="font-size:clamp(22px,3vw,30px);color:#fff;line-height:1.2;margin-bottom:14px;">Quer ser nosso expositor?</h2>
+        <p style="color:rgba(255,255,255,.75);font-size:15px;line-height:1.7;margin-bottom:28px;flex:1;">Confira as feiras com vagas abertas e garanta seu espaço. Trabalhamos com curadoria rigorosa para garantir as melhores oportunidades para o seu negócio.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <a href="#trabalhe" class="btn btn-gold"><i class="fa-solid fa-search"></i> Ver vagas disponíveis</a>
+          <a href="https://wa.me/5511999999999?text=Olá%2C%20quero%20ser%20expositor!" target="_blank" rel="noopener" class="btn btn-outline"><i class="fa-brands fa-whatsapp"></i> Quero ser expositor</a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -910,6 +912,48 @@ function escapeHtml(str){
     .replaceAll('"','&quot;').replaceAll("'",'&#039;');
 }
 
+/* ---------- CARROSSEL helper ---------- */
+function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId, perPage){
+  const track = document.getElementById(trackId);
+  const nav = document.getElementById(navId);
+  const dotsEl = document.getElementById(dotsId);
+  const btnAnterior = document.getElementById(anteriorId);
+  const btnProximo = document.getElementById(proximoId);
+  if(!track) return;
+
+  const items = Array.from(track.children);
+  const total = items.length;
+  if(total <= 1){ nav.style.display='none'; return; }
+
+  // pages = ceil(total / perPage)
+  const pages = Math.ceil(total / perPage);
+  let page = 0;
+
+  // build dots
+  dotsEl.innerHTML = '';
+  for(let i=0;i<pages;i++){
+    const d = document.createElement('button');
+    d.className = 'carrossel-dot' + (i===0?' ativo':'');
+    d.setAttribute('aria-label', `Página ${i+1}`);
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(p){
+    page = Math.max(0, Math.min(p, pages-1));
+    const itemW = items[0].offsetWidth + 28; // gap=28
+    track.style.transform = `translateX(-${page * perPage * itemW}px)`;
+    dotsEl.querySelectorAll('.carrossel-dot').forEach((d,i) => d.classList.toggle('ativo', i===page));
+    btnAnterior.disabled = page===0;
+    btnProximo.disabled = page>=pages-1;
+  }
+
+  btnAnterior.addEventListener('click', () => goTo(page-1));
+  btnProximo.addEventListener('click', () => goTo(page+1));
+  nav.style.display = 'flex';
+  goTo(0);
+}
+
 /* ---------- FEIRAS — Trabalhe Conosco ---------- */
 function cardFeira(f){
   const vagas = (f.vagas_para || '').split(',').map(v => v.trim()).filter(Boolean);
@@ -950,63 +994,19 @@ async function carregarFeiras(){
     if(!res.ok) throw new Error('Falha ao buscar feiras');
     const feiras = await res.json();
     if(!feiras.length){
-      grid.innerHTML = '<div class="feiras-empty"><i class="fa-solid fa-calendar-check"></i><p>Nenhuma feira com vagas abertas no momento. <a href="#contato" style="color:var(--dourado-claro);text-decoration:underline;">Entre em contato</a> para saber das próximas datas.</p></div>';
-      return;
+      grid.innerHTML = '<div class="feira-card" style="min-width:100%;background:rgba(255,255,255,.04);"><div class="feiras-empty"><i class="fa-solid fa-calendar-check"></i><p>Nenhuma feira com vagas abertas no momento. <a href="#contato" style="color:var(--dourado-claro);text-decoration:underline;">Entre em contato</a> para saber das próximas datas.</p></div></div>';
+      // still add CTA
+    } else {
+      // Render cards + CTA card at end
+      const ctaCard = `<div class="cta-expositor-card"><i class="fa-solid fa-plus-circle"></i><h3>Quer anunciar aqui?</h3><p>Reserve sua vaga no próximo evento e alcance moradores de condomínios em São Paulo.</p><a href="https://wa.me/5511999999999?text=Quero%20anunciar%20minha%20feira!" target="_blank" rel="noopener" class="btn btn-gold" style="font-size:13px;padding:11px 18px;"><i class="fa-brands fa-whatsapp"></i> Falar conosco</a></div>`;
+      grid.innerHTML = feiras.map(cardFeira).join('') + ctaCard;
     }
-    grid.innerHTML = feiras.map(cardFeira).join('');
+    // Init carousel — 2 items per page on desktop
+    const perPage = window.innerWidth <= 780 ? 1 : 2;
+    initCarrossel('feirasGrid','feirasNav','feirasDots','feirasAnterior','feirasProximo', perPage);
   }catch(err){
     console.error(err);
-    grid.innerHTML = '<div class="feiras-empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar as feiras agora.</p></div>';
-  }
-}
-
-/* ---------- EVENTOS (Próximos Eventos — tema claro) ---------- */
-function cardEvento(f){
-  const vagas = (f.vagas_para || '').split(',').map(v => v.trim()).filter(Boolean);
-  const vagasPills = vagas.length
-    ? `<div class="feira-vagas" style="background:rgba(84,31,81,.08);border:1px solid rgba(84,31,81,.2);"><div class="vl" style="color:var(--vinho);">Vagas para:</div><ul>${vagas.map(v => `<li style="background:rgba(84,31,81,.12);color:var(--vinho);">${escapeHtml(v)}</li>`).join('')}</ul></div>`
-    : '';
-  const obs = f.observacoes ? `<p class="feira-obs" style="color:var(--cinza);border-left:2px solid var(--dourado);">${escapeHtml(f.observacoes)}</p>` : '';
-  const infra = f.infraestrutura ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Infraestrutura</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.infraestrutura)}</div></div>` : '';
-  const taxa = f.taxa ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Taxa</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.taxa)}</div></div>` : '';
-  const org = f.organizador ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Organizador</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.organizador)}</div></div>` : '';
-  const dataFmt = f.data_evento ? new Date(f.data_evento + 'T00:00:00').toLocaleDateString('pt-BR') : '';
-  const dataHora = [dataFmt, f.horario].filter(Boolean).join(' · ');
-  const whatsMsg = encodeURIComponent(`Olá, tenho interesse no evento: ${f.nome}`);
-  const whatsLink = f.whatsapp
-    ? `<a href="https://wa.me/55${f.whatsapp.replace(/\D/g,'')}?text=${whatsMsg}" target="_blank" rel="noopener" class="feira-whats"><i class="fa-brands fa-whatsapp"></i> Falar com o organizador</a>`
-    : '';
-  return `
-    <article class="feira-card" style="background:#fff;border:1px solid var(--linha);">
-      <span class="feira-badge"><i class="fa-solid fa-calendar-star"></i> Próximo Evento</span>
-      <h3 class="feira-nome" style="color:var(--carvao);">${escapeHtml(f.nome)}</h3>
-      ${f.local ? `<p class="feira-local" style="color:var(--cinza);"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(f.local)}</p>` : ''}
-      <div class="feira-info-grid">
-        ${dataHora ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Data e horário</div><div class="valor" style="color:var(--carvao);">${escapeHtml(dataHora)}</div></div>` : ''}
-        ${taxa}${infra}${org}
-      </div>
-      ${vagasPills}
-      ${obs}
-      ${whatsLink}
-    </article>
-  `;
-}
-
-async function carregarEventos(){
-  const grid = document.getElementById('eventosGrid');
-  if(!grid) return;
-  try{
-    const res = await fetch('/api/feiras');
-    if(!res.ok) throw new Error('Falha ao buscar eventos');
-    const eventos = await res.json();
-    if(!eventos.length){
-      grid.innerHTML = '<div class="feiras-empty" style="color:var(--cinza);"><i class="fa-solid fa-calendar-check" style="color:var(--vinho);"></i><p>Nenhum evento programado no momento. <a href="#contato" style="color:var(--vinho);text-decoration:underline;">Entre em contato</a> para saber das próximas datas.</p></div>';
-      return;
-    }
-    grid.innerHTML = eventos.map(cardEvento).join('');
-  }catch(err){
-    console.error(err);
-    grid.innerHTML = '<div class="feiras-empty" style="color:var(--cinza);"><i class="fa-solid fa-triangle-exclamation" style="color:var(--vinho);"></i><p>Não foi possível carregar os eventos agora.</p></div>';
+    grid.innerHTML = '<div class="feira-card" style="min-width:100%;background:rgba(255,255,255,.04);"><div class="feiras-empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar as feiras agora.</p></div></div>';
   }
 }
 
@@ -1016,7 +1016,6 @@ carregarCategorias().then(carregarExpositores);
 carregarDepoimentos();
 carregarBlogHome();
 carregarFeiras();
-carregarEventos();
 </script>
 </body>
 </html>
