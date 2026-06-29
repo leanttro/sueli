@@ -337,6 +337,50 @@
   .socials a:hover{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
   .footer-bottom{border-top:1px solid rgba(255,255,255,.12);padding-top:24px;display:flex;justify-content:space-between;font-size:12.5px;color:rgba(255,255,255,.45);flex-wrap:wrap;gap:10px;}
 
+  /* ---------- SOLUÇÕES ---------- */
+  .solucoes{background:var(--creme);}
+  .solucoes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+  .solucao-card{
+    background:#fff;border-radius:8px;padding:32px 28px;
+    border:1px solid var(--linha);border-top:3px solid var(--dourado);
+    transition:transform .3s ease, box-shadow .3s ease;
+  }
+  .solucao-card:hover{transform:translateY(-5px);box-shadow:var(--sombra);}
+  .solucao-icone{width:50px;height:50px;border-radius:50%;background:var(--rosa-suave);color:var(--vinho);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:18px;}
+  .solucao-card h3{font-size:17px;margin-bottom:10px;line-height:1.3;color:var(--carvao);}
+  .solucao-card p{color:var(--cinza);font-size:14px;line-height:1.65;}
+
+  /* ---------- CURSOS ---------- */
+  .cursos{background:var(--vinho-escuro);color:#fff;}
+  .cursos .section-head h2{color:#fff;}
+  .cursos .section-head p.lead{color:rgba(255,255,255,.65);}
+  .cursos .eyebrow{color:var(--dourado-claro);}
+  .cursos .eyebrow::before{background:var(--dourado-claro);}
+  .cursos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;}
+  .curso-card{
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+    border-radius:12px;padding:36px 32px;display:flex;flex-direction:column;gap:18px;
+    transition:transform .3s ease, box-shadow .3s ease, background .3s ease;
+  }
+  .curso-card:hover{transform:translateY(-5px);box-shadow:0 20px 50px -20px rgba(0,0,0,.5);background:rgba(255,255,255,.11);}
+  .curso-icone{width:58px;height:58px;border-radius:50%;background:rgba(201,212,84,.15);border:1.5px solid rgba(201,212,84,.4);color:var(--dourado-claro);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+  .curso-card h3{font-size:21px;font-weight:800;color:#fff;line-height:1.2;margin:0;}
+  .curso-card p{color:rgba(255,255,255,.68);font-size:14.5px;line-height:1.65;margin:0;flex:1;}
+  .curso-card .btn-curso{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--dourado);color:var(--vinho-escuro);font-weight:700;font-size:14px;
+    padding:13px 24px;border-radius:var(--raio);border:none;
+    transition:background .25s ease, transform .25s ease;align-self:flex-start;
+  }
+  .curso-card .btn-curso:hover{background:var(--dourado-claro);transform:translateY(-2px);}
+  @media(max-width:780px){
+    .solucoes-grid{grid-template-columns:1fr 1fr;}
+    .cursos-grid{grid-template-columns:1fr;}
+  }
+  @media(max-width:540px){
+    .solucoes-grid{grid-template-columns:1fr;}
+  }
+
   /* ---------- RESPONSIVE ---------- */
   @media (max-width:980px){
     .sobre-grid{grid-template-columns:1fr;gap:48px;}
@@ -374,6 +418,7 @@
       <a href="#sobre">Sobre</a>
       <a href="#servicos">Serviços</a>
       <a href="#expositores">Expositores</a>
+      <a href="#eventos">Eventos</a>
       <a href="#trabalhe">Trabalhe Conosco</a>
       <a href="#depoimentos">Depoimentos</a>
       <a href="/blog">Blog</a>
@@ -388,6 +433,7 @@
   <a href="#sobre">Sobre</a>
   <a href="#servicos">Serviços</a>
   <a href="#expositores">Expositores</a>
+  <a href="#eventos">Eventos</a>
   <a href="#trabalhe">Trabalhe Conosco</a>
   <a href="#depoimentos">Depoimentos</a>
   <a href="/blog">Blog</a>
@@ -456,6 +502,49 @@
   </div>
 </section>
 
+<!-- SOLUÇÕES -->
+<section class="solucoes" id="solucoes">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Como atuamos</p>
+      <h2>Soluções sob medida para cada necessidade</h2>
+      <p class="lead">Do planejamento à execução, desenvolvemos experiências completas para condomínios, espaços abertos e empresas.</p>
+    </div>
+    <div class="solucoes-grid">
+      <div class="solucao-card">
+        <div class="solucao-icone"><i class="fa-solid fa-building"></i></div>
+        <h3>Soluções para o seu Condomínio</h3>
+        <p>Desenvolvemos experiências personalizadas para o perfil e a infraestrutura do seu condomínio. Cuidamos de absolutamente tudo: da curadoria rigorosa de expositores à produção e execução completa do evento.</p>
+      </div>
+      <div class="solucao-card">
+        <div class="solucao-icone"><i class="fa-solid fa-store"></i></div>
+        <h3>Feiras e Eventos em Locais Abertos</h3>
+        <p>Organização de feiras gastronômicas, mercados artesanais e festivais ao ar livre, com infraestrutura completa e logística segura para espaços externos.</p>
+      </div>
+      <div class="solucao-card">
+        <div class="solucao-icone"><i class="fa-solid fa-party-horn"></i></div>
+        <h3>Eventos Sociais e Datas Comemorativas</h3>
+        <p>Celebrações memoráveis como aniversários, festas temáticas de Natal, Festa Junina, Dia das Mães e Dia das Crianças.</p>
+      </div>
+      <div class="solucao-card">
+        <div class="solucao-icone"><i class="fa-solid fa-bullhorn"></i></div>
+        <h3>Ações Promocionais e Inaugurações</h3>
+        <p>Lançamentos de novos espaços do condomínio, ativações de marcas parceiras e eventos de entrega de áreas comuns.</p>
+      </div>
+      <div class="solucao-card">
+        <div class="solucao-icone"><i class="fa-solid fa-mug-hot"></i></div>
+        <h3>Eventos Corporativos e Coffee Breaks</h3>
+        <p>Estrutura completa de alimentação e logística para assembleias de condomínio, reuniões estratégicas, treinamentos e workshops.</p>
+      </div>
+      <div class="solucao-card">
+        <div class="solucao-icone"><i class="fa-solid fa-heart-pulse"></i></div>
+        <h3>Programas de Bem-Estar Corporativo</h3>
+        <p>Ações focadas em qualidade de vida com workshops de saúde, atividades de integração e palestras de conscientização.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- EXPOSITORES -->
 <section class="expositores" id="expositores">
   <div class="container">
@@ -489,6 +578,31 @@
   </div>
 </section>
 
+
+<!-- PRÓXIMOS EVENTOS -->
+<section class="trabalhe" id="eventos" style="background:var(--rosa-suave);">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow" style="color:var(--vinho);">Agenda</p>
+      <h2 style="color:var(--carvao);">Próximos Eventos</h2>
+      <p class="lead" style="color:var(--cinza);">Confira os eventos que estão por vir e garanta sua participação.</p>
+    </div>
+    <div class="feiras-grid" id="eventosGrid" style="--card-bg:var(--branco);--card-border:var(--linha);--card-text:var(--carvao);">
+      <div class="feira-card" style="background:#fff;border:1px solid var(--linha);">
+        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
+        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
+        <div class="skeleton" style="height:80px;width:100%;"></div>
+      </div>
+      <div class="feira-card" style="background:#fff;border:1px solid var(--linha);">
+        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
+        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
+        <div class="skeleton" style="height:80px;width:100%;"></div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- TRABALHE CONOSCO -->
 <section class="trabalhe" id="trabalhe">
@@ -1010,12 +1124,63 @@ async function carregarFeiras(){
   }
 }
 
+/* ---------- EVENTOS (Próximos Eventos — tema claro) ---------- */
+function cardEvento(f){
+  const vagas = (f.vagas_para || '').split(',').map(v => v.trim()).filter(Boolean);
+  const vagasPills = vagas.length
+    ? `<div class="feira-vagas" style="background:rgba(84,31,81,.08);border:1px solid rgba(84,31,81,.2);"><div class="vl" style="color:var(--vinho);">Vagas para:</div><ul>${vagas.map(v => `<li style="background:rgba(84,31,81,.12);color:var(--vinho);">${escapeHtml(v)}</li>`).join('')}</ul></div>`
+    : '';
+  const obs = f.observacoes ? `<p class="feira-obs" style="color:var(--cinza);border-left:2px solid var(--dourado);">${escapeHtml(f.observacoes)}</p>` : '';
+  const infra = f.infraestrutura ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Infraestrutura</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.infraestrutura)}</div></div>` : '';
+  const taxa = f.taxa ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Taxa</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.taxa)}</div></div>` : '';
+  const org = f.organizador ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Organizador</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.organizador)}</div></div>` : '';
+  const dataFmt = f.data_evento ? new Date(f.data_evento + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const dataHora = [dataFmt, f.horario].filter(Boolean).join(' · ');
+  const whatsMsg = encodeURIComponent(`Olá, tenho interesse no evento: ${f.nome}`);
+  const whatsLink = f.whatsapp
+    ? `<a href="https://wa.me/55${f.whatsapp.replace(/\D/g,'')}?text=${whatsMsg}" target="_blank" rel="noopener" class="feira-whats"><i class="fa-brands fa-whatsapp"></i> Falar com o organizador</a>`
+    : '';
+  return `
+    <article class="feira-card" style="background:#fff;border:1px solid var(--linha);">
+      <span class="feira-badge"><i class="fa-solid fa-calendar-star"></i> Próximo Evento</span>
+      <h3 class="feira-nome" style="color:var(--carvao);">${escapeHtml(f.nome)}</h3>
+      ${f.local ? `<p class="feira-local" style="color:var(--cinza);"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(f.local)}</p>` : ''}
+      <div class="feira-info-grid">
+        ${dataHora ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Data e horário</div><div class="valor" style="color:var(--carvao);">${escapeHtml(dataHora)}</div></div>` : ''}
+        ${taxa}${infra}${org}
+      </div>
+      ${vagasPills}
+      ${obs}
+      ${whatsLink}
+    </article>
+  `;
+}
+
+async function carregarEventos(){
+  const grid = document.getElementById('eventosGrid');
+  if(!grid) return;
+  try{
+    const res = await fetch('/api/feiras');
+    if(!res.ok) throw new Error('Falha ao buscar eventos');
+    const eventos = await res.json();
+    if(!eventos.length){
+      grid.innerHTML = '<div class="feiras-empty" style="color:var(--cinza);"><i class="fa-solid fa-calendar-check" style="color:var(--vinho);"></i><p>Nenhum evento programado no momento. <a href="#contato" style="color:var(--vinho);text-decoration:underline;">Entre em contato</a> para saber das próximas datas.</p></div>';
+      return;
+    }
+    grid.innerHTML = eventos.map(cardEvento).join('');
+  }catch(err){
+    console.error(err);
+    grid.innerHTML = '<div class="feiras-empty" style="color:var(--cinza);"><i class="fa-solid fa-triangle-exclamation" style="color:var(--vinho);"></i><p>Não foi possível carregar os eventos agora.</p></div>';
+  }
+}
+
 /* Init */
 carregarServicos();
 carregarCategorias().then(carregarExpositores);
 carregarDepoimentos();
 carregarBlogHome();
 carregarFeiras();
+carregarEventos();
 </script>
 </body>
 </html>
