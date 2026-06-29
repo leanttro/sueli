@@ -390,8 +390,32 @@ tbody tr:hover td{background:#fdfafb;}
         <div class="field-group"><label>Descrição</label><textarea id="serv-descricao" placeholder="Descrição do serviço…"></textarea></div>
       </div>
       <div class="form-row">
-        <div class="field-group"><label>Ícone URL</label><input id="serv-icone" placeholder="https://…"></div>
-        <div class="field-group"><label>Foto URL</label><input id="serv-foto" placeholder="https://…"></div>
+        <div class="field-group">
+          <label>Ícone</label>
+          <div class="upload-box" id="upload-serv-icone">
+            <input type="hidden" id="serv-icone">
+            <div class="upload-area" onclick="document.getElementById('file-serv-icone').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-serv-icone" accept="image/*" style="display:none" onchange="uploadImagem(this,'serv-icone','prev-serv-icone')">
+            <img id="prev-serv-icone" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-serv-icone"></div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Foto</label>
+          <div class="upload-box" id="upload-serv-foto">
+            <input type="hidden" id="serv-foto">
+            <div class="upload-area" onclick="document.getElementById('file-serv-foto').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-serv-foto" accept="image/*" style="display:none" onchange="uploadImagem(this,'serv-foto','prev-serv-foto')">
+            <img id="prev-serv-foto" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-serv-foto"></div>
+          </div>
+        </div>
       </div>
       <div class="form-row">
         <div class="field-group"><label>Ordem</label><input id="serv-ordem" type="number" value="0" min="0"></div>
@@ -543,9 +567,8 @@ tbody tr:hover td{background:#fdfafb;}
 </div>
 
 <script>
-// ─── UPLOAD CLOUDINARY ────────────────────────────────────────
-const CLOUDINARY_CLOUD = 'dhu1cqvrb';
-const CLOUDINARY_PRESET = 'oficina_unsigned'; // crie um upload preset "unsigned" no Cloudinary
+// ─── UPLOAD IMGUR ──────────────────────────────────────────────
+const IMGUR_CLIENT_ID = '546c25a59c58ad7';
 
 async function uploadImagem(input, hiddenId, previewId) {
   const file = input.files[0];
@@ -558,20 +581,24 @@ async function uploadImagem(input, hiddenId, previewId) {
   prevEl.style.display = 'none';
 
   const fd = new FormData();
-  fd.append('file', file);
-  fd.append('upload_preset', CLOUDINARY_PRESET);
+  fd.append('image', file);
 
   try {
-    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:fd });
+    const res  = await fetch('https://api.imgur.com/3/image', {
+      method: 'POST',
+      headers: { 'Authorization': `Client-ID ${IMGUR_CLIENT_ID}` },
+      body: fd
+    });
     const data = await res.json();
-    if (data.secure_url) {
-      document.getElementById(hiddenId).value = data.secure_url;
-      prevEl.src = data.secure_url;
+    if (data.success) {
+      const url = data.data.link;
+      document.getElementById(hiddenId).value = url;
+      prevEl.src = url;
       prevEl.style.display = 'block';
       statusEl.className = 'upload-status ok';
       statusEl.textContent = '✅ Imagem enviada!';
     } else {
-      throw new Error(data.error?.message || 'Falha no upload');
+      throw new Error(data.data?.error || 'Falha no upload');
     }
   } catch(e) {
     statusEl.className = 'upload-status err';
@@ -852,6 +879,10 @@ function abrirModalServ(){
   $('modalServTit').textContent='Novo Serviço';
   ['id','titulo','slug','descricao','icone','foto'].forEach(f=>$(`serv-${f}`).value='');
   $('serv-ordem').value='0'; $('serv-ativo').checked=true;
+  ['serv-icone','serv-foto'].forEach(hid=>{
+    const prev=$(`prev-${hid}`); if(prev){prev.style.display='none';prev.src='';}
+    const stat=$(`status-${hid}`); if(stat){stat.className='upload-status';stat.textContent='';}
+  });
   abrirModal('modalServ');
 }
 function editarServico(s){
@@ -859,6 +890,8 @@ function editarServico(s){
   $('serv-id').value=s.id; $('serv-titulo').value=s.titulo||''; $('serv-slug').value=s.slug||'';
   $('serv-descricao').value=s.descricao||''; $('serv-icone').value=s.icone_url||'';
   $('serv-foto').value=s.foto_url||''; $('serv-ordem').value=s.ordem??0; $('serv-ativo').checked=!!s.ativo;
+  mostrarPreviewExistente(s.icone_url,'prev-serv-icone','status-serv-icone');
+  mostrarPreviewExistente(s.foto_url,'prev-serv-foto','status-serv-foto');
   abrirModal('modalServ');
 }
 async function salvarServico(){
