@@ -420,6 +420,7 @@
       <a href="#sobre">Sobre</a>
       <a href="#servicos">Serviços</a>
       <a href="#expositores">Expositores</a>
+      <a href="#cursos">Cursos</a>
       <a href="#eventos">Eventos</a>
       <a href="#trabalhe">Trabalhe Conosco</a>
       <a href="#depoimentos">Depoimentos</a>
@@ -435,6 +436,7 @@
   <a href="#sobre">Sobre</a>
   <a href="#servicos">Serviços</a>
   <a href="#expositores">Expositores</a>
+  <a href="#cursos">Cursos</a>
   <a href="#eventos">Eventos</a>
   <a href="#trabalhe">Trabalhe Conosco</a>
   <a href="#depoimentos">Depoimentos</a>
@@ -562,12 +564,6 @@
         </select>
         <select id="filtroRegiao" aria-label="Filtrar por região">
           <option value="">Todas as regiões</option>
-          <option value="Zona Sul">Zona Sul</option>
-          <option value="Zona Oeste">Zona Oeste</option>
-          <option value="Zona Leste">Zona Leste</option>
-          <option value="Zona Norte">Zona Norte</option>
-          <option value="ABC">ABC</option>
-          <option value="Indiferente">Indiferente</option>
         </select>
         <button class="btn btn-ghost" id="limparFiltros" type="button" style="padding:11px 18px;">Limpar</button>
       </div>
@@ -601,6 +597,35 @@
         <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
         <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
         <div class="skeleton" style="height:80px;width:100%;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURSOS EM DESTAQUE -->
+<section class="cursos" id="cursos">
+  <div class="container">
+    <div class="section-head">
+      <p class="eyebrow">Aprenda com quem entende</p>
+      <h2>Cursos em Destaque</h2>
+      <p class="lead">Quer transformar sua criatividade em renda? Conheça os cursos parceiros que selecionamos pra você.</p>
+    </div>
+    <div class="cursos-grid">
+      <div style="background:#fff;border-radius:14px;padding:32px 28px;display:flex;flex-direction:column;box-shadow:0 2px 18px rgba(0,0,0,.06);">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(193,154,57,.12);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--dourado);margin-bottom:20px;">
+          <i class="fa-solid fa-wine-bottle"></i>
+        </div>
+        <h3 style="font-size:20px;margin-bottom:10px;color:var(--vinho-escuro);">Aprenda Sobre Artesanato com Garrafas</h3>
+        <p style="color:var(--cinza);font-size:15px;line-height:1.7;margin-bottom:24px;flex:1;">Transforme garrafas de vidro em peças decorativas únicas e lucrativas — passo a passo, do básico ao avançado.</p>
+        <a href="https://go.hotmart.com/N77040485R" target="_blank" rel="noopener" class="btn btn-primary">Quero aprender <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div style="background:#fff;border-radius:14px;padding:32px 28px;display:flex;flex-direction:column;box-shadow:0 2px 18px rgba(0,0,0,.06);">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(193,154,57,.12);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--dourado);margin-bottom:20px;">
+          <i class="fa-solid fa-gifts"></i>
+        </div>
+        <h3 style="font-size:20px;margin-bottom:10px;color:var(--vinho-escuro);">Decoração para Festas</h3>
+        <p style="color:var(--cinza);font-size:15px;line-height:1.7;margin-bottom:24px;flex:1;">Técnicas profissionais de decoração de festas para começar a faturar com seus próprios eventos e clientes.</p>
+        <a href="https://go.hotmart.com/S105497375A" target="_blank" rel="noopener" class="btn btn-primary">Quero aprender <i class="fa-solid fa-arrow-right"></i></a>
       </div>
     </div>
   </div>
@@ -852,6 +877,21 @@ async function carregarCategorias(){
       const opt = document.createElement('option');
       opt.value = c.slug;
       opt.textContent = c.nome;
+      select.appendChild(opt);
+    });
+  }catch(err){ console.error(err); }
+}
+
+async function carregarRegioes(){
+  const select = document.getElementById('filtroRegiao');
+  try{
+    const res = await fetch('/api/regioes');
+    if(!res.ok) throw new Error('Falha ao buscar regiões');
+    const regioes = await res.json();
+    regioes.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = r.nome;
+      opt.textContent = r.nome;
       select.appendChild(opt);
     });
   }catch(err){ console.error(err); }
@@ -1178,6 +1218,7 @@ async function carregarEventos(){
 
 /* Init */
 carregarServicos();
+carregarRegioes();
 carregarCategorias().then(carregarExpositores);
 carregarDepoimentos();
 carregarBlogHome();
