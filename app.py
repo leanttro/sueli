@@ -242,6 +242,23 @@ def api_categorias():
         if conn: conn.close()
 
 
+@app.route('/api/regioes')
+def api_regioes():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM regioes WHERE ativo = TRUE ORDER BY ordem, nome")
+        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+        cur.close()
+        return jsonify(rows)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao buscar regiões'}), 500
+    finally:
+        if conn: conn.close()
+
+
 # ════════════════════════════════════════════════════════════
 #  API — SERVIÇOS
 # ════════════════════════════════════════════════════════════
