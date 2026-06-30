@@ -273,6 +273,8 @@
   .vamos{background:var(--vinho);color:#fff;padding:64px 0;}
   .vamos-inner{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
   @media(max-width:780px){.vamos-inner{grid-template-columns:1fr;gap:36px;}}
+  .vamos-inner--dual{gap:40px;align-items:stretch;}
+  @media(max-width:780px){.vamos-inner--dual{grid-template-columns:1fr;gap:24px;align-items:stretch;}}
   .vamos h2{font-size:clamp(26px,3.8vw,38px);color:#fff;line-height:1.2;margin-bottom:16px;}
   .vamos p{color:rgba(255,255,255,.75);font-size:15.5px;line-height:1.7;}
   .vamos-acoes{display:flex;flex-direction:column;gap:16px;margin-top:28px;}
@@ -560,12 +562,12 @@
         </select>
         <select id="filtroRegiao" aria-label="Filtrar por região">
           <option value="">Todas as regiões</option>
-          <option value="zona-sul">Zona Sul</option>
-          <option value="zona-oeste">Zona Oeste</option>
-          <option value="zona-leste">Zona Leste</option>
-          <option value="zona-norte">Zona Norte</option>
-          <option value="abc">ABC</option>
-          <option value="indiferente">Indiferente</option>
+          <option value="Zona Sul">Zona Sul</option>
+          <option value="Zona Oeste">Zona Oeste</option>
+          <option value="Zona Leste">Zona Leste</option>
+          <option value="Zona Norte">Zona Norte</option>
+          <option value="ABC">ABC</option>
+          <option value="Indiferente">Indiferente</option>
         </select>
         <button class="btn btn-ghost" id="limparFiltros" type="button" style="padding:11px 18px;">Limpar</button>
       </div>
@@ -642,7 +644,7 @@
 <!-- DUAL CTA -->
 <section class="vamos" id="cta-duplo">
   <div class="container">
-    <div class="vamos-inner" style="grid-template-columns:1fr 1fr;gap:40px;align-items:stretch;">
+    <div class="vamos-inner vamos-inner--dual">
       <div style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:40px 36px;display:flex;flex-direction:column;">
         <div style="width:54px;height:54px;border-radius:50%;background:rgba(201,212,84,.2);display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--dourado-claro);margin-bottom:22px;flex-shrink:0;">
           <i class="fa-solid fa-calendar-plus"></i>
