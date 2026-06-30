@@ -147,7 +147,7 @@ def api_expositores():
             filtros += " AND c.slug = %s"
             params.append(categoria_slug)
         if regiao:
-            filtros += " AND e.regiao = %s"
+            filtros += " AND TRIM(LOWER(e.regiao)) = TRIM(LOWER(%s))"
             params.append(regiao)
         if cidade:
             filtros += " AND e.cidade = %s"
