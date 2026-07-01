@@ -248,7 +248,16 @@ def api_regioes():
     try:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("SELECT * FROM regioes WHERE ativo = TRUE ORDER BY ordem, nome")
+        # Busca as regiões diretamente das que já estão em uso pelos
+        # expositores ativos, evitando depender de uma tabela separada
+        # que precisaria ser mantida manualmente e ficava dessincronizada
+        # com o que é cadastrado no admin.
+        cur.execute("""
+            SELECT DISTINCT TRIM(regiao) AS nome
+            FROM expositores
+            WHERE ativo = TRUE AND regiao IS NOT NULL AND TRIM(regiao) <> ''
+            ORDER BY nome
+        """)
         rows = [format_db_data(dict(r)) for r in cur.fetchall()]
         cur.close()
         return jsonify(rows)
