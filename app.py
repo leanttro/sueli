@@ -969,19 +969,20 @@ def api_admin_feira(feira_id):
 @app.route('/sitemap.xml')
 def sitemap():
     conn  = None
+    BASE_URL = 'https://www.oficinaempreendersp.com.br'
     urls  = [
-        'https://www.seudominio.com.br/',
-        'https://www.seudominio.com.br/blog',
+        f'{BASE_URL}/',
+        f'{BASE_URL}/blog',
     ]
     try:
         conn = get_db_connection()
         cur  = conn.cursor()
         cur.execute("SELECT slug FROM expositores WHERE ativo = TRUE AND slug IS NOT NULL")
         for row in cur.fetchall():
-            urls.append(f'https://www.seudominio.com.br/expositores/{row[0]}')
+            urls.append(f'{BASE_URL}/expositores/{row[0]}')
         cur.execute("SELECT slug FROM posts WHERE ativo = TRUE AND slug IS NOT NULL")
         for row in cur.fetchall():
-            urls.append(f'https://www.seudominio.com.br/blog/{row[0]}')
+            urls.append(f'{BASE_URL}/blog/{row[0]}')
         cur.close()
     except Exception as e:
         print(f"AVISO: Erro ao buscar URLs para sitemap: {e}")
