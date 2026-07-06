@@ -719,10 +719,12 @@ async function carregarDashboard(){
 }
 
 // ─── EXPOSITORES ──────────────────────────────────────────────
+let _cacheExpositores = [];
 async function carregarExpositores(){
   $('tabelaExpositores').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/expositores');
+    _cacheExpositores = data;
     if(!data.length){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-store"></i>Nenhum expositor cadastrado.</div>'; return; }
     $('tabelaExpositores').innerHTML = `<table><thead><tr>
       <th>Nome</th><th>Categoria</th><th>Plano</th><th>Região</th><th>Status</th><th>Expiração</th><th>Ações</th>
@@ -735,12 +737,16 @@ async function carregarExpositores(){
       <td>${e.bloqueado?'<span class="tag tag-red">Bloqueado</span>':e.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
       <td>${e.data_expiracao||'—'}</td>
       <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick='editarExpositor(${JSON.stringify(e)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="editarExpositorPorId(${e.id})"><i class="fa-solid fa-pen"></i></button>
         <button class="btn btn-danger btn-sm" onclick="excluirExpositor(${e.id})"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Erro ao carregar.</div>'; }
+}
+function editarExpositorPorId(id){
+  const e = _cacheExpositores.find(x=>x.id===id);
+  if(e) editarExpositor(e);
 }
 
 async function carregarOpcoesModal(){
@@ -822,22 +828,28 @@ async function excluirExpositor(id){
 }
 
 // ─── CATEGORIAS ───────────────────────────────────────────────
+let _cacheCategorias = [];
 async function carregarCategorias(){
   $('tabelaCategorias').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/categorias');
+    _cacheCategorias = data;
     if(!data.length){ $('tabelaCategorias').innerHTML = '<div class="empty"><i class="fa-solid fa-tags"></i>Nenhuma categoria.</div>'; return; }
     $('tabelaCategorias').innerHTML = `<table><thead><tr><th>Nome</th><th>Slug</th><th>Status</th><th>Ações</th></tr></thead><tbody>
     ${data.map(c=>`<tr>
       <td><b>${c.nome}</b></td><td>${c.slug}</td>
       <td>${c.ativo?'<span class="tag tag-green">Ativa</span>':'<span class="tag tag-gray">Inativa</span>'}</td>
       <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick='editarCategoria(${JSON.stringify(c)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="editarCategoriaPorId(${c.id})"><i class="fa-solid fa-pen"></i></button>
         <button class="btn btn-danger btn-sm" onclick="excluirCategoria(${c.id})"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaCategorias').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function editarCategoriaPorId(id){
+  const c = _cacheCategorias.find(x=>x.id===id);
+  if(c) editarCategoria(c);
 }
 
 function abrirModalCat(){
@@ -868,22 +880,28 @@ async function excluirCategoria(id){
 }
 
 // ─── SERVIÇOS ─────────────────────────────────────────────────
+let _cacheServicos = [];
 async function carregarServicos(){
   $('tabelaServicos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/servicos');
+    _cacheServicos = data;
     if(!data.length){ $('tabelaServicos').innerHTML = '<div class="empty"><i class="fa-solid fa-sparkles"></i>Nenhum serviço.</div>'; return; }
     $('tabelaServicos').innerHTML = `<table><thead><tr><th>Título</th><th>Slug</th><th>Ordem</th><th>Status</th><th>Ações</th></tr></thead><tbody>
     ${data.map(s=>`<tr>
       <td><b>${s.titulo}</b></td><td>${s.slug}</td><td>${s.ordem??0}</td>
       <td>${s.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
       <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick='editarServico(${JSON.stringify(s)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="editarServicoPorId(${s.id})"><i class="fa-solid fa-pen"></i></button>
         <button class="btn btn-danger btn-sm" onclick="excluirServico(${s.id})"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaServicos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function editarServicoPorId(id){
+  const s = _cacheServicos.find(x=>x.id===id);
+  if(s) editarServico(s);
 }
 function abrirModalServ(){
   $('modalServTit').textContent='Novo Serviço';
@@ -922,22 +940,28 @@ async function excluirServico(id){
 }
 
 // ─── DEPOIMENTOS ──────────────────────────────────────────────
+let _cacheDepoimentos = [];
 async function carregarDepoimentos(){
   $('tabelaDepoimentos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/depoimentos');
+    _cacheDepoimentos = data;
     if(!data.length){ $('tabelaDepoimentos').innerHTML = '<div class="empty"><i class="fa-solid fa-quote-left"></i>Nenhum depoimento.</div>'; return; }
     $('tabelaDepoimentos').innerHTML = `<table><thead><tr><th>Nome</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody>
     ${data.map(d=>`<tr>
       <td><b>${d.nome}</b></td><td>${d.cargo||'—'}</td>
       <td>${d.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
       <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick='editarDepoimento(${JSON.stringify(d)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="editarDepoimentoPorId(${d.id})"><i class="fa-solid fa-pen"></i></button>
         <button class="btn btn-danger btn-sm" onclick="excluirDepoimento(${d.id})"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaDepoimentos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function editarDepoimentoPorId(id){
+  const d = _cacheDepoimentos.find(x=>x.id===id);
+  if(d) editarDepoimento(d);
 }
 function abrirModalDep(){
   $('modalDepTit').textContent='Novo Depoimento';
@@ -971,10 +995,12 @@ async function excluirDepoimento(id){
 }
 
 // ─── FEIRAS ───────────────────────────────────────────────────
+let _cacheFeiras = [];
 async function carregarFeiras(){
   $('tabelaFeiras').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/feiras');
+    _cacheFeiras = data;
     if(!data.length){ $('tabelaFeiras').innerHTML = '<div class="empty"><i class="fa-solid fa-calendar-star"></i>Nenhuma feira cadastrada.</div>'; return; }
     $('tabelaFeiras').innerHTML = `<table><thead><tr>
       <th>Nome</th><th>Local</th><th>Data</th><th>Vagas para</th><th>Taxa</th><th>Status</th><th>Ações</th>
@@ -987,12 +1013,16 @@ async function carregarFeiras(){
       <td style="white-space:nowrap;">${f.taxa||'—'}</td>
       <td>${f.ativo?'<span class="tag tag-green">Ativa</span>':'<span class="tag tag-gray">Inativa</span>'}</td>
       <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick='editarFeira(${JSON.stringify(f)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="editarFeiraPorId(${f.id})"><i class="fa-solid fa-pen"></i></button>
         <button class="btn btn-danger btn-sm" onclick="excluirFeira(${f.id})"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaFeiras').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Erro ao carregar.</div>'; }
+}
+function editarFeiraPorId(id){
+  const f = _cacheFeiras.find(x=>x.id===id);
+  if(f) editarFeira(f);
 }
 
 function abrirModalFeira(){
@@ -1060,10 +1090,12 @@ async function excluirFeira(id){
 }
 
 // ─── BLOG ─────────────────────────────────────────────────────
+let _cacheBlog = [];
 async function carregarBlog(){
   $('tabelaBlog').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/blog');
+    _cacheBlog = data;
     if(!data.length){ $('tabelaBlog').innerHTML = '<div class="empty"><i class="fa-solid fa-newspaper"></i>Nenhum post.</div>'; return; }
     $('tabelaBlog').innerHTML = `<table><thead><tr><th>Título</th><th>Autor</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead><tbody>
     ${data.map(p=>`<tr>
@@ -1071,12 +1103,16 @@ async function carregarBlog(){
       <td>${p.ativo?'<span class="tag tag-green">Publicado</span>':'<span class="tag tag-gray">Rascunho</span>'}</td>
       <td><div class="td-acoes">
         <a class="btn btn-ghost btn-sm" href="/blog/${p.slug}" target="_blank"><i class="fa-solid fa-eye"></i></a>
-        <button class="btn btn-ghost btn-sm" onclick='editarPost(${JSON.stringify(p)})'><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-ghost btn-sm" onclick="editarPostPorId(${p.id})"><i class="fa-solid fa-pen"></i></button>
         <button class="btn btn-danger btn-sm" onclick="excluirPost(${p.id})"><i class="fa-solid fa-trash"></i></button>
       </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaBlog').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function editarPostPorId(id){
+  const p = _cacheBlog.find(x=>x.id===id);
+  if(p) editarPost(p);
 }
 function abrirModalBlog(){
   $('modalBlogTit').textContent='Novo Post';
