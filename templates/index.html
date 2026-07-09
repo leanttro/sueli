@@ -961,7 +961,7 @@ async function carregarRegioes(){
 /* ---------- EXPOSITORES ---------- */
 function cardExpositor(exp){
   const bloqueado = exp.bloqueado;
-  const foto = exp.foto_url || 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?q=80&w=600&auto=format&fit=crop';
+  const foto = exp.foto_url || 'https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png';
   const regiaoBloco = bloqueado
     ? `<p class="exp-regiao lock-msg"><i class="fa-solid fa-lock"></i> Entre em contato para obter as informações</p>`
     : `<p class="exp-regiao"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(exp.regiao || exp.cidade || 'São Paulo')}</p>`;
