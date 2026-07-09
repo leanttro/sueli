@@ -8,8 +8,13 @@ import datetime
 import traceback
 import decimal
 import bcrypt
+import requests
 
 load_dotenv()
+
+# ── Config do Chat IA (Groq) ──────────────────────────────────
+GROQ_API_KEYS = [k for k in [os.getenv('GROQ_API_KEY_1'), os.getenv('GROQ_API_KEY_2')] if k]
+GROQ_LIMITE_MENSAGENS = 1000
 
 app = Flask(__name__, static_folder='.', static_url_path='', template_folder='templates')
 app.secret_key = os.getenv('SECRET_KEY', 'eventos-secret-key-2025')
@@ -46,6 +51,167 @@ def login_required(f):
             return redirect('/admin/login')
         return f(*args, **kwargs)
     return decorated
+
+# ── IA / Chatbot — criação de tabelas (idempotente) ───────────
+def init_ia_tables():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS ia_config (
+                id SERIAL PRIMARY KEY,
+                persona_nome TEXT DEFAULT 'Assistente',
+                modelo TEXT DEFAULT 'llama-3.1-8b-instant',
+                prompt_sistema TEXT DEFAULT '',
+                temperatura NUMERIC(3,2) DEFAULT 0.7,
+                ativo BOOLEAN DEFAULT TRUE
+            )
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS ia_produtos (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                preco TEXT DEFAULT '',
+                descricao TEXT DEFAULT '',
+                ordem INTEGER DEFAULT 0
+            )
+        """)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS ia_uso (
+                id INTEGER PRIMARY KEY DEFAULT 1,
+                total_mensagens INTEGER DEFAULT 0
+            )
+        """)
+        cur.execute("SELECT COUNT(*) FROM ia_config")
+        if cur.fetchone()[0] == 0:
+            cur.execute("INSERT INTO ia_config (persona_nome, modelo, prompt_sistema, temperatura, ativo) VALUES (%s,%s,%s,%s,%s)",
+                        ('Assistente', 'llama-3.1-8b-instant', 'Você é um assistente de vendas simpático e direto.', 0.7, True))
+        cur.execute("SELECT COUNT(*) FROM ia_uso")
+        if cur.fetchone()[0] == 0:
+            cur.execute("INSERT INTO ia_uso (id, total_mensagens) VALUES (1, 0)")
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        traceback.print_exc()
+    finally:
+        if conn: conn.close()
+
+init_ia_tables()
+
+
+# ── IA / Chatbot — helpers ────────────────────────────────────
+def get_ia_config():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM ia_config ORDER BY id LIMIT 1")
+        row = cur.fetchone()
+        cur.close()
+        return format_db_data(dict(row)) if row else None
+    finally:
+        if conn: conn.close()
+
+
+def get_ia_produtos():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM ia_produtos ORDER BY ordem, id")
+        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+        cur.close()
+        return rows
+    finally:
+        if conn: conn.close()
+
+
+def get_contador():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT total_mensagens FROM ia_uso WHERE id = 1")
+        row = cur.fetchone()
+        cur.close()
+        return row['total_mensagens'] if row else 0
+    finally:
+        if conn: conn.close()
+
+
+def incrementar_contador():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("UPDATE ia_uso SET total_mensagens = total_mensagens + 1 WHERE id = 1")
+        conn.commit()
+        cur.close()
+    finally:
+        if conn: conn.close()
+
+
+def montar_system_prompt(config, produtos):
+    partes = []
+    persona = config.get('persona_nome') or 'Assistente'
+    partes.append(f"Você é {persona}, um assistente de vendas virtual.")
+    prompt_base = config.get('prompt_sistema') or ''
+    if prompt_base:
+        partes.append(prompt_base)
+    if produtos:
+        partes.append("\nProdutos/serviços disponíveis para oferecer durante a conversa:")
+        for p in produtos:
+            linha = f"- {p.get('nome')}"
+            if p.get('preco'):
+                linha += f" | Preço: {p.get('preco')}"
+            if p.get('descricao'):
+                linha += f" | {p.get('descricao')}"
+            partes.append(linha)
+        partes.append("\nUse essas informações para conduzir a conversa de forma natural e induzir a pessoa a comprar, sem ser insistente ou repetitivo.")
+    return "\n".join(partes)
+
+
+def chamar_groq(mensagens, config):
+    """Tenta a 1ª chave Groq; se falhar, tenta a 2ª. Levanta exceção se ambas falharem."""
+    if not GROQ_API_KEYS:
+        raise RuntimeError('Nenhuma chave GROQ configurada no ambiente')
+
+    modelo = config.get('modelo') or 'llama-3.1-8b-instant'
+    try:
+        temperatura = float(config.get('temperatura') or 0.7)
+    except (TypeError, ValueError):
+        temperatura = 0.7
+
+    ultimo_erro = None
+    for chave in GROQ_API_KEYS:
+        try:
+            resp = requests.post(
+                'https://api.groq.com/openai/v1/chat/completions',
+                headers={
+                    'Authorization': f'Bearer {chave}',
+                    'Content-Type': 'application/json'
+                },
+                json={
+                    'model': modelo,
+                    'messages': mensagens,
+                    'temperature': temperatura,
+                    'max_tokens': 1024
+                },
+                timeout=30
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                return data['choices'][0]['message']['content']
+            else:
+                ultimo_erro = f"Groq respondeu {resp.status_code}: {resp.text[:200]}"
+                continue
+        except Exception as e:
+            ultimo_erro = str(e)
+            continue
+
+    raise RuntimeError(ultimo_erro or 'Falha ao chamar Groq')
+
 
 # ── Verifica se expositor tem infos bloqueadas ───────────────
 def expositor_bloqueado(expositor):
@@ -960,6 +1126,200 @@ def api_admin_feira(feira_id):
         return jsonify({'error': str(e)}), 500
     finally:
         if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
+#  API ADMIN — CONFIGURAR IA (persona, modelo, prompt, temperatura)
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/admin/ia/config', methods=['GET', 'POST'])
+@login_required
+def api_admin_ia_config():
+    conn = None
+    try:
+        if request.method == 'GET':
+            return jsonify(get_ia_config() or {})
+
+        data = request.get_json()
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE ia_config SET persona_nome=%s, modelo=%s, prompt_sistema=%s,
+                temperatura=%s, ativo=%s
+            WHERE id = (SELECT id FROM ia_config ORDER BY id LIMIT 1)
+        """, (
+            data.get('persona_nome', 'Assistente'),
+            data.get('modelo', 'llama-3.1-8b-instant'),
+            data.get('prompt_sistema', ''),
+            data.get('temperatura', 0.7),
+            data.get('ativo', True)
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
+#  API ADMIN — PRODUTOS DA IA
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/admin/ia/produtos', methods=['GET', 'POST'])
+@login_required
+def api_admin_ia_produtos():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        if request.method == 'GET':
+            cur.execute("SELECT * FROM ia_produtos ORDER BY ordem, id")
+            rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+            cur.close()
+            return jsonify(rows)
+
+        data = request.get_json()
+        cur.execute("""
+            INSERT INTO ia_produtos (nome, preco, descricao, ordem)
+            VALUES (%s,%s,%s,%s) RETURNING id
+        """, (
+            data.get('nome', ''), data.get('preco', ''),
+            data.get('descricao', ''), data.get('ordem', 0)
+        ))
+        new_id = cur.fetchone()['id']
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True, 'id': new_id})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/ia/produtos/<int:prod_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_admin_ia_produto(prod_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        if request.method == 'DELETE':
+            cur.execute("DELETE FROM ia_produtos WHERE id = %s", (prod_id,))
+            conn.commit()
+            cur.close()
+            return jsonify({'ok': True})
+
+        data = request.get_json()
+        cur.execute("""
+            UPDATE ia_produtos SET nome=%s, preco=%s, descricao=%s, ordem=%s
+            WHERE id=%s
+        """, (
+            data.get('nome', ''), data.get('preco', ''),
+            data.get('descricao', ''), data.get('ordem', 0), prod_id
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
+#  API ADMIN — CONTADOR DE MENSAGENS DA IA
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/admin/ia/contador', methods=['GET'])
+@login_required
+def api_admin_ia_contador():
+    usado = get_contador()
+    return jsonify({
+        'usado': usado,
+        'limite': GROQ_LIMITE_MENSAGENS,
+        'restante': max(0, GROQ_LIMITE_MENSAGENS - usado),
+        'chaves_configuradas': len(GROQ_API_KEYS)
+    })
+
+
+@app.route('/api/admin/ia/contador/resetar', methods=['POST'])
+@login_required
+def api_admin_ia_contador_resetar():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("UPDATE ia_uso SET total_mensagens = 0 WHERE id = 1")
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
+#  API PÚBLICA — CHAT (widget do site)
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/chat', methods=['POST'])
+def api_chat():
+    try:
+        data = request.get_json() or {}
+        historico = data.get('mensagens', [])
+        if not isinstance(historico, list) or not historico:
+            return jsonify({'error': 'Mensagem vazia'}), 400
+
+        # Limita histórico enviado (evita prompt gigante)
+        historico = historico[-20:]
+
+        usado = get_contador()
+        if usado >= GROQ_LIMITE_MENSAGENS:
+            return jsonify({
+                'error': 'indisponivel',
+                'reply': 'No momento o assistente está indisponível. Fale com a gente pelo WhatsApp!'
+            }), 200
+
+        config = get_ia_config()
+        if not config or not config.get('ativo', True):
+            return jsonify({
+                'error': 'indisponivel',
+                'reply': 'No momento o assistente está indisponível. Fale com a gente pelo WhatsApp!'
+            }), 200
+
+        produtos = get_ia_produtos()
+        system_prompt = montar_system_prompt(config, produtos)
+
+        mensagens_groq = [{'role': 'system', 'content': system_prompt}]
+        for m in historico:
+            papel = m.get('role')
+            conteudo = m.get('content', '')
+            if papel in ('user', 'assistant') and conteudo:
+                mensagens_groq.append({'role': papel, 'content': conteudo})
+
+        try:
+            resposta = chamar_groq(mensagens_groq, config)
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({
+                'error': 'indisponivel',
+                'reply': 'No momento o assistente está indisponível. Fale com a gente pelo WhatsApp!'
+            }), 200
+
+        incrementar_contador()
+        return jsonify({'reply': resposta})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'Erro interno'}), 500
 
 
 # ════════════════════════════════════════════════════════════
