@@ -289,7 +289,7 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="section-header"><h2>Configurar IA</h2></div>
 
     <!-- Contador de uso -->
-    <div class="dash-cards" style="grid-template-columns:repeat(4,1fr);margin-bottom:22px;">
+    <div class="dash-cards" style="grid-template-columns:repeat(2,1fr);margin-bottom:22px;">
       <div class="dash-card">
         <div class="val" id="ia-c-usado">—</div>
         <div class="lbl">Mensagens usadas</div>
@@ -299,14 +299,6 @@ tbody tr:hover td{background:#fdfafb;}
         <div class="val" id="ia-c-restante">—</div>
         <div class="lbl">Restantes (limite 1000)</div>
         <div class="ico"><i class="fa-solid fa-gauge-high"></i></div>
-      </div>
-      <div class="dash-card">
-        <div class="val" id="ia-c-chaves">—</div>
-        <div class="lbl">Chaves Groq configuradas</div>
-        <div class="ico"><i class="fa-solid fa-key"></i></div>
-      </div>
-      <div class="dash-card" style="display:flex;align-items:center;justify-content:center;">
-        <button class="btn btn-ghost" onclick="resetarContadorIA()"><i class="fa-solid fa-rotate-left"></i> Resetar contador</button>
       </div>
     </div>
 
@@ -1339,16 +1331,9 @@ async function carregarIAContador(){
     const d = await api('/api/admin/ia/contador');
     $('ia-c-usado').textContent = d.usado;
     $('ia-c-restante').textContent = d.restante;
-    $('ia-c-chaves').textContent = d.chaves_configuradas;
   }catch(e){
-    $('ia-c-usado').textContent = '—'; $('ia-c-restante').textContent = '—'; $('ia-c-chaves').textContent = '—';
+    $('ia-c-usado').textContent = '—'; $('ia-c-restante').textContent = '—';
   }
-}
-
-async function resetarContadorIA(){
-  if(!confirmar('Zerar o contador de mensagens da IA?')) return;
-  try{ await api('/api/admin/ia/contador/resetar','POST'); toast('Contador zerado!'); carregarIAContador(); }
-  catch(e){ toast('Erro.','error'); }
 }
 
 async function carregarIAProdutos(){
