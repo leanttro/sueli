@@ -54,11 +54,37 @@
   #ia-chat-bubble.hidden{display:none;}
 
   #ia-chat-window{
-    position:fixed;right:22px;bottom:22px;width:360px;max-width:92vw;height:520px;max-height:78vh;
+    position:fixed;right:22px;bottom:22px;width:340px;max-width:90vw;height:480px;max-height:72vh;
     background:#fff;border-radius:14px;box-shadow:0 24px 60px -16px rgba(43,31,38,.4);
     z-index:9999;display:flex;flex-direction:column;overflow:hidden;font-family:'Inter',sans-serif;
   }
   #ia-chat-window.hidden{display:none;}
+
+  /* ── Caixinha "teaser" (estado médio, fechado) ─────────── */
+  #ia-chat-teaser{
+    position:fixed;right:22px;bottom:94px;width:280px;max-width:86vw;
+    background:#fff;border-radius:14px;box-shadow:0 20px 50px -16px rgba(43,31,38,.35);
+    z-index:9998;overflow:hidden;font-family:'Inter',sans-serif;cursor:pointer;
+    animation:iaTeaserIn .35s ease;
+  }
+  #ia-chat-teaser.hidden{display:none;}
+  @keyframes iaTeaserIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .ia-teaser-header{
+    background:linear-gradient(135deg,var(--vinho),var(--vinho-escuro));color:#fff;
+    padding:14px 14px;display:flex;align-items:center;gap:10px;
+  }
+  .ia-teaser-header .ia-avatar{
+    width:34px;height:34px;border-radius:50%;background:var(--dourado);color:var(--vinho-escuro);
+    display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;
+  }
+  .ia-teaser-header .ia-info{flex:1;min-width:0;}
+  .ia-teaser-header .ia-info strong{display:block;font-size:13.5px;line-height:1.25;}
+  .ia-teaser-header .ia-info span{font-size:11px;opacity:.8;display:flex;align-items:center;gap:5px;}
+  .ia-teaser-header .ia-info span::before{content:'';width:6px;height:6px;border-radius:50%;background:#5fd97a;display:inline-block;}
+  .ia-teaser-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:24px;height:24px;border-radius:50%;
+    cursor:pointer;flex-shrink:0;font-size:11px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+  .ia-teaser-close:hover{background:rgba(255,255,255,.3);}
+  .ia-teaser-body{padding:12px 14px 16px;font-size:13px;line-height:1.5;color:var(--carvao);}
   .ia-chat-header{
     background:linear-gradient(135deg,var(--vinho),var(--vinho-escuro));color:#fff;
     padding:16px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;
@@ -92,16 +118,20 @@
   .ia-chat-footer button:disabled{opacity:.5;cursor:default;}
 
   @media(max-width:480px){
-    #ia-chat-window{right:10px;bottom:10px;width:calc(100vw - 20px);height:calc(100vh - 100px);}
+    #ia-chat-window{right:10px;bottom:10px;width:calc(100vw - 20px);height:min(560px, calc(100vh - 140px));}
     #ia-chat-bubble{right:16px;bottom:16px;}
+    #ia-chat-teaser{right:10px;bottom:84px;width:calc(100vw - 20px);max-width:none;}
   }
-  html{scroll-behavior:smooth;}
+  html{scroll-behavior:smooth;overflow-x:hidden;max-width:100%;}
   body{
     margin:0;
     font-family:'Inter',sans-serif;
     color:var(--carvao);
     background:var(--creme);
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+    max-width:100%;
+    overscroll-behavior-x:none;
   }
   h1,h2,h3,h4{font-family:'Inter',sans-serif; margin:0; font-weight:700; letter-spacing:-.3px;}
   p{margin:0;}
@@ -1291,6 +1321,18 @@ carregarEventos();
   <i class="fa-solid fa-comment-dots"></i>
 </button>
 
+<div id="ia-chat-teaser" class="hidden" onclick="iaAbrirChat()">
+  <div class="ia-teaser-header">
+    <div class="ia-avatar"><i class="fa-solid fa-robot"></i></div>
+    <div class="ia-info">
+      <strong>Fale com a gente</strong>
+      <span>Online agora</span>
+    </div>
+    <button class="ia-teaser-close" onclick="event.stopPropagation(); iaFecharTeaser();" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="ia-teaser-body">Tem dúvidas sobre nossas feiras e eventos? Fale com a gente agora! 👋</div>
+</div>
+
 <div id="ia-chat-window">
   <div class="ia-chat-header">
     <div class="ia-avatar"><i class="fa-solid fa-robot"></i></div>
@@ -1311,9 +1353,10 @@ carregarEventos();
 // ── WIDGET DE CHAT IA ────────────────────────────────────────
 (function(){
   const STORAGE_KEY = 'ia_chat_historico_v1';
-  const STATE_KEY = 'ia_chat_estado_v1'; // 'aberto' | 'fechado'
+  const STATE_KEY = 'ia_chat_estado_v1'; // 'aberto' | 'icone' | 'teaser'
 
   const bubble = document.getElementById('ia-chat-bubble');
+  const teaser = document.getElementById('ia-chat-teaser');
   const win = document.getElementById('ia-chat-window');
   const body = document.getElementById('ia-chat-body');
   const input = document.getElementById('ia-chat-input');
@@ -1365,13 +1408,21 @@ carregarEventos();
   window.iaAbrirChat = function(){
     win.classList.remove('hidden');
     bubble.classList.add('hidden');
+    teaser.classList.add('hidden');
     try{ sessionStorage.setItem(STATE_KEY, 'aberto'); }catch(e){}
     setTimeout(()=>input.focus(), 150);
   };
   window.iaFecharChat = function(){
     win.classList.add('hidden');
+    teaser.classList.add('hidden');
     bubble.classList.remove('hidden');
-    try{ sessionStorage.setItem(STATE_KEY, 'fechado'); }catch(e){}
+    try{ sessionStorage.setItem(STATE_KEY, 'icone'); }catch(e){}
+  };
+  window.iaFecharTeaser = function(){
+    teaser.classList.add('hidden');
+    win.classList.add('hidden');
+    bubble.classList.remove('hidden');
+    try{ sessionStorage.setItem(STATE_KEY, 'icone'); }catch(e){}
   };
 
   window.iaEnviarMensagem = async function(){
@@ -1414,12 +1465,19 @@ carregarEventos();
   renderHistorico();
   let estadoSalvo = null;
   try{ estadoSalvo = sessionStorage.getItem(STATE_KEY); }catch(e){}
-  if(estadoSalvo === 'fechado'){
+  if(estadoSalvo === 'aberto'){
+    win.classList.remove('hidden');
+    teaser.classList.add('hidden');
+    bubble.classList.add('hidden');
+  } else if(estadoSalvo === 'icone'){
     win.classList.add('hidden');
+    teaser.classList.add('hidden');
     bubble.classList.remove('hidden');
   } else {
-    win.classList.remove('hidden');
+    // primeiro acesso da sessão: mostra a caixinha "teaser" (estado médio)
+    win.classList.add('hidden');
     bubble.classList.add('hidden');
+    teaser.classList.remove('hidden');
   }
 })();
 </script>
