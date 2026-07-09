@@ -100,6 +100,27 @@ def init_ia_tables():
 init_ia_tables()
 
 
+# ── Visibilidade de campos — colunas novas (idempotente) ──────
+def init_visibilidade_columns():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        # Padrão por PLANO: se o plano libera ou não cada campo
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_foto BOOLEAN DEFAULT TRUE")
+        # Exceção por EXPOSITOR: NULL = usa o padrão do plano, TRUE = força mostrar, FALSE = força esconder
+        for col in ('overr_foto', 'overr_whatsapp', 'overr_instagram', 'overr_site', 'overr_regiao'):
+            cur.execute(f"ALTER TABLE expositores ADD COLUMN IF NOT EXISTS {col} BOOLEAN")
+        conn.commit()
+        cur.close()
+    except Exception as e:
+        traceback.print_exc()
+    finally:
+        if conn: conn.close()
+
+init_visibilidade_columns()
+
+
 # ── IA / Chatbot — helpers ────────────────────────────────────
 def get_ia_config():
     conn = None
@@ -300,6 +321,36 @@ def expositor_bloqueado(expositor):
     return False
 
 
+def aplicar_visibilidade(exp):
+    """Aplica as regras de visibilidade: exceção do expositor > padrão do plano > mostra por padrão."""
+    def decide(campo_override, campo_exibe_plano):
+        override = exp.get(campo_override)
+        if override is not None:
+            return bool(override)
+        val = exp.get(campo_exibe_plano)
+        return True if val is None else bool(val)
+
+    if not decide('overr_foto', 'exibe_foto'):
+        exp['foto_url'] = None
+    if not decide('overr_whatsapp', 'exibe_whatsapp'):
+        exp['whatsapp'] = None
+    if not decide('overr_instagram', 'exibe_instagram'):
+        exp['instagram'] = None
+    if not decide('overr_site', 'exibe_site'):
+        exp['site_url'] = None
+    if not decide('overr_regiao', 'exibe_regiao'):
+        exp['regiao'] = None
+
+    # Se estiver bloqueado (trial expirado), esconde os contatos independente de tudo
+    if expositor_bloqueado(exp):
+        exp['whatsapp']  = None
+        exp['instagram'] = None
+        exp['site_url']  = None
+        exp['regiao']    = None
+
+    return exp
+
+
 # ════════════════════════════════════════════════════════════
 #  ROTAS DE PÁGINAS HTML
 # ════════════════════════════════════════════════════════════
@@ -316,7 +367,7 @@ def expositor_detalhe(slug):
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute("""
             SELECT e.*, c.nome as categoria_nome, c.slug as categoria_slug,
-                   p.nome as plano_nome, p.exibe_whatsapp, p.exibe_instagram,
+                   p.nome as plano_nome, p.exibe_whatsapp, p.exibe_instagram, p.exibe_foto,
                    p.exibe_regiao, p.exibe_site
             FROM expositores e
             LEFT JOIN categorias c ON e.categoria_id = c.id
@@ -329,6 +380,7 @@ def expositor_detalhe(slug):
             return "Expositor não encontrado", 404
         expositor = format_db_data(dict(expositor))
         bloqueado = expositor_bloqueado(expositor)
+        expositor = aplicar_visibilidade(expositor)
         return render_template('expositor-detalhe.html', expositor=expositor, bloqueado=bloqueado)
     except Exception as e:
         traceback.print_exc()
@@ -389,7 +441,7 @@ def api_expositores():
 
         cur.execute(f"""
             SELECT e.*, c.nome as categoria_nome, c.slug as categoria_slug,
-                   p.nome as plano_nome, p.exibe_whatsapp, p.exibe_instagram,
+                   p.nome as plano_nome, p.exibe_whatsapp, p.exibe_instagram, p.exibe_foto,
                    p.exibe_regiao, p.exibe_site
             FROM expositores e
             LEFT JOIN categorias c ON e.categoria_id = c.id
@@ -402,12 +454,7 @@ def api_expositores():
         for r in cur.fetchall():
             exp = format_db_data(dict(r))
             bloqueado = expositor_bloqueado(exp)
-            # Se bloqueado, oculta as infos de contato
-            if bloqueado:
-                exp['whatsapp']  = None
-                exp['instagram'] = None
-                exp['site_url']  = None
-                exp['regiao']    = None
+            exp = aplicar_visibilidade(exp)
             exp['bloqueado'] = bloqueado
             rows.append(exp)
 
@@ -428,7 +475,7 @@ def api_expositor(slug):
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute("""
             SELECT e.*, c.nome as categoria_nome, c.slug as categoria_slug,
-                   p.nome as plano_nome, p.exibe_whatsapp, p.exibe_instagram,
+                   p.nome as plano_nome, p.exibe_whatsapp, p.exibe_instagram, p.exibe_foto,
                    p.exibe_regiao, p.exibe_site
             FROM expositores e
             LEFT JOIN categorias c ON e.categoria_id = c.id
@@ -441,11 +488,7 @@ def api_expositor(slug):
             return jsonify({'error': 'Não encontrado'}), 404
         exp = format_db_data(dict(exp))
         bloqueado = expositor_bloqueado(exp)
-        if bloqueado:
-            exp['whatsapp']  = None
-            exp['instagram'] = None
-            exp['site_url']  = None
-            exp['regiao']    = None
+        exp = aplicar_visibilidade(exp)
         exp['bloqueado'] = bloqueado
         return jsonify(exp)
     except Exception as e:
@@ -665,8 +708,9 @@ def api_admin_expositores():
         data = request.get_json()
         cur.execute("""
             INSERT INTO expositores (nome, slug, categoria_id, plano_id, descricao, foto_url,
-                regiao, cidade, whatsapp, instagram, site_url, ativo, destaque, data_expiracao)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                regiao, cidade, whatsapp, instagram, site_url, ativo, destaque, data_expiracao,
+                overr_foto, overr_whatsapp, overr_instagram, overr_site, overr_regiao)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
         """, (
             data.get('nome',''), data.get('slug',''),
@@ -676,7 +720,9 @@ def api_admin_expositores():
             data.get('whatsapp',''), data.get('instagram',''),
             data.get('site_url',''),
             data.get('ativo', True), data.get('destaque', False),
-            data.get('data_expiracao') or None
+            data.get('data_expiracao') or None,
+            data.get('overr_foto'), data.get('overr_whatsapp'),
+            data.get('overr_instagram'), data.get('overr_site'), data.get('overr_regiao')
         ))
         new_id = cur.fetchone()['id']
         conn.commit()
@@ -708,7 +754,8 @@ def api_admin_expositor(exp_id):
             UPDATE expositores SET
                 nome=%s, slug=%s, categoria_id=%s, plano_id=%s, descricao=%s,
                 foto_url=%s, regiao=%s, cidade=%s, whatsapp=%s, instagram=%s,
-                site_url=%s, ativo=%s, destaque=%s, data_expiracao=%s
+                site_url=%s, ativo=%s, destaque=%s, data_expiracao=%s,
+                overr_foto=%s, overr_whatsapp=%s, overr_instagram=%s, overr_site=%s, overr_regiao=%s
             WHERE id=%s
         """, (
             data.get('nome',''), data.get('slug',''),
@@ -719,6 +766,8 @@ def api_admin_expositor(exp_id):
             data.get('site_url',''),
             data.get('ativo', True), data.get('destaque', False),
             data.get('data_expiracao') or None,
+            data.get('overr_foto'), data.get('overr_whatsapp'),
+            data.get('overr_instagram'), data.get('overr_site'), data.get('overr_regiao'),
             exp_id
         ))
         conn.commit()
@@ -1082,6 +1131,34 @@ def api_admin_planos():
         rows = [format_db_data(dict(r)) for r in cur.fetchall()]
         cur.close()
         return jsonify(rows)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/planos/<int:plano_id>/visibilidade', methods=['PUT'])
+@login_required
+def api_admin_plano_visibilidade(plano_id):
+    conn = None
+    try:
+        data = request.get_json()
+        conn = get_db_connection()
+        cur  = conn.cursor()
+        cur.execute("""
+            UPDATE planos SET
+                exibe_foto=%s, exibe_whatsapp=%s, exibe_instagram=%s,
+                exibe_site=%s, exibe_regiao=%s
+            WHERE id=%s
+        """, (
+            data.get('exibe_foto', True), data.get('exibe_whatsapp', True),
+            data.get('exibe_instagram', True), data.get('exibe_site', True),
+            data.get('exibe_regiao', True), plano_id
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
