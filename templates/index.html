@@ -42,6 +42,59 @@
     --raio: 4px;
   }
   *{box-sizing:border-box;}
+
+  /* ── CHAT WIDGET IA ─────────────────────────────────────── */
+  #ia-chat-bubble{
+    position:fixed;right:22px;bottom:22px;width:60px;height:60px;border-radius:50%;
+    background:var(--vinho);color:#fff;border:none;cursor:pointer;z-index:9998;
+    box-shadow:0 10px 30px -8px rgba(84,31,81,.55);display:flex;align-items:center;justify-content:center;
+    font-size:24px;transition:transform .2s;
+  }
+  #ia-chat-bubble:hover{transform:scale(1.08);}
+  #ia-chat-bubble.hidden{display:none;}
+
+  #ia-chat-window{
+    position:fixed;right:22px;bottom:22px;width:360px;max-width:92vw;height:520px;max-height:78vh;
+    background:#fff;border-radius:14px;box-shadow:0 24px 60px -16px rgba(43,31,38,.4);
+    z-index:9999;display:flex;flex-direction:column;overflow:hidden;font-family:'Inter',sans-serif;
+  }
+  #ia-chat-window.hidden{display:none;}
+  .ia-chat-header{
+    background:linear-gradient(135deg,var(--vinho),var(--vinho-escuro));color:#fff;
+    padding:16px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;
+  }
+  .ia-chat-header .ia-avatar{
+    width:38px;height:38px;border-radius:50%;background:var(--dourado);color:var(--vinho-escuro);
+    display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;
+  }
+  .ia-chat-header .ia-info{flex:1;min-width:0;}
+  .ia-chat-header .ia-info strong{display:block;font-size:14.5px;line-height:1.25;}
+  .ia-chat-header .ia-info span{font-size:11.5px;opacity:.8;display:flex;align-items:center;gap:5px;}
+  .ia-chat-header .ia-info span::before{content:'';width:7px;height:7px;border-radius:50%;background:#5fd97a;display:inline-block;}
+  .ia-chat-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;
+    cursor:pointer;flex-shrink:0;font-size:13px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+  .ia-chat-close:hover{background:rgba(255,255,255,.3);}
+
+  .ia-chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--rosa-suave);}
+  .ia-msg{max-width:82%;padding:9px 13px;border-radius:14px;font-size:13.5px;line-height:1.45;word-wrap:break-word;white-space:pre-wrap;}
+  .ia-msg.bot{background:#fff;color:var(--carvao);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+  .ia-msg.user{background:var(--vinho);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .ia-typing{align-self:flex-start;background:#fff;padding:10px 14px;border-radius:14px;border-bottom-left-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;gap:4px;}
+  .ia-typing span{width:6px;height:6px;background:var(--cinza);border-radius:50%;animation:iaBlink 1.2s infinite ease-in-out;}
+  .ia-typing span:nth-child(2){animation-delay:.2s;}
+  .ia-typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes iaBlink{0%,80%,100%{opacity:.3;}40%{opacity:1;}}
+
+  .ia-chat-footer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--linha);background:#fff;flex-shrink:0;}
+  .ia-chat-footer input{flex:1;border:1px solid var(--linha);border-radius:20px;padding:10px 16px;font-size:13.5px;outline:none;font-family:inherit;}
+  .ia-chat-footer input:focus{border-color:var(--vinho);}
+  .ia-chat-footer button{width:38px;height:38px;border-radius:50%;background:var(--vinho);color:#fff;border:none;cursor:pointer;flex-shrink:0;font-size:14px;}
+  .ia-chat-footer button:disabled{opacity:.5;cursor:default;}
+
+  @media(max-width:480px){
+    #ia-chat-window{right:10px;bottom:10px;width:calc(100vw - 20px);height:calc(100vh - 100px);}
+    #ia-chat-bubble{right:16px;bottom:16px;}
+  }
   html{scroll-behavior:smooth;}
   body{
     margin:0;
@@ -1233,5 +1286,143 @@ carregarBlogHome();
 carregarFeiras();
 carregarEventos();
 </script>
+<!-- ── WIDGET DE CHAT IA ─────────────────────────────────── -->
+<button id="ia-chat-bubble" class="hidden" onclick="iaAbrirChat()" aria-label="Abrir chat">
+  <i class="fa-solid fa-comment-dots"></i>
+</button>
+
+<div id="ia-chat-window">
+  <div class="ia-chat-header">
+    <div class="ia-avatar"><i class="fa-solid fa-robot"></i></div>
+    <div class="ia-info">
+      <strong>Fale com a gente</strong>
+      <span>Online agora</span>
+    </div>
+    <button class="ia-chat-close" onclick="iaFecharChat()" aria-label="Fechar chat"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="ia-chat-body" id="ia-chat-body"></div>
+  <div class="ia-chat-footer">
+    <input id="ia-chat-input" type="text" placeholder="Digite sua mensagem…" maxlength="500" onkeydown="if(event.key==='Enter') iaEnviarMensagem();">
+    <button id="ia-chat-send" onclick="iaEnviarMensagem()" aria-label="Enviar"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<script>
+// ── WIDGET DE CHAT IA ────────────────────────────────────────
+(function(){
+  const STORAGE_KEY = 'ia_chat_historico_v1';
+  const STATE_KEY = 'ia_chat_estado_v1'; // 'aberto' | 'fechado'
+
+  const bubble = document.getElementById('ia-chat-bubble');
+  const win = document.getElementById('ia-chat-window');
+  const body = document.getElementById('ia-chat-body');
+  const input = document.getElementById('ia-chat-input');
+  const sendBtn = document.getElementById('ia-chat-send');
+
+  let historico = [];
+  let bloqueado = false;
+
+  function carregarHistoricoSalvo(){
+    try{
+      const salvo = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '[]');
+      if(Array.isArray(salvo)) historico = salvo;
+    }catch(e){ historico = []; }
+  }
+  function salvarHistorico(){
+    try{ sessionStorage.setItem(STORAGE_KEY, JSON.stringify(historico.slice(-20))); }catch(e){}
+  }
+
+  function renderMensagem(role, texto){
+    const div = document.createElement('div');
+    div.className = 'ia-msg ' + (role === 'user' ? 'user' : 'bot');
+    div.textContent = texto;
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function renderHistorico(){
+    body.innerHTML = '';
+    if(!historico.length){
+      renderMensagem('assistant', 'Olá! 👋 Posso te ajudar a conhecer nossos serviços e feiras. Como posso te chamar?');
+    } else {
+      historico.forEach(m => renderMensagem(m.role, m.content));
+    }
+  }
+
+  function mostrarDigitando(){
+    const div = document.createElement('div');
+    div.className = 'ia-typing';
+    div.id = 'ia-typing-indicator';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    body.appendChild(div);
+    body.scrollTop = body.scrollHeight;
+  }
+  function removerDigitando(){
+    const el = document.getElementById('ia-typing-indicator');
+    if(el) el.remove();
+  }
+
+  window.iaAbrirChat = function(){
+    win.classList.remove('hidden');
+    bubble.classList.add('hidden');
+    try{ sessionStorage.setItem(STATE_KEY, 'aberto'); }catch(e){}
+    setTimeout(()=>input.focus(), 150);
+  };
+  window.iaFecharChat = function(){
+    win.classList.add('hidden');
+    bubble.classList.remove('hidden');
+    try{ sessionStorage.setItem(STATE_KEY, 'fechado'); }catch(e){}
+  };
+
+  window.iaEnviarMensagem = async function(){
+    const texto = input.value.trim();
+    if(!texto || bloqueado) return;
+    input.value = '';
+    historico.push({ role:'user', content:texto });
+    renderMensagem('user', texto);
+    salvarHistorico();
+
+    sendBtn.disabled = true;
+    mostrarDigitando();
+    try{
+      const res = await fetch('/api/chat', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ mensagens: historico })
+      });
+      const data = await res.json();
+      removerDigitando();
+      const resposta = data.reply || 'Desculpe, algo deu errado. Tente novamente em instantes.';
+      historico.push({ role:'assistant', content:resposta });
+      renderMensagem('assistant', resposta);
+      salvarHistorico();
+      if(data.error === 'indisponivel'){
+        bloqueado = true;
+        input.disabled = true;
+        input.placeholder = 'Assistente indisponível no momento';
+      }
+    }catch(e){
+      removerDigitando();
+      renderMensagem('assistant', 'Não consegui me conectar agora. Tente novamente em instantes ou fale com a gente pelo WhatsApp.');
+    }finally{
+      sendBtn.disabled = false;
+    }
+  };
+
+  // ── Inicialização ──
+  carregarHistoricoSalvo();
+  renderHistorico();
+  let estadoSalvo = null;
+  try{ estadoSalvo = sessionStorage.getItem(STATE_KEY); }catch(e){}
+  if(estadoSalvo === 'fechado'){
+    win.classList.add('hidden');
+    bubble.classList.remove('hidden');
+  } else {
+    win.classList.remove('hidden');
+    bubble.classList.add('hidden');
+  }
+})();
+</script>
+
 </body>
 </html>
