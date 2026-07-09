@@ -127,6 +127,41 @@ def get_ia_produtos():
         if conn: conn.close()
 
 
+def get_dados_site():
+    """Busca feiras ativas (futuras) e expositores em destaque pra dar contexto real à IA."""
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute("""
+            SELECT nome, local, data_evento, horario, taxa, organizador
+            FROM feiras
+            WHERE ativo = TRUE AND data_evento >= CURRENT_DATE
+            ORDER BY data_evento ASC
+            LIMIT 6
+        """)
+        feiras = [format_db_data(dict(r)) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT e.nome, e.descricao, e.regiao, e.cidade, c.nome as categoria_nome
+            FROM expositores e
+            LEFT JOIN categorias c ON e.categoria_id = c.id
+            WHERE e.ativo = TRUE AND e.destaque = TRUE
+            ORDER BY e.nome
+            LIMIT 10
+        """)
+        expositores = [format_db_data(dict(r)) for r in cur.fetchall()]
+
+        cur.close()
+        return {'feiras': feiras, 'expositores': expositores}
+    except Exception:
+        traceback.print_exc()
+        return {'feiras': [], 'expositores': []}
+    finally:
+        if conn: conn.close()
+
+
 def get_contador():
     conn = None
     try:
@@ -152,7 +187,7 @@ def incrementar_contador():
         if conn: conn.close()
 
 
-def montar_system_prompt(config, produtos):
+def montar_system_prompt(config, produtos, dados_site=None):
     partes = []
     persona = config.get('persona_nome') or 'Assistente'
     partes.append(f"Você é {persona}, um assistente de vendas virtual.")
@@ -169,6 +204,39 @@ def montar_system_prompt(config, produtos):
                 linha += f" | {p.get('descricao')}"
             partes.append(linha)
         partes.append("\nUse essas informações para conduzir a conversa de forma natural e induzir a pessoa a comprar, sem ser insistente ou repetitivo.")
+
+    dados_site = dados_site or {}
+    feiras = dados_site.get('feiras') or []
+    if feiras:
+        partes.append("\nFeiras/eventos ativos no site no momento (use datas e locais reais, nunca invente):")
+        for f in feiras:
+            linha = f"- {f.get('nome')}"
+            if f.get('data_evento'):
+                linha += f" | Data: {f.get('data_evento')}"
+            if f.get('horario'):
+                linha += f" | Horário: {f.get('horario')}"
+            if f.get('local'):
+                linha += f" | Local: {f.get('local')}"
+            if f.get('taxa'):
+                linha += f" | Taxa: {f.get('taxa')}"
+            partes.append(linha)
+
+    expositores = dados_site.get('expositores') or []
+    if expositores:
+        partes.append("\nExpositores em destaque no site (pode citar como exemplos reais, nunca invente nomes):")
+        for e in expositores:
+            linha = f"- {e.get('nome')}"
+            if e.get('categoria_nome'):
+                linha += f" | Categoria: {e.get('categoria_nome')}"
+            if e.get('regiao') or e.get('cidade'):
+                linha += f" | Região: {e.get('regiao') or e.get('cidade')}"
+            if e.get('descricao'):
+                linha += f" | {e.get('descricao')}"
+            partes.append(linha)
+
+    if feiras or expositores:
+        partes.append("\nSe a pessoa perguntar sobre feiras, eventos ou expositores fora do que está listado acima, diga que não tem essa informação no momento e oriente a falar pelo WhatsApp — nunca invente datas, nomes ou informações.")
+
     return "\n".join(partes)
 
 
@@ -1297,7 +1365,8 @@ def api_chat():
             }), 200
 
         produtos = get_ia_produtos()
-        system_prompt = montar_system_prompt(config, produtos)
+        dados_site = get_dados_site()
+        system_prompt = montar_system_prompt(config, produtos, dados_site)
 
         mensagens_groq = [{'role': 'system', 'content': system_prompt}]
         for m in historico:
