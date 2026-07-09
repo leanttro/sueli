@@ -414,6 +414,32 @@ tbody tr:hover td{background:#fdfafb;}
           </div>
         </div>
       </div>
+
+      <div style="margin-top:6px;padding-top:16px;border-top:1px solid var(--linha);">
+        <label style="display:block;font-weight:600;font-size:13px;margin-bottom:2px;">Visibilidade (exceção manual)</label>
+        <p style="font-size:12px;color:var(--cinza);margin-bottom:12px;">Por padrão segue o plano. Só mude aqui se este expositor específico precisar de uma regra diferente.</p>
+        <div class="form-row">
+          <div class="field-group"><label>Foto</label>
+            <select id="exp-overr-foto"><option value="">— Padrão do plano —</option><option value="mostrar">Sempre mostrar</option><option value="esconder">Sempre esconder</option></select>
+          </div>
+          <div class="field-group"><label>WhatsApp</label>
+            <select id="exp-overr-whatsapp"><option value="">— Padrão do plano —</option><option value="mostrar">Sempre mostrar</option><option value="esconder">Sempre esconder</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-group"><label>Instagram</label>
+            <select id="exp-overr-instagram"><option value="">— Padrão do plano —</option><option value="mostrar">Sempre mostrar</option><option value="esconder">Sempre esconder</option></select>
+          </div>
+          <div class="field-group"><label>Site</label>
+            <select id="exp-overr-site"><option value="">— Padrão do plano —</option><option value="mostrar">Sempre mostrar</option><option value="esconder">Sempre esconder</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="field-group"><label>Região</label>
+            <select id="exp-overr-regiao"><option value="">— Padrão do plano —</option><option value="mostrar">Sempre mostrar</option><option value="esconder">Sempre esconder</option></select>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modalExp')">Cancelar</button>
@@ -569,6 +595,31 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modalIAProduto')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarIAProduto()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VISIBILIDADE DO PLANO -->
+<div class="overlay" id="modalPlano">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <h3 id="modalPlanoTit">Visibilidade do Plano</h3>
+      <button class="modal-close" onclick="fecharModal('modalPlano')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="plano-id">
+      <p style="font-size:12.5px;color:var(--cinza);margin-bottom:14px;">Desmarque o que os expositores desse plano NÃO devem exibir no site (pode ser sobrescrito individualmente na tela de Expositores).</p>
+      <div class="form-checks" style="display:flex;flex-direction:column;gap:10px;">
+        <label class="checkbox-row"><input type="checkbox" id="plano-exibe-foto" checked> Exibir foto</label>
+        <label class="checkbox-row"><input type="checkbox" id="plano-exibe-whatsapp" checked> Exibir WhatsApp</label>
+        <label class="checkbox-row"><input type="checkbox" id="plano-exibe-instagram" checked> Exibir Instagram</label>
+        <label class="checkbox-row"><input type="checkbox" id="plano-exibe-site" checked> Exibir Site</label>
+        <label class="checkbox-row"><input type="checkbox" id="plano-exibe-regiao" checked> Exibir Região</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalPlano')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarPlanoVisibilidade()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
     </div>
   </div>
 </div>
@@ -853,12 +904,25 @@ async function carregarOpcoesModal(){
     planosList.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
 }
 
+// Converte select ('','mostrar','esconder') <-> valor booleano/null salvo no banco
+function overrSelectParaValor(v){
+  if(v === 'mostrar') return true;
+  if(v === 'esconder') return false;
+  return null;
+}
+function overrValorParaSelect(v){
+  if(v === true) return 'mostrar';
+  if(v === false) return 'esconder';
+  return '';
+}
+
 async function abrirModalExp(){
   await carregarOpcoesModal();
   $('modalExpTit').textContent = 'Novo Expositor';
   ['id','nome','slug','descricao','foto','whatsapp','instagram','site','regiao','cidade','expiracao'].forEach(f=>$(`exp-${f}`).value='');
   $('exp-ativo').checked = true;
   $('exp-destaque').checked = false;
+  ['foto','whatsapp','instagram','site','regiao'].forEach(f=>$(`exp-overr-${f}`).value='');
   // limpar preview
   const prev = $('prev-exp-foto'); if(prev){ prev.style.display='none'; prev.src=''; }
   const stat = $('status-exp-foto'); if(stat){ stat.className='upload-status'; stat.textContent=''; }
@@ -881,6 +945,11 @@ async function editarExpositor(e){
   $('exp-expiracao').value = e.data_expiracao ? e.data_expiracao.split('/').reverse().join('-') : '';
   $('exp-ativo').checked = !!e.ativo;
   $('exp-destaque').checked = !!e.destaque;
+  $('exp-overr-foto').value = overrValorParaSelect(e.overr_foto);
+  $('exp-overr-whatsapp').value = overrValorParaSelect(e.overr_whatsapp);
+  $('exp-overr-instagram').value = overrValorParaSelect(e.overr_instagram);
+  $('exp-overr-site').value = overrValorParaSelect(e.overr_site);
+  $('exp-overr-regiao').value = overrValorParaSelect(e.overr_regiao);
   mostrarPreviewExistente(e.foto_url, 'prev-exp-foto', 'status-exp-foto');
   // selecionar categoria e plano
   setTimeout(()=>{
@@ -901,6 +970,11 @@ async function salvarExpositor(){
     ativo: $('exp-ativo').checked, destaque: $('exp-destaque').checked,
     categoria_id: $('exp-categoria').value || null,
     plano_id: $('exp-plano').value || null,
+    overr_foto: overrSelectParaValor($('exp-overr-foto').value),
+    overr_whatsapp: overrSelectParaValor($('exp-overr-whatsapp').value),
+    overr_instagram: overrSelectParaValor($('exp-overr-instagram').value),
+    overr_site: overrSelectParaValor($('exp-overr-site').value),
+    overr_regiao: overrSelectParaValor($('exp-overr-regiao').value),
   };
   if(!body.nome || !body.slug){ toast('Nome e slug são obrigatórios.','error'); return; }
   try{
@@ -1277,16 +1351,47 @@ async function carregarPlanos(){
   $('tabelaPlanos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/planos');
+    _cachePlanos = data;
     if(!data.length){ $('tabelaPlanos').innerHTML = '<div class="empty"><i class="fa-solid fa-crown"></i>Nenhum plano.</div>'; return; }
-    $('tabelaPlanos').innerHTML = `<table><thead><tr><th>Nome</th><th>Descrição</th><th>Duração (dias)</th><th>Status</th></tr></thead><tbody>
+    $('tabelaPlanos').innerHTML = `<table><thead><tr><th>Nome</th><th>Descrição</th><th>Duração (dias)</th><th>Status</th><th>Visibilidade</th><th>Ações</th></tr></thead><tbody>
     ${data.map(p=>`<tr>
       <td><b>${p.nome}</b></td>
       <td>${p.descricao||'—'}</td>
       <td>${p.duracao_dias??'—'}</td>
       <td>${p.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+      <td style="font-size:12px;color:var(--cinza);">
+        ${['foto','whatsapp','instagram','site','regiao'].map(f=>p['exibe_'+f]===false?`<span class="tag tag-gray" style="margin:1px;">${f}</span>`:'').join('') || 'Mostra tudo'}
+      </td>
+      <td><div class="td-acoes">
+        <button class="btn btn-ghost btn-sm" onclick="editarPlanoPorId(${p.id})"><i class="fa-solid fa-pen"></i> Visibilidade</button>
+      </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaPlanos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+let _cachePlanos = [];
+function editarPlanoPorId(id){
+  const p = _cachePlanos.find(x=>x.id===id);
+  if(!p) return;
+  $('plano-id').value = p.id;
+  $('modalPlanoTit').textContent = 'Visibilidade — ' + p.nome;
+  ['foto','whatsapp','instagram','site','regiao'].forEach(f=>{
+    $('plano-exibe-'+f).checked = p['exibe_'+f] !== false;
+  });
+  abrirModal('modalPlano');
+}
+async function salvarPlanoVisibilidade(){
+  const id = $('plano-id').value;
+  const body = {};
+  ['foto','whatsapp','instagram','site','regiao'].forEach(f=>{
+    body['exibe_'+f] = $('plano-exibe-'+f).checked;
+  });
+  try{
+    await api(`/api/admin/planos/${id}/visibilidade`,'PUT',body);
+    fecharModal('modalPlano');
+    toast('Visibilidade do plano atualizada!');
+    carregarPlanos();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
 }
 
 // ─── FECHAR OVERLAY AO CLICAR FORA ───────────────────────────
