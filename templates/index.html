@@ -340,61 +340,31 @@
   /* ---------- CARROSSEL ---------- */
   .carrossel-wrap{position:relative;}
   .carrossel-track-outer{overflow:hidden;}
-  .carrossel-track{display:flex;gap:28px;transition:transform .4s cubic-bezier(.4,0,.2,1);align-items:stretch;}
-  .carrossel-track > *{flex-shrink:0;box-sizing:border-box;}
-
-  /* larguras dos cards dentro do carrossel — expositores (3/2/1 por página) */
-  #expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 52px)/3);max-width:calc((100% - 52px)/3);}
-  @media(max-width:1024px){#expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 26px)/2);max-width:calc((100% - 26px)/2);}}
-  @media(max-width:780px){#expositoresGrid.carrossel-track > .exp-card{flex:0 0 100%;max-width:100%;}}
-
-  /* larguras dos cards dentro do carrossel — feiras / eventos (2/2/1 por página) */
-  #feirasGrid.carrossel-track > .feira-card, #feirasGrid.carrossel-track > .cta-expositor-card,
-  #eventosGrid.carrossel-track > .feira-card{flex:0 0 calc((100% - 28px)/2);max-width:calc((100% - 28px)/2);}
-  @media(max-width:780px){
-    #feirasGrid.carrossel-track > .feira-card, #feirasGrid.carrossel-track > .cta-expositor-card,
-    #eventosGrid.carrossel-track > .feira-card{flex:0 0 100%;max-width:100%;}
+  .carrossel-track{
+    display:flex;gap:28px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
   }
-
-  /* modo grade — desliga o carrossel e exibe tudo em grid normal */
-  .carrossel-track.modo-grade{display:grid !important;transform:none !important;transition:none !important;gap:26px;}
-  .carrossel-track.modo-grade > *{flex:none !important;max-width:none !important;width:auto !important;}
-  #expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(3,1fr);}
-  #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);gap:28px;}
-  @media(max-width:1024px){#expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);}}
-  @media(max-width:780px){
-    #expositoresGrid.carrossel-track.modo-grade,
-    #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:1fr;}
-  }
-
+  .carrossel-track::-webkit-scrollbar{display:none;}
+  .carrossel-track .feira-card{min-width:calc(50% - 14px);flex-shrink:0;scroll-snap-align:start;}
+  @media(max-width:780px){.carrossel-track .feira-card{min-width:calc(100% - 0px);}}
   .carrossel-nav{display:flex;gap:12px;margin-top:24px;justify-content:center;}
-  .carrossel-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease, border-color .2s ease;flex-shrink:0;}
+  .carrossel-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease, border-color .2s ease;}
   .carrossel-btn:hover{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
   .carrossel-btn:disabled{opacity:.3;cursor:default;}
-  .carrossel-dots{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;}
-  .carrossel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;transition:background .2s ease,transform .2s ease;flex-shrink:0;}
+  .carrossel-dots{display:flex;gap:8px;align-items:center;}
+  .carrossel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;transition:background .2s ease,transform .2s ease;}
   .carrossel-dot.ativo{background:var(--dourado);transform:scale(1.3);}
-
-  /* tema claro — carrosséis em seções de fundo claro (expositores, eventos) */
-  .carrossel-nav.tema-claro .carrossel-btn{border:1px solid var(--linha);background:#fff;color:var(--vinho);}
-  .carrossel-nav.tema-claro .carrossel-btn:hover{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
-  .carrossel-nav.tema-claro .carrossel-dot{background:rgba(0,0,0,.15);}
-  .carrossel-nav.tema-claro .carrossel-dot.ativo{background:var(--dourado);}
-
-  /* botão de alternância grade/carrossel */
-  .view-toggle{display:flex;justify-content:flex-end;gap:8px;margin-bottom:20px;}
-  .vt-btn{width:38px;height:38px;border-radius:8px;border:1px solid var(--linha);background:#fff;color:var(--cinza);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s ease;}
-  .vt-btn.ativo{background:var(--vinho);border-color:var(--vinho);color:#fff;}
-  .vt-btn:hover:not(.ativo){border-color:var(--vinho);color:var(--vinho);}
-  .view-toggle.tema-escuro .vt-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7);}
-  .view-toggle.tema-escuro .vt-btn.ativo{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
-  .view-toggle.tema-escuro .vt-btn:hover:not(.ativo){border-color:var(--dourado);color:var(--dourado-claro);}
-
   .cta-expositor-card{
+    min-width:calc(50% - 14px);flex-shrink:0;scroll-snap-align:start;
     background:rgba(201,212,84,.08);border:2px dashed rgba(201,212,84,.4);border-radius:10px;
     padding:30px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;
     text-align:center;gap:16px;
   }
+  @media(max-width:780px){.cta-expositor-card{min-width:calc(100% - 0px);}}
   .cta-expositor-card i{font-size:32px;color:var(--dourado);}
   .cta-expositor-card h3{font-size:18px;font-weight:700;color:#fff;margin:0;}
   .cta-expositor-card p{font-size:14px;color:rgba(255,255,255,.65);margin:0;line-height:1.55;}
@@ -699,23 +669,10 @@
         <button class="btn btn-ghost" id="limparFiltros" type="button" style="padding:11px 18px;">Limpar</button>
       </div>
     </div>
-    <div class="view-toggle" id="expositoresToggle">
-      <button class="vt-btn ativo" type="button" data-modo="carrossel" aria-label="Ver em carrossel"><i class="fa-solid fa-images"></i></button>
-      <button class="vt-btn" type="button" data-modo="grade" aria-label="Ver em grade"><i class="fa-solid fa-table-cells-large"></i></button>
-    </div>
-    <div class="carrossel-wrap" id="expositoresCarrossel">
-      <div class="carrossel-track-outer">
-        <div class="carrossel-track" id="expositoresGrid">
-          <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
-          <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
-          <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
-        </div>
-      </div>
-      <div class="carrossel-nav tema-claro" id="expositoresNav" style="display:none;">
-        <button class="carrossel-btn" id="expositoresAnterior" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
-        <div class="carrossel-dots" id="expositoresDots"></div>
-        <button class="carrossel-btn" id="expositoresProximo" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
-      </div>
+    <div class="exp-grid" id="expositoresGrid">
+      <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+      <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+      <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
     </div>
   </div>
 </section>
@@ -1084,7 +1041,6 @@ async function carregarExpositores(){
       return;
     }
     grid.innerHTML = expositores.map(cardExpositor).join('');
-    initCarrossel('expositoresGrid','expositoresNav','expositoresDots','expositoresAnterior','expositoresProximo');
   }catch(err){
     console.error(err);
     grid.innerHTML = `<div class="exp-erro"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar os expositores agora. Tente novamente em breve.</p></div>`;
@@ -1213,119 +1169,91 @@ function escapeHtml(str){
 }
 
 /* ---------- CARROSSEL helper ---------- */
-// Registro de todos os carrosséis ativos, para recalcular no resize da janela
-const todosCarrosseis = [];
-
-// Quantos cards por página, de acordo com a largura atual da tela
-function calcPerPage(trackId){
-  const largura = window.innerWidth;
-  if(trackId === 'expositoresGrid'){
-    if(largura <= 780) return 1;
-    if(largura <= 1024) return 2;
-    return 3;
-  }
-  // feirasGrid / eventosGrid
-  return largura <= 780 ? 1 : 2;
-}
-
-function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
+function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId, perPageDesktop){
   const track = document.getElementById(trackId);
   const nav = document.getElementById(navId);
-  if(!track || !nav) return;
-
-  // Se este carrossel já foi inicializado antes (ex: expositores recarrega ao trocar filtro),
-  // não religamos os botões de novo — só atualizamos os itens.
-  if(nav._carrosselApi){
-    nav._carrosselApi.atualizar();
-    return;
-  }
-
   const dotsEl = document.getElementById(dotsId);
   const btnAnterior = document.getElementById(anteriorId);
   const btnProximo = document.getElementById(proximoId);
+  if(!track) return;
 
-  let items = [];
-  let perPage = 1;
-  let pages = 1;
+  const items = Array.from(track.children);
+  const total = items.length;
+  if(total <= 1){ nav.style.display='none'; return; }
+
+  // perPage é recalculado sempre que precisamos dele, então nunca fica
+  // desalinhado com o breakpoint do CSS (era o bug: valor fixo travava
+  // ao redimensionar/girar a tela)
+  function getPerPage(){
+    return window.innerWidth <= 780 ? 1 : perPageDesktop;
+  }
+
+  let pages = Math.ceil(total / getPerPage());
   let page = 0;
 
-  function construirDots(){
+  function buildDots(){
     dotsEl.innerHTML = '';
     for(let i=0;i<pages;i++){
       const d = document.createElement('button');
-      d.className = 'carrossel-dot' + (i===0?' ativo':'');
+      d.className = 'carrossel-dot' + (i===page?' ativo':'');
       d.setAttribute('aria-label', `Página ${i+1}`);
       d.addEventListener('click', () => goTo(i));
       dotsEl.appendChild(d);
     }
   }
 
-  function goTo(p){
-    page = Math.max(0, Math.min(p, pages-1));
-    const itemW = items[0] ? items[0].getBoundingClientRect().width + 28 : 0; // gap=28
-    track.style.transform = `translateX(-${page * perPage * itemW}px)`;
+  function updateUI(){
     dotsEl.querySelectorAll('.carrossel-dot').forEach((d,i) => d.classList.toggle('ativo', i===page));
     btnAnterior.disabled = page===0;
     btnProximo.disabled = page>=pages-1;
   }
 
-  // Recalcula perPage/páginas quando a tela muda de tamanho, sem perder a posição atual
-  function recalcular(){
-    if(!items.length) return;
-    perPage = calcPerPage(trackId);
-    pages = Math.ceil(items.length / perPage);
-    construirDots();
-    goTo(Math.min(page, pages-1));
+  function goTo(p){
+    const perPage = getPerPage();
+    pages = Math.ceil(total / perPage);
+    page = Math.max(0, Math.min(p, pages-1));
+    const targetIndex = Math.min(page * perPage, total-1);
+    const target = items[targetIndex];
+    track.scrollTo({ left: target.offsetLeft - track.offsetLeft, behavior:'smooth' });
+    updateUI();
   }
 
-  // Chamado toda vez que o conteúdo do carrossel é (re)carregado (ex: nova lista vinda da API)
-  function atualizar(){
-    items = Array.from(track.children);
-    const total = items.length;
-    if(total <= 1){ nav.style.display='none'; return; }
-    perPage = calcPerPage(trackId);
-    pages = Math.ceil(total / perPage);
-    page = 0;
-    construirDots();
-    nav.style.display = 'flex';
-    // espera o layout assentar antes de medir a largura do card
-    requestAnimationFrame(() => goTo(0));
-  }
+  // Mantém dots/botões sincronizados quando a pessoa arrasta/rola manualmente
+  let scrollTimeout;
+  track.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      const perPage = getPerPage();
+      pages = Math.ceil(total / perPage);
+      const scrollLeft = track.scrollLeft;
+      let closestIdx = 0, closestDist = Infinity;
+      items.forEach((it, idx) => {
+        const dist = Math.abs((it.offsetLeft - track.offsetLeft) - scrollLeft);
+        if(dist < closestDist){ closestDist = dist; closestIdx = idx; }
+      });
+      page = Math.min(Math.floor(closestIdx / perPage), pages-1);
+      updateUI();
+    }, 100);
+  }, {passive:true});
+
+  // Recalcula perPage/páginas quando a tela é redimensionada ou girada
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+      pages = Math.ceil(total / getPerPage());
+      page = Math.min(page, pages-1);
+      buildDots();
+      updateUI();
+    }, 150);
+  });
 
   btnAnterior.addEventListener('click', () => goTo(page-1));
   btnProximo.addEventListener('click', () => goTo(page+1));
-
-  // Suporte a swipe (arrastar com o dedo) no mobile
-  let touchStartX = 0;
-  let touchDeltaX = 0;
-  track.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchDeltaX = 0;
-  }, {passive:true});
-  track.addEventListener('touchmove', (e) => {
-    touchDeltaX = e.touches[0].clientX - touchStartX;
-  }, {passive:true});
-  track.addEventListener('touchend', () => {
-    const threshold = 40;
-    if(touchDeltaX > threshold){ goTo(page-1); }
-    else if(touchDeltaX < -threshold){ goTo(page+1); }
-    touchDeltaX = 0;
-  });
-
-  nav._carrosselApi = { atualizar, recalcular };
-  todosCarrosseis.push(nav._carrosselApi);
-
-  atualizar();
+  nav.style.display = 'flex';
+  buildDots();
+  updateUI();
 }
-
-// Recalcula todos os carrosséis quando a janela é redimensionada (debounced)
-let carrosselResizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(carrosselResizeTimer);
-  carrosselResizeTimer = setTimeout(() => {
-    todosCarrosseis.forEach(api => api.recalcular());
-  }, 150);
-});
 
 /* ---------- FEIRAS — Trabalhe Conosco ---------- */
 function cardFeira(f){
@@ -1374,8 +1302,8 @@ async function carregarFeiras(){
       const ctaCard = `<div class="cta-expositor-card"><i class="fa-solid fa-plus-circle"></i><h3>Quer anunciar aqui?</h3><p>Reserve sua vaga no próximo evento e alcance moradores de condomínios em São Paulo.</p><a href="https://wa.me/5511999999999?text=Quero%20anunciar%20minha%20feira!" target="_blank" rel="noopener" class="btn btn-gold" style="font-size:13px;padding:11px 18px;"><i class="fa-brands fa-whatsapp"></i> Falar conosco</a></div>`;
       grid.innerHTML = feiras.map(cardFeira).join('') + ctaCard;
     }
-    // Init carousel
-    initCarrossel('feirasGrid','feirasNav','feirasDots','feirasAnterior','feirasProximo');
+    // Init carousel — 2 items per page on desktop, 1 no mobile (recalculado dinamicamente)
+    initCarrossel('feirasGrid','feirasNav','feirasDots','feirasAnterior','feirasProximo', 2);
   }catch(err){
     console.error(err);
     grid.innerHTML = '<div class="feira-card" style="min-width:100%;background:rgba(255,255,255,.04);"><div class="feiras-empty"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar as feiras agora.</p></div></div>';
