@@ -345,8 +345,8 @@
 
   /* larguras dos cards dentro do carrossel — expositores (3/2/1 por página) */
   #expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 52px)/3);max-width:calc((100% - 52px)/3);}
-  @media(max-width:1024px){#expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 26px)/2);max-width:calc((100% - 26px)/2);}}
-  @media(max-width:780px){#expositoresGrid.carrossel-track > .exp-card{flex:0 0 100%;max-width:100%;}}
+  @media(max-width:1024px){ #expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 26px)/2);max-width:calc((100% - 26px)/2);}}
+  @media(max-width:780px){ #expositoresGrid.carrossel-track > .exp-card{flex:0 0 100%;max-width:100%;}}
 
   /* larguras dos cards dentro do carrossel — feiras / eventos (2/2/1 por página) */
   #feirasGrid.carrossel-track > .feira-card, #feirasGrid.carrossel-track > .cta-expositor-card,
@@ -361,7 +361,7 @@
   .carrossel-track.modo-grade > *{flex:none !important;max-width:none !important;width:auto !important;}
   #expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(3,1fr);}
   #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);gap:28px;}
-  @media(max-width:1024px){#expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:1024px){ #expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:780px){
     #expositoresGrid.carrossel-track.modo-grade,
     #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:1fr;}
