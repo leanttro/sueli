@@ -1346,7 +1346,11 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
 
   track.addEventListener('pointerup', finalizarDrag);
   track.addEventListener('pointercancel', finalizarDrag);
-  track.addEventListener('pointerleave', () => { if(dragging) finalizarDrag(); });
+  // Não usamos 'pointerleave' aqui: com setPointerCapture ativo, esse evento dispara
+  // pelo hit-test real da tela (não respeita a captura) e no mobile o dedo "sai"
+  // geometricamente do track no meio do arraste (já que o track se move por baixo
+  // dele), encerrando o drag antes da hora. pointerup/pointercancel já são
+  // suficientes e confiáveis quando o ponteiro está capturado.
 
   nav._carrosselApi = { atualizar, recalcular };
   todosCarrosseis.push(nav._carrosselApi);
