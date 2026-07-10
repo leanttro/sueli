@@ -1199,6 +1199,23 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId, perPage){
   btnProximo.addEventListener('click', () => goTo(page+1));
   nav.style.display = 'flex';
   goTo(0);
+
+  // Suporte a swipe (arrastar com o dedo) no mobile
+  let touchStartX = 0;
+  let touchDeltaX = 0;
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchDeltaX = 0;
+  }, {passive:true});
+  track.addEventListener('touchmove', (e) => {
+    touchDeltaX = e.touches[0].clientX - touchStartX;
+  }, {passive:true});
+  track.addEventListener('touchend', () => {
+    const threshold = 40;
+    if(touchDeltaX > threshold){ goTo(page-1); }
+    else if(touchDeltaX < -threshold){ goTo(page+1); }
+    touchDeltaX = 0;
+  });
 }
 
 /* ---------- FEIRAS — Trabalhe Conosco ---------- */
