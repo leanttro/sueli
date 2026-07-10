@@ -340,45 +340,67 @@
   /* ---------- CARROSSEL ---------- */
   .carrossel-wrap{position:relative;}
   .carrossel-track-outer{overflow:hidden;}
-  .carrossel-track-outer::-webkit-scrollbar{display:none;}
-  .carrossel-track{display:flex;gap:28px;transition:transform .4s cubic-bezier(.4,0,.2,1);}
-  .carrossel-track .feira-card{min-width:calc(50% - 14px);flex-shrink:0;}
-  @media(max-width:780px){.carrossel-track .feira-card{min-width:calc(100% - 0px);}}
+  .carrossel-track{display:flex;gap:28px;transition:transform .4s cubic-bezier(.4,0,.2,1);align-items:stretch;}
+  .carrossel-track > *{flex-shrink:0;box-sizing:border-box;}
+
+  /* larguras dos cards dentro do carrossel — expositores (3/2/1 por página) */
+  #expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 52px)/3);max-width:calc((100% - 52px)/3);}
+  @media(max-width:1024px){#expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 26px)/2);max-width:calc((100% - 26px)/2);}}
+  @media(max-width:780px){#expositoresGrid.carrossel-track > .exp-card{flex:0 0 100%;max-width:100%;}}
+
+  /* larguras dos cards dentro do carrossel — feiras / eventos (2/2/1 por página) */
+  #feirasGrid.carrossel-track > .feira-card, #feirasGrid.carrossel-track > .cta-expositor-card,
+  #eventosGrid.carrossel-track > .feira-card{flex:0 0 calc((100% - 28px)/2);max-width:calc((100% - 28px)/2);}
+  @media(max-width:780px){
+    #feirasGrid.carrossel-track > .feira-card, #feirasGrid.carrossel-track > .cta-expositor-card,
+    #eventosGrid.carrossel-track > .feira-card{flex:0 0 100%;max-width:100%;}
+  }
+
+  /* modo grade — desliga o carrossel e exibe tudo em grid normal */
+  .carrossel-track.modo-grade{display:grid !important;transform:none !important;transition:none !important;gap:26px;}
+  .carrossel-track.modo-grade > *{flex:none !important;max-width:none !important;width:auto !important;}
+  #expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(3,1fr);}
+  #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);gap:28px;}
+  @media(max-width:1024px){#expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:780px){
+    #expositoresGrid.carrossel-track.modo-grade,
+    #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:1fr;}
+  }
+
   .carrossel-nav{display:flex;gap:12px;margin-top:24px;justify-content:center;}
-  .carrossel-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease, border-color .2s ease;}
+  .carrossel-btn{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s ease, border-color .2s ease;flex-shrink:0;}
   .carrossel-btn:hover{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
   .carrossel-btn:disabled{opacity:.3;cursor:default;}
-  .carrossel-dots{display:flex;gap:8px;align-items:center;}
-  .carrossel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;transition:background .2s ease,transform .2s ease;}
+  .carrossel-dots{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;}
+  .carrossel-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);border:none;cursor:pointer;transition:background .2s ease,transform .2s ease;flex-shrink:0;}
   .carrossel-dot.ativo{background:var(--dourado);transform:scale(1.3);}
+
+  /* tema claro — carrosséis em seções de fundo claro (expositores, eventos) */
+  .carrossel-nav.tema-claro .carrossel-btn{border:1px solid var(--linha);background:#fff;color:var(--vinho);}
+  .carrossel-nav.tema-claro .carrossel-btn:hover{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
+  .carrossel-nav.tema-claro .carrossel-dot{background:rgba(0,0,0,.15);}
+  .carrossel-nav.tema-claro .carrossel-dot.ativo{background:var(--dourado);}
+
+  /* botão de alternância grade/carrossel */
+  .view-toggle{display:flex;justify-content:flex-end;gap:8px;margin-bottom:20px;}
+  .vt-btn{width:38px;height:38px;border-radius:8px;border:1px solid var(--linha);background:#fff;color:var(--cinza);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s ease;}
+  .vt-btn.ativo{background:var(--vinho);border-color:var(--vinho);color:#fff;}
+  .vt-btn:hover:not(.ativo){border-color:var(--vinho);color:var(--vinho);}
+  .view-toggle.tema-escuro .vt-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7);}
+  .view-toggle.tema-escuro .vt-btn.ativo{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
+  .view-toggle.tema-escuro .vt-btn:hover:not(.ativo){border-color:var(--dourado);color:var(--dourado-claro);}
+
   .cta-expositor-card{
-    min-width:calc(50% - 14px);flex-shrink:0;
     background:rgba(201,212,84,.08);border:2px dashed rgba(201,212,84,.4);border-radius:10px;
     padding:30px 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;
     text-align:center;gap:16px;
   }
-  @media(max-width:780px){.cta-expositor-card{min-width:calc(100% - 0px);}}
   .cta-expositor-card i{font-size:32px;color:var(--dourado);}
   .cta-expositor-card h3{font-size:18px;font-weight:700;color:#fff;margin:0;}
   .cta-expositor-card p{font-size:14px;color:rgba(255,255,255,.65);margin:0;line-height:1.55;}
   .cta-expositor-card a{margin-top:8px;}
 
-  /* ---------- TOGGLE GRADE/CARROSSEL ---------- */
-  .view-toggle{display:flex;gap:8px;align-items:center;}
-  .view-toggle-btn{width:36px;height:36px;border-radius:6px;border:1px solid var(--linha);background:#fff;color:var(--cinza);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-  .view-toggle-btn.ativo{background:var(--vinho);border-color:var(--vinho);color:#fff;}
-  .view-toggle-btn--dark{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:rgba(255,255,255,.6);}
-  .view-toggle-btn--dark.ativo{background:var(--dourado);border-color:var(--dourado);color:var(--vinho-escuro);}
-  /* carrossel de expositores */
-  .carrossel-track .exp-card{min-width:calc(33.333% - 19px);flex-shrink:0;}
-  @media(max-width:900px){.carrossel-track .exp-card{min-width:calc(50% - 14px);}}
-  @media(max-width:600px){.carrossel-track .exp-card{min-width:calc(100% - 0px);}}
-  /* carrossel de eventos (fundo claro) */
-  .carrossel-btn--dark{border-color:rgba(0,0,0,.15);background:rgba(0,0,0,.04);color:var(--carvao);}
-  .carrossel-btn--dark:hover{background:var(--vinho);border-color:var(--vinho);color:#fff;}
-  .carrossel-dot--dark{background:rgba(0,0,0,.15);}
-  .carrossel-dot--dark.ativo{background:var(--vinho);}
-  /* VAMOS CONVERSAR ---------- */
+  /* ---------- VAMOS CONVERSAR ---------- */
   .vamos{background:var(--vinho);color:#fff;padding:64px 0;}
   .vamos-inner{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
   @media(max-width:780px){.vamos-inner{grid-template-columns:1fr;gap:36px;}}
@@ -676,25 +698,25 @@
         </select>
         <button class="btn btn-ghost" id="limparFiltros" type="button" style="padding:11px 18px;">Limpar</button>
       </div>
-      <div class="view-toggle">
-        <button class="view-toggle-btn ativo" id="expCarrosselBtn" title="Carrossel" aria-label="Ver em carrossel"><i class="fa-solid fa-film"></i></button>
-        <button class="view-toggle-btn" id="expGradeBtn" title="Grade" aria-label="Ver em grade"><i class="fa-solid fa-grip"></i></button>
-      </div>
+    </div>
+    <div class="view-toggle" id="expositoresToggle">
+      <button class="vt-btn ativo" type="button" data-modo="carrossel" aria-label="Ver em carrossel"><i class="fa-solid fa-images"></i></button>
+      <button class="vt-btn" type="button" data-modo="grade" aria-label="Ver em grade"><i class="fa-solid fa-table-cells-large"></i></button>
     </div>
     <div class="carrossel-wrap" id="expositoresCarrossel">
       <div class="carrossel-track-outer">
         <div class="carrossel-track" id="expositoresGrid">
-      <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
-      <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
-      <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
-        </div><!-- /carrossel-track -->
-      </div><!-- /carrossel-track-outer -->
-      <div class="carrossel-nav" id="expNav" style="display:none;">
-        <button class="carrossel-btn" id="expAnterior" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
-        <div class="carrossel-dots" id="expDots"></div>
-        <button class="carrossel-btn" id="expProximo" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
+          <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+          <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+          <div class="exp-card"><div class="skeleton" style="aspect-ratio:4/3;"></div><div style="padding:20px 22px;"><div class="skeleton" style="height:14px;width:40%;margin-bottom:10px;"></div><div class="skeleton" style="height:20px;width:80%;margin-bottom:14px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+        </div>
       </div>
-    </div><!-- /carrossel-wrap -->
+      <div class="carrossel-nav tema-claro" id="expositoresNav" style="display:none;">
+        <button class="carrossel-btn" id="expositoresAnterior" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="carrossel-dots" id="expositoresDots"></div>
+        <button class="carrossel-btn" id="expositoresProximo" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -707,35 +729,20 @@
       <h2 style="color:var(--carvao);">Próximos Eventos</h2>
       <p class="lead" style="color:var(--cinza);">Confira os eventos que estão por vir e garanta sua participação.</p>
     </div>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
-      <div class="view-toggle">
-        <button class="view-toggle-btn ativo" id="evtCarrosselBtn" title="Carrossel" aria-label="Ver em carrossel"><i class="fa-solid fa-film"></i></button>
-        <button class="view-toggle-btn" id="evtGradeBtn" title="Grade" aria-label="Ver em grade"><i class="fa-solid fa-grip"></i></button>
+    <div class="feiras-grid" id="eventosGrid" style="--card-bg:var(--branco);--card-border:var(--linha);--card-text:var(--carvao);">
+      <div class="feira-card" style="background:#fff;border:1px solid var(--linha);">
+        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
+        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
+        <div class="skeleton" style="height:80px;width:100%;"></div>
+      </div>
+      <div class="feira-card" style="background:#fff;border:1px solid var(--linha);">
+        <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
+        <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
+        <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
+        <div class="skeleton" style="height:80px;width:100%;"></div>
       </div>
     </div>
-    <div class="carrossel-wrap" id="eventosCarrossel">
-      <div class="carrossel-track-outer">
-        <div class="carrossel-track" id="eventosGrid">
-          <div class="feira-card" style="background:#fff;border:1px solid var(--linha);min-width:calc(50% - 14px);flex-shrink:0;">
-            <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
-            <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
-            <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
-            <div class="skeleton" style="height:80px;width:100%;"></div>
-          </div>
-          <div class="feira-card" style="background:#fff;border:1px solid var(--linha);min-width:calc(50% - 14px);flex-shrink:0;">
-            <div class="skeleton" style="height:28px;width:140px;border-radius:30px;margin-bottom:16px;"></div>
-            <div class="skeleton" style="height:22px;width:70%;margin-bottom:8px;"></div>
-            <div class="skeleton" style="height:14px;width:50%;margin-bottom:20px;"></div>
-            <div class="skeleton" style="height:80px;width:100%;"></div>
-          </div>
-        </div><!-- /carrossel-track -->
-      </div><!-- /carrossel-track-outer -->
-      <div class="carrossel-nav" id="evtNav" style="display:none;">
-        <button class="carrossel-btn carrossel-btn--dark" id="evtAnterior" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
-        <div class="carrossel-dots" id="evtDots"></div>
-        <button class="carrossel-btn carrossel-btn--dark" id="evtProximo" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
-      </div>
-    </div><!-- /carrossel-wrap -->
   </div>
 </section>
 
@@ -1197,21 +1204,6 @@ document.getElementById('formContato').addEventListener('submit', async (e) => {
   }
 });
 
-function parseData(str){
-  if(!str) return null;
-  // suporta dd/mm/yyyy e yyyy-mm-dd
-  const dmY = str.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-  if(dmY) return new Date(+dmY[3], +dmY[2]-1, +dmY[1]);
-  const ymd = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if(ymd) return new Date(+ymd[1], +ymd[2]-1, +ymd[3]);
-  return null;
-}
-function formatData(str){
-  const d = parseData(str);
-  if(!d || isNaN(d)) return '';
-  return d.toLocaleDateString('pt-BR');
-}
-
 function escapeHtml(str){
   if(str === null || str === undefined) return '';
   return String(str)
@@ -1221,7 +1213,6 @@ function escapeHtml(str){
 
 /* ---------- CARROSSEL helper ---------- */
 function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId, perPage){
-  const outer = document.getElementById(trackId)?.parentElement;
   const track = document.getElementById(trackId);
   const nav = document.getElementById(navId);
   const dotsEl = document.getElementById(dotsId);
@@ -1233,23 +1224,7 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId, perPage){
   const total = items.length;
   if(total <= 1){ nav.style.display='none'; return; }
 
-  // Usar scroll nativo no outer — confiável em qualquer width
-  outer.style.overflowX = 'auto';
-  outer.style.scrollBehavior = 'smooth';
-  outer.style.scrollSnapType = 'x mandatory';
-  outer.style.webkitOverflowScrolling = 'touch';
-  // esconder scrollbar visual mas manter funcional
-  outer.style.msOverflowStyle = 'none';
-  outer.style.scrollbarWidth = 'none';
-  outer.style.cssText += '; scrollbar-width:none;';
-  items.forEach(el => {
-    el.style.scrollSnapAlign = 'start';
-    el.style.flexShrink = '0';
-  });
-  // remover transform antigo se existir
-  track.style.transform = '';
-  track.style.transition = '';
-
+  // pages = ceil(total / perPage)
   const pages = Math.ceil(total / perPage);
   let page = 0;
 
@@ -1265,10 +1240,8 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId, perPage){
 
   function goTo(p){
     page = Math.max(0, Math.min(p, pages-1));
-    const idx = page * perPage;
-    const target = items[Math.min(idx, items.length-1)];
-    // scroll o outer até o item correto
-    outer.scrollTo({ left: target.offsetLeft, behavior: 'smooth' });
+    const itemW = items[0].offsetWidth + 28; // gap=28
+    track.style.transform = `translateX(-${page * perPage * itemW}px)`;
     dotsEl.querySelectorAll('.carrossel-dot').forEach((d,i) => d.classList.toggle('ativo', i===page));
     btnAnterior.disabled = page===0;
     btnProximo.disabled = page>=pages-1;
@@ -1278,23 +1251,6 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId, perPage){
   btnProximo.addEventListener('click', () => goTo(page+1));
   nav.style.display = 'flex';
   goTo(0);
-
-  // Sync dot ativo quando user arrasta manualmente
-  let scrollTimer;
-  outer.addEventListener('scroll', () => {
-    clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => {
-      const sl = outer.scrollLeft;
-      const outerW = outer.offsetWidth;
-      const newPage = Math.round(sl / (outerW / perPage * perPage || outerW));
-      if(newPage !== page){
-        page = Math.max(0, Math.min(newPage, pages-1));
-        dotsEl.querySelectorAll('.carrossel-dot').forEach((d,i) => d.classList.toggle('ativo', i===page));
-        btnAnterior.disabled = page===0;
-        btnProximo.disabled = page>=pages-1;
-      }
-    }, 80);
-  }, {passive:true});
 
   // Suporte a swipe (arrastar com o dedo) no mobile
   let touchStartX = 0;
@@ -1324,7 +1280,7 @@ function cardFeira(f){
   const infra = f.infraestrutura ? `<div class="feira-info-item"><div class="label">Infraestrutura</div><div class="valor">${escapeHtml(f.infraestrutura)}</div></div>` : '';
   const taxa = f.taxa ? `<div class="feira-info-item"><div class="label">Taxa</div><div class="valor">${escapeHtml(f.taxa)}</div></div>` : '';
   const org = f.organizador ? `<div class="feira-info-item"><div class="label">Organizador</div><div class="valor">${escapeHtml(f.organizador)}</div></div>` : '';
-  const dataFmt = f.data_evento ? formatData(f.data_evento) : '';
+  const dataFmt = f.data_evento ? new Date(f.data_evento + 'T00:00:00').toLocaleDateString('pt-BR') : '';
   const dataHora = [dataFmt, f.horario].filter(Boolean).join(' · ');
   const whatsMsg = encodeURIComponent(`Olá, tenho interesse na feira: ${f.nome}`);
   const whatsLink = f.whatsapp
@@ -1380,7 +1336,7 @@ function cardEvento(f){
   const infra = f.infraestrutura ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Infraestrutura</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.infraestrutura)}</div></div>` : '';
   const taxa = f.taxa ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Taxa</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.taxa)}</div></div>` : '';
   const org = f.organizador ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Organizador</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.organizador)}</div></div>` : '';
-  const dataFmt = f.data_evento ? formatData(f.data_evento) : '';
+  const dataFmt = f.data_evento ? new Date(f.data_evento + 'T00:00:00').toLocaleDateString('pt-BR') : '';
   const dataHora = [dataFmt, f.horario].filter(Boolean).join(' · ');
   const whatsMsg = encodeURIComponent(`Olá, tenho interesse no evento: ${f.nome}`);
   const whatsLink = f.whatsapp
@@ -1587,10 +1543,10 @@ carregarEventos();
     teaser.classList.add('hidden');
     bubble.classList.remove('hidden');
   } else {
-    // primeiro acesso: começa como ícone fechado
+    // primeiro acesso da sessão: mostra a caixinha "teaser" (estado médio)
     win.classList.add('hidden');
-    teaser.classList.add('hidden');
-    bubble.classList.remove('hidden');
+    bubble.classList.add('hidden');
+    teaser.classList.remove('hidden');
   }
 })();
 </script>
