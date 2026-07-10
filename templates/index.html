@@ -369,7 +369,10 @@
     .carrossel-track-outer::-webkit-scrollbar{display:none;}
     .carrossel-track{transform:none !important;transition:none !important;}
     .carrossel-track > *{scroll-snap-align:start;}
-    .carrossel-nav{display:none !important;}
+    /* nav no mobile: mantém só as 2 setas centralizadas embaixo do carrossel,
+       pra pessoa poder tocar pra deslizar além do swipe direto no dedo */
+    .carrossel-nav{margin-top:18px;}
+    .carrossel-nav .carrossel-dots{display:none !important;}
   }
 
   /* modo grade — desliga o carrossel e exibe tudo em grid normal */
@@ -1290,8 +1293,11 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
     const itemW = items[0] ? items[0].getBoundingClientRect().width + 28 : 0; // gap=28
     track.style.transform = `translateX(-${page * perPage * itemW}px)`;
     dotsEl.querySelectorAll('.carrossel-dot').forEach((d,i) => d.classList.toggle('ativo', i===page));
-    btnAnterior.disabled = page===0;
-    btnProximo.disabled = page>=pages-1;
+    const ehMobile = window.innerWidth <= 780;
+    // no mobile quem move é o scroll nativo (setas só dão um "empurrão"),
+    // então as setas nunca ficam travadas/desabilitadas ali
+    btnAnterior.disabled = ehMobile ? false : page===0;
+    btnProximo.disabled = ehMobile ? false : page>=pages-1;
   }
 
   // Recalcula perPage/páginas quando a tela muda de tamanho, sem perder a posição atual
@@ -1317,8 +1323,22 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
     requestAnimationFrame(() => goTo(0));
   }
 
-  btnAnterior.addEventListener('click', () => goTo(page-1));
-  btnProximo.addEventListener('click', () => goTo(page+1));
+  btnAnterior.addEventListener('click', () => {
+    // no mobile o carrossel usa scroll nativo (scroll-snap) — as setas então
+    // dão um scroll de "uma tela" pro lado, em vez de mexer no transform
+    if(window.innerWidth <= 780){
+      track.parentElement.scrollBy({ left: -track.parentElement.clientWidth, behavior: 'smooth' });
+    } else {
+      goTo(page-1);
+    }
+  });
+  btnProximo.addEventListener('click', () => {
+    if(window.innerWidth <= 780){
+      track.parentElement.scrollBy({ left: track.parentElement.clientWidth, behavior: 'smooth' });
+    } else {
+      goTo(page+1);
+    }
+  });
 
   // Suporte a arrastar com o MOUSE via Pointer Events (desktop).
   // No celular/touch a gente NÃO mexe em nada por JS — quem cuida do arraste
@@ -1384,6 +1404,28 @@ window.addEventListener('resize', () => {
     todosCarrosseis.forEach(api => api.recalcular());
   }, 150);
 });
+
+/* ---------- Botão de alternância CARROSSEL / GRADE ---------- */
+(function(){
+  const toggle = document.getElementById('expositoresToggle');
+  const track = document.getElementById('expositoresGrid');
+  const nav = document.getElementById('expositoresNav');
+  if(!toggle || !track) return;
+  const botoes = toggle.querySelectorAll('.vt-btn');
+  botoes.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const modo = btn.dataset.modo;
+      botoes.forEach(b => b.classList.toggle('ativo', b === btn));
+      if(modo === 'grade'){
+        track.classList.add('modo-grade');
+        if(nav) nav.style.display = 'none';
+      } else {
+        track.classList.remove('modo-grade');
+        if(nav && nav._carrosselApi) nav._carrosselApi.recalcular();
+      }
+    });
+  });
+})();
 
 /* ---------- FEIRAS — Trabalhe Conosco ---------- */
 function cardFeira(f){
