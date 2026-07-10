@@ -342,6 +342,7 @@
   .carrossel-track-outer{overflow:hidden;}
   .carrossel-track{display:flex;gap:28px;transition:transform .4s cubic-bezier(.4,0,.2,1);align-items:stretch;}
   .carrossel-track > *{flex-shrink:0;box-sizing:border-box;}
+  .carrossel-track img{-webkit-user-drag:none;user-select:none;pointer-events:none;}
 
   /* larguras dos cards dentro do carrossel — expositores (3/2/1 por página) */
   #expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 52px)/3);max-width:calc((100% - 52px)/3);}
@@ -1295,22 +1296,48 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
   btnAnterior.addEventListener('click', () => goTo(page-1));
   btnProximo.addEventListener('click', () => goTo(page+1));
 
-  // Suporte a swipe (arrastar com o dedo) no mobile
-  let touchStartX = 0;
-  let touchDeltaX = 0;
-  track.addEventListener('touchstart', (e) => {
-    touchStartX = e.touches[0].clientX;
-    touchDeltaX = 0;
-  }, {passive:true});
-  track.addEventListener('touchmove', (e) => {
-    touchDeltaX = e.touches[0].clientX - touchStartX;
-  }, {passive:true});
-  track.addEventListener('touchend', () => {
+  // Suporte a arrastar com o dedo (touch) ou mouse — via Pointer Events
+  track.style.touchAction = 'pan-y'; // deixa o navegador só cuidar do scroll vertical; horizontal é nosso
+  let dragging = false;
+  let dragStartX = 0;
+  let dragDeltaX = 0;
+  let dragStartTransform = 0;
+
+  function currentTranslateX(){
+    const m = new DOMMatrixReadOnly(window.getComputedStyle(track).transform);
+    return m.m41;
+  }
+
+  function finalizarDrag(){
+    if(!dragging) return;
+    dragging = false;
+    track.style.transition = '';
     const threshold = 40;
-    if(touchDeltaX > threshold){ goTo(page-1); }
-    else if(touchDeltaX < -threshold){ goTo(page+1); }
-    touchDeltaX = 0;
+    if(dragDeltaX > threshold){ goTo(page-1); }
+    else if(dragDeltaX < -threshold){ goTo(page+1); }
+    else{ goTo(page); }
+    dragDeltaX = 0;
+  }
+
+  track.addEventListener('pointerdown', (e) => {
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    dragging = true;
+    dragStartX = e.clientX;
+    dragDeltaX = 0;
+    dragStartTransform = currentTranslateX();
+    track.style.transition = 'none';
+    track.setPointerCapture(e.pointerId);
   });
+
+  track.addEventListener('pointermove', (e) => {
+    if(!dragging) return;
+    dragDeltaX = e.clientX - dragStartX;
+    track.style.transform = `translateX(${dragStartTransform + dragDeltaX}px)`;
+  });
+
+  track.addEventListener('pointerup', finalizarDrag);
+  track.addEventListener('pointercancel', finalizarDrag);
+  track.addEventListener('pointerleave', () => { if(dragging) finalizarDrag(); });
 
   nav._carrosselApi = { atualizar, recalcular };
   todosCarrosseis.push(nav._carrosselApi);
