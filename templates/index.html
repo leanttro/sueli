@@ -347,29 +347,29 @@
   .feiras-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:rgba(255,255,255,.4);font-size:16px;}
   .feiras-empty i{font-size:32px;color:var(--dourado);display:block;margin-bottom:14px;}
 
-  /* DESKTOP (>780px): cards de feira/evento um pouco menores para caber 5 por página, sem mexer no mobile */
+  /* DESKTOP (>780px): cards de feira/evento um pouco menores para caber 4 por página, sem mexer no mobile */
   @media(min-width:781px){
-    .feira-card{padding:20px 18px;}
-    .feira-badge{font-size:10px;padding:4px 10px;margin-bottom:12px;}
-    .feira-nome{font-size:16px;margin-bottom:4px;}
-    .feira-local{font-size:12.5px;margin-bottom:12px;}
-    .feira-info-grid{grid-template-columns:1fr;gap:8px;margin-bottom:14px;}
-    .feira-info-item{font-size:12px;}
-    .feira-info-item .label{font-size:10px;}
-    .feira-vagas{padding:10px 12px;margin-bottom:12px;}
-    .feira-vagas .vl{font-size:11px;margin-bottom:5px;}
-    .feira-vagas ul{gap:6px;}
-    .feira-vagas ul li{font-size:11px;padding:3px 10px;}
-    .feira-obs{font-size:12px;margin-bottom:14px;}
-    .feira-taxa{font-size:13px;margin-bottom:14px;}
-    .feira-org{padding-top:14px;}
-    .feira-org .org-info{font-size:12px;}
-    .feira-org .org-info b{font-size:13px;}
-    .feira-whats{font-size:12px;padding:8px 14px;margin-top:10px;}
-    .cta-expositor-card{padding:20px 18px;gap:10px;}
-    .cta-expositor-card i{font-size:26px;}
-    .cta-expositor-card h3{font-size:15px;}
-    .cta-expositor-card p{font-size:12.5px;}
+    .feira-card{padding:24px 22px;}
+    .feira-badge{font-size:11px;padding:5px 11px;margin-bottom:14px;}
+    .feira-nome{font-size:18px;margin-bottom:4px;}
+    .feira-local{font-size:13.5px;margin-bottom:14px;}
+    .feira-info-grid{gap:10px 14px;margin-bottom:16px;}
+    .feira-info-item{font-size:12.5px;}
+    .feira-info-item .label{font-size:10.5px;}
+    .feira-vagas{padding:11px 13px;margin-bottom:14px;}
+    .feira-vagas .vl{font-size:11.5px;}
+    .feira-vagas ul{gap:7px;}
+    .feira-vagas ul li{font-size:12px;padding:4px 11px;}
+    .feira-obs{font-size:12.5px;margin-bottom:16px;}
+    .feira-taxa{font-size:13.5px;margin-bottom:16px;}
+    .feira-org{padding-top:16px;}
+    .feira-org .org-info{font-size:12.5px;}
+    .feira-org .org-info b{font-size:13.5px;}
+    .feira-whats{font-size:12.5px;padding:9px 16px;margin-top:12px;}
+    .cta-expositor-card{padding:24px 22px;gap:12px;}
+    .cta-expositor-card i{font-size:28px;}
+    .cta-expositor-card h3{font-size:16px;}
+    .cta-expositor-card p{font-size:13px;}
   }
 
   /* ---------- CARROSSEL ---------- */
@@ -384,9 +384,9 @@
   @media(max-width:1024px){ #expositoresGrid.carrossel-track > .exp-card{flex:0 0 calc((100% - 26px)/2);max-width:calc((100% - 26px)/2);}}
   @media(max-width:780px){ #expositoresGrid.carrossel-track > .exp-card{flex:0 0 100%;max-width:100%;}}
 
-  /* larguras dos cards dentro do carrossel — feiras / eventos (5/1 por página) */
+  /* larguras dos cards dentro do carrossel — feiras / eventos (4/1 por página) */
   #feirasGrid.carrossel-track > .feira-card, #feirasGrid.carrossel-track > .cta-expositor-card,
-  #eventosGrid.carrossel-track > .feira-card{flex:0 0 calc((100% - 112px)/5);max-width:calc((100% - 112px)/5);}
+  #eventosGrid.carrossel-track > .feira-card{flex:0 0 calc((100% - 84px)/4);max-width:calc((100% - 84px)/4);}
   @media(max-width:780px){
     #feirasGrid.carrossel-track > .feira-card, #feirasGrid.carrossel-track > .cta-expositor-card,
     #eventosGrid.carrossel-track > .feira-card{flex:0 0 100%;max-width:100%;}
@@ -414,7 +414,7 @@
   .carrossel-track.modo-grade{display:grid !important;transform:none !important;transition:none !important;gap:26px;}
   .carrossel-track.modo-grade > *{flex:none !important;max-width:none !important;width:auto !important;}
   #expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(5,1fr);}
-  #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:repeat(5,1fr);gap:28px;}
+  #feirasGrid.carrossel-track.modo-grade, #eventosGrid.carrossel-track.modo-grade{grid-template-columns:repeat(4,1fr);gap:28px;}
   @media(max-width:1024px){ #expositoresGrid.carrossel-track.modo-grade{grid-template-columns:repeat(2,1fr);}}
   @media(max-width:780px){
     #expositoresGrid.carrossel-track.modo-grade,
@@ -1288,7 +1288,7 @@ function calcPerPage(trackId){
     return 5; // desktop: 4 -> 5 por página
   }
   // feirasGrid / eventosGrid
-  return largura <= 780 ? 1 : 5; // desktop: 3 -> 5 por página
+  return largura <= 780 ? 1 : 4; // desktop: 4 por página (5 ficou apertado)
 }
 
 function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
