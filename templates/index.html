@@ -311,15 +311,16 @@
   .feira-card{
     background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:10px;
     padding:30px 28px;backdrop-filter:blur(4px);transition:transform .3s ease, box-shadow .3s ease;
+    max-width:100%;overflow-wrap:break-word;
   }
   .feira-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px -20px rgba(0,0,0,.5);}
   .feira-badge{display:inline-flex;align-items:center;gap:6px;background:var(--dourado);color:var(--vinho-escuro);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:5px 12px;border-radius:30px;margin-bottom:16px;}
   .feira-nome{font-size:21px;font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2;}
   .feira-local{font-size:14px;color:rgba(255,255,255,.65);margin-bottom:18px;display:flex;align-items:center;gap:6px;}
-  .feira-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;margin-bottom:20px;}
+  .feira-info-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px 20px;margin-bottom:20px;}
   .feira-info-item{font-size:13px;}
   .feira-info-item .label{color:rgba(255,255,255,.45);font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:600;margin-bottom:3px;}
-  .feira-info-item .valor{color:#fff;font-weight:600;}
+  .feira-info-item .valor{color:#fff;font-weight:600;overflow-wrap:break-word;word-break:break-word;}
   .feira-vagas{background:rgba(201,212,84,.15);border:1px solid rgba(201,212,84,.3);border-radius:6px;padding:12px 14px;margin-bottom:18px;}
   .feira-vagas .vl{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--dourado-claro);font-weight:700;margin-bottom:6px;}
   .feira-vagas ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px;}
@@ -329,7 +330,7 @@
   .feira-taxa span{color:var(--dourado-claro);}
   .feira-org{display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);}
   .feira-org .org-info{font-size:13px;}
-  .feira-org .org-info b{display:block;color:#fff;font-size:14px;}
+  .feira-org .org-info b{display:block;color:#fff;font-size:14px;overflow-wrap:break-word;word-break:break-word;}
   .feira-org .org-info span{color:rgba(255,255,255,.55);}
   .feira-whats{margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;font-weight:700;font-size:13.5px;padding:10px 18px;border-radius:6px;transition:background .2s ease;}
   .feira-whats:hover{background:#1EB254;}
