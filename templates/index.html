@@ -357,6 +357,21 @@
     #eventosGrid.carrossel-track > .feira-card{flex:0 0 100%;max-width:100%;}
   }
 
+  /* ── MOBILE: desliga o drag em JS e usa scroll nativo com scroll-snap ──
+     (mesmo padrão do carrossel de referência — no touch do celular quem
+     manda é o navegador, não Pointer Events manuais, então nunca trava) */
+  @media(max-width:780px){
+    .carrossel-track-outer{
+      overflow-x:scroll;overflow-y:hidden;
+      -webkit-overflow-scrolling:touch;
+      scroll-snap-type:x mandatory;scrollbar-width:none;
+    }
+    .carrossel-track-outer::-webkit-scrollbar{display:none;}
+    .carrossel-track{transform:none !important;transition:none !important;}
+    .carrossel-track > *{scroll-snap-align:start;}
+    .carrossel-nav{display:none !important;}
+  }
+
   /* modo grade — desliga o carrossel e exibe tudo em grid normal */
   .carrossel-track.modo-grade{display:grid !important;transform:none !important;transition:none !important;gap:26px;}
   .carrossel-track.modo-grade > *{flex:none !important;max-width:none !important;width:auto !important;}
@@ -1305,8 +1320,11 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
   btnAnterior.addEventListener('click', () => goTo(page-1));
   btnProximo.addEventListener('click', () => goTo(page+1));
 
-  // Suporte a arrastar com o dedo (touch) ou mouse — via Pointer Events
-  track.style.touchAction = 'pan-y'; // deixa o navegador só cuidar do scroll vertical; horizontal é nosso
+  // Suporte a arrastar com o MOUSE via Pointer Events (desktop).
+  // No celular/touch a gente NÃO mexe em nada por JS — quem cuida do arraste
+  // é o próprio navegador, via scroll nativo + scroll-snap (CSS, ver acima).
+  // É o mesmo padrão do carrossel de referência: JS de drag só é ligado fora
+  // do touch, então no mobile nunca tem Pointer Event pra travar.
   let dragging = false;
   let dragStartX = 0;
   let dragDeltaX = 0;
@@ -1329,7 +1347,7 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
   }
 
   track.addEventListener('pointerdown', (e) => {
-    if(e.pointerType === 'mouse' && e.button !== 0) return;
+    if(e.pointerType !== 'mouse' || e.button !== 0) return; // só mouse: touch fica com o navegador
     dragging = true;
     dragStartX = e.clientX;
     dragDeltaX = 0;
