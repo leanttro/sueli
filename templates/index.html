@@ -1472,7 +1472,7 @@ function cardFeira(f){
   const infra = f.infraestrutura ? `<div class="feira-info-item"><div class="label">Infraestrutura</div><div class="valor">${escapeHtml(f.infraestrutura)}</div></div>` : '';
   const taxa = f.taxa ? `<div class="feira-info-item"><div class="label">Taxa</div><div class="valor">${escapeHtml(f.taxa)}</div></div>` : '';
   const org = f.organizador ? `<div class="feira-info-item"><div class="label">Organizador</div><div class="valor">${escapeHtml(f.organizador)}</div></div>` : '';
-  const dataFmt = f.data_evento ? new Date(f.data_evento + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const dataFmt = f.data_evento || '';
   const dataHora = [dataFmt, f.horario].filter(Boolean).join(' · ');
   const whatsMsg = encodeURIComponent(`Olá, tenho interesse na feira: ${f.nome}`);
   const whatsLink = f.whatsapp
@@ -1527,7 +1527,7 @@ function cardEvento(f){
   const infra = f.infraestrutura ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Infraestrutura</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.infraestrutura)}</div></div>` : '';
   const taxa = f.taxa ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Taxa</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.taxa)}</div></div>` : '';
   const org = f.organizador ? `<div class="feira-info-item"><div class="label" style="color:var(--cinza);">Organizador</div><div class="valor" style="color:var(--carvao);">${escapeHtml(f.organizador)}</div></div>` : '';
-  const dataFmt = f.data_evento ? new Date(f.data_evento + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+  const dataFmt = f.data_evento || '';
   const dataHora = [dataFmt, f.horario].filter(Boolean).join(' · ');
   const whatsMsg = encodeURIComponent(`Olá, tenho interesse no evento: ${f.nome}`);
   const whatsLink = f.whatsapp
