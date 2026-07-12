@@ -545,6 +545,32 @@ def api_regioes():
         if conn: conn.close()
 
 
+@app.route('/api/admin/regioes')
+@login_required
+def api_admin_regioes():
+    # Igual ao /api/regioes público, mas considera TODOS os expositores
+    # (inclusive inativos), para sugerir no admin qualquer região já usada
+    # alguma vez — inclusive uma recém-digitada pela própria cliente.
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            SELECT DISTINCT TRIM(regiao) AS nome
+            FROM expositores
+            WHERE regiao IS NOT NULL AND TRIM(regiao) <> ''
+            ORDER BY nome
+        """)
+        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+        cur.close()
+        return jsonify(rows)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao buscar regiões'}), 500
+    finally:
+        if conn: conn.close()
+
+
 # ════════════════════════════════════════════════════════════
 #  API — SERVIÇOS
 # ════════════════════════════════════════════════════════════
