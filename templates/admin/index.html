@@ -393,15 +393,8 @@ tbody tr:hover td{background:#fdfafb;}
       </div>
       <div class="form-row">
         <div class="field-group"><label>Região</label>
-          <select id="exp-regiao">
-            <option value="">Selecione…</option>
-            <option value="Zona Sul">Zona Sul</option>
-            <option value="Zona Oeste">Zona Oeste</option>
-            <option value="Zona Leste">Zona Leste</option>
-            <option value="Zona Norte">Zona Norte</option>
-            <option value="ABC">ABC</option>
-            <option value="Indiferente">Indiferente</option>
-          </select>
+          <input id="exp-regiao" list="lista-regioes" placeholder="Ex: Zona Leste (escolha uma existente ou digite uma nova)" autocomplete="off">
+          <datalist id="lista-regioes"></datalist>
         </div>
         <div class="field-group"><label>Cidade</label><input id="exp-cidade" placeholder="São Paulo"></div>
       </div>
@@ -769,6 +762,7 @@ function mostrarPreviewExistente(url, previewId, statusId) {
 const $ = id => document.getElementById(id);
 let categoriasList = [];
 let planosList = [];
+let regioesList = [];
 
 function toast(msg, tipo='success'){
   const t = $('toast');
@@ -902,6 +896,10 @@ async function carregarOpcoesModal(){
     categoriasList.map(c=>`<option value="${c.id}">${c.nome}</option>`).join('');
   $('exp-plano').innerHTML = '<option value="">— Plano —</option>' +
     planosList.map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+  // Regiões: busca sempre atualizado (não cacheia), pra já sugerir uma região
+  // recém-cadastrada em outro expositor sem precisar recarregar a página.
+  try{ regioesList = await api('/api/admin/regioes'); }catch(e){ regioesList = []; }
+  $('lista-regioes').innerHTML = regioesList.map(r=>`<option value="${r.nome}"></option>`).join('');
 }
 
 // Converte select ('','mostrar','esconder') <-> valor booleano/null salvo no banco
