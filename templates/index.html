@@ -1401,24 +1401,41 @@ function initCarrossel(trackId, navId, dotsId, anteriorId, proximoId){
     dragDeltaX = 0;
   }
 
+  let pointerDownId = null; // guarda o pointerId, mas SÓ ativa o drag depois de mover
+
   track.addEventListener('pointerdown', (e) => {
     if(e.pointerType !== 'mouse' || e.button !== 0) return; // só mouse: touch fica com o navegador
-    dragging = true;
+    pointerDownId = e.pointerId;
+    dragging = false; // ainda não é drag — só vira drag se houver movimento de verdade
     dragStartX = e.clientX;
     dragDeltaX = 0;
     dragStartTransform = currentTranslateX();
-    track.style.transition = 'none';
-    track.setPointerCapture(e.pointerId);
   });
 
   track.addEventListener('pointermove', (e) => {
-    if(!dragging) return;
+    if(pointerDownId === null || e.pointerId !== pointerDownId) return;
     dragDeltaX = e.clientX - dragStartX;
-    track.style.transform = `translateX(${dragStartTransform + dragDeltaX}px)`;
+
+    // só "sequestra" o ponteiro quando o mouse realmente se moveu (arraste de verdade)
+    if(!dragging && Math.abs(dragDeltaX) > 5){
+      dragging = true;
+      track.style.transition = 'none';
+      track.setPointerCapture(e.pointerId);
+    }
+
+    if(dragging){
+      track.style.transform = `translateX(${dragStartTransform + dragDeltaX}px)`;
+    }
   });
 
-  track.addEventListener('pointerup', finalizarDrag);
-  track.addEventListener('pointercancel', finalizarDrag);
+  track.addEventListener('pointerup', (e) => {
+    pointerDownId = null;
+    if(dragging) finalizarDrag(); // só reposiciona/anima se de fato houve arraste
+  });
+  track.addEventListener('pointercancel', (e) => {
+    pointerDownId = null;
+    if(dragging) finalizarDrag();
+  });
   // Não usamos 'pointerleave' aqui: com setPointerCapture ativo, esse evento dispara
   // pelo hit-test real da tela (não respeita a captura) e no mobile o dedo "sai"
   // geometricamente do track no meio do arraste (já que o track se move por baixo
