@@ -465,38 +465,29 @@ tbody tr:hover td{background:#fdfafb;}
   </div>
 </div>
 
-<!-- MODAL SERVIÇO -->
+<!-- MODAL ANÚNCIO (reaproveita a tabela "servicos") -->
 <div class="overlay" id="modalServ">
   <div class="modal">
     <div class="modal-header">
-      <h3 id="modalServTit">Novo Serviço</h3>
+      <h3 id="modalServTit">Novo Anúncio</h3>
       <button class="modal-close" onclick="fecharModal('modalServ')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="serv-id">
       <div class="form-row">
-        <div class="field-group"><label>Título*</label><input id="serv-titulo" oninput="gerarSlug('serv-titulo','serv-slug')" placeholder="Nome do serviço"></div>
-        <div class="field-group"><label>Slug*</label><input id="serv-slug" placeholder="gerado-automaticamente"></div>
+        <div class="field-group"><label>Nome do anunciante*</label><input id="serv-titulo" placeholder="Ex: Studio Beleza & Cia"></div>
+        <div class="field-group"><label>Link do site/Instagram*</label><input id="serv-slug" placeholder="https://instagram.com/seuanunciante"></div>
       </div>
       <div class="form-row full">
-        <div class="field-group"><label>Descrição</label><textarea id="serv-descricao" placeholder="Descrição do serviço…"></textarea></div>
+        <div class="field-group"><label>Descrição</label><textarea id="serv-descricao" placeholder="Texto curto do anúncio…"></textarea></div>
       </div>
       <div class="form-row">
         <div class="field-group">
-          <label>Ícone</label>
-          <div class="upload-box" id="upload-serv-icone">
-            <input type="hidden" id="serv-icone">
-            <div class="upload-area" onclick="document.getElementById('file-serv-icone').click()">
-              <i class="fa-solid fa-cloud-arrow-up"></i>
-              <span>Clique para enviar imagem</span>
-            </div>
-            <input type="file" id="file-serv-icone" accept="image/*" style="display:none" onchange="uploadImagem(this,'serv-icone','prev-serv-icone')">
-            <img id="prev-serv-icone" class="upload-preview" style="display:none">
-            <div class="upload-status" id="status-serv-icone"></div>
-          </div>
+          <label>WhatsApp</label>
+          <input id="serv-icone" placeholder="Número (5511999999999) ou link https://wa.me/...">
         </div>
         <div class="field-group">
-          <label>Foto</label>
+          <label>Foto do anúncio</label>
           <div class="upload-box" id="upload-serv-foto">
             <input type="hidden" id="serv-foto">
             <div class="upload-area" onclick="document.getElementById('file-serv-foto').click()">
