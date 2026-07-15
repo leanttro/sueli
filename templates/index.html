@@ -243,14 +243,24 @@
   .destaque-item b{display:block;font-family:'Inter',sans-serif;font-weight:800;font-size:30px;color:var(--vinho);}
   .destaque-item span{font-size:13px;color:var(--cinza);}
 
-  /* ---------- SERVICOS ---------- */
+  /* ---------- ANUNCIE AQUI ---------- */
   .servicos{background:var(--rosa-suave);position:relative;}
   .servicos-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
-  .servico-card{background:#fff;border-radius:6px;padding:34px 26px;box-shadow:0 14px 34px -22px rgba(61,11,28,.25);transition:transform .3s ease, box-shadow .3s ease;border:1px solid var(--linha);}
-  .servico-card:hover{transform:translateY(-6px);box-shadow:var(--sombra);}
-  .servico-icone{width:54px;height:54px;border-radius:50%;background:var(--rosa-suave);color:var(--vinho);display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:20px;}
-  .servico-card h3{font-size:19px;margin-bottom:10px;line-height:1.3;}
-  .servico-card p{color:var(--cinza);font-size:14.5px;line-height:1.6;}
+  .anuncio-card{background:#fff;border-radius:6px;overflow:hidden;box-shadow:0 14px 34px -22px rgba(61,11,28,.25);transition:transform .3s ease, box-shadow .3s ease;border:1px solid var(--linha);display:flex;flex-direction:column;}
+  .anuncio-card:hover{transform:translateY(-6px);box-shadow:var(--sombra);}
+  .anuncio-foto{width:100%;aspect-ratio:4/3;overflow:hidden;background:var(--rosa-suave);}
+  .anuncio-foto img{width:100%;height:100%;object-fit:cover;display:block;}
+  .anuncio-corpo{padding:22px 22px 24px;display:flex;flex-direction:column;flex:1;}
+  .anuncio-corpo h3{font-size:18px;margin-bottom:8px;line-height:1.3;}
+  .anuncio-corpo p{color:var(--cinza);font-size:14px;line-height:1.6;margin-bottom:18px;flex:1;}
+  .anuncio-botoes{display:flex;gap:8px;flex-wrap:wrap;}
+  .anuncio-botoes .btn{padding:10px 14px;font-size:12.5px;flex:1;white-space:nowrap;}
+  .btn-whatsapp{background:#25D366;color:#fff;}
+  .btn-whatsapp:hover{background:#1ebe57;transform:translateY(-2px);}
+  .anuncio-cta{background:var(--vinho);padding:34px 26px;align-items:flex-start;justify-content:center;gap:10px;}
+  .anuncio-cta i{font-size:30px;color:var(--dourado);margin-bottom:4px;}
+  .anuncio-cta h3{font-size:18px;color:#fff;margin:0 0 6px;}
+  .anuncio-cta p{font-size:14px;color:rgba(255,255,255,.7);margin:0 0 16px;line-height:1.55;flex:none;}
   .skeleton{background:linear-gradient(90deg,#eee,#f6f1ec,#eee);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;}
   @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
@@ -603,7 +613,7 @@
     <a href="/" class="brand"><img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png" alt="Oficina Empreender SP" style="height:88px;width:88px;object-fit:contain;border-radius:50%;">Oficina Empreender SP</a>
     <nav class="links">
       <a href="#sobre">Sobre</a>
-      <a href="#servicos">Serviços</a>
+      <a href="#servicos">Anuncie Aqui</a>
       <a href="#expositores">Expositores</a>
       <a href="#cursos">Cursos</a>
       <a href="#eventos">Eventos</a>
@@ -619,7 +629,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <button class="mclose" id="mobileCloseBtn" aria-label="Fechar menu"><i class="fa-solid fa-xmark"></i></button>
   <a href="#sobre">Sobre</a>
-  <a href="#servicos">Serviços</a>
+  <a href="#servicos">Anuncie Aqui</a>
   <a href="#expositores">Expositores</a>
   <a href="#cursos">Cursos</a>
   <a href="#eventos">Eventos</a>
@@ -678,15 +688,15 @@
 <section class="servicos" id="servicos">
   <div class="container">
     <div class="section-head">
-      <p class="eyebrow">O que oferecemos</p>
-      <h2>Serviços pensados para o seu condomínio</h2>
-      <p class="lead">Cada formato pode ser adaptado ao perfil e ao espaço do seu condomínio, sempre com curadoria de expositores e produção completa.</p>
+      <p class="eyebrow">Anuncie aqui</p>
+      <h2>Divulgue sua marca para moradores de condomínios em SP</h2>
+      <p class="lead">Espaços de destaque para marcas parceiras, com foto em evidência e contato direto pelo WhatsApp ou pelo seu site/Instagram.</p>
     </div>
     <div class="servicos-grid" id="servicosGrid">
-      <div class="servico-card"><div class="skeleton" style="height:54px;width:54px;border-radius:50%;margin-bottom:20px;"></div><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div>
-      <div class="servico-card"><div class="skeleton" style="height:54px;width:54px;border-radius:50%;margin-bottom:20px;"></div><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div>
-      <div class="servico-card"><div class="skeleton" style="height:54px;width:54px;border-radius:50%;margin-bottom:20px;"></div><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div>
-      <div class="servico-card"><div class="skeleton" style="height:54px;width:54px;border-radius:50%;margin-bottom:20px;"></div><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div>
+      <div class="anuncio-card"><div class="skeleton" style="height:160px;width:100%;"></div><div style="padding:22px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+      <div class="anuncio-card"><div class="skeleton" style="height:160px;width:100%;"></div><div style="padding:22px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+      <div class="anuncio-card"><div class="skeleton" style="height:160px;width:100%;"></div><div style="padding:22px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+      <div class="anuncio-card"><div class="skeleton" style="height:160px;width:100%;"></div><div style="padding:22px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
     </div>
   </div>
 </section>
@@ -996,7 +1006,7 @@
       <div class="footer-col">
         <h4>Navegação</h4>
         <a href="#sobre">Sobre</a>
-        <a href="#servicos">Serviços</a>
+        <a href="#servicos">Anuncie Aqui</a>
         <a href="#expositores">Expositores</a>
         <a href="#trabalhe">Trabalhe Conosco</a>
         <a href="/blog">Blog</a>
@@ -1038,37 +1048,64 @@ hamburgerBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
 mobileCloseBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
 mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
 
-/* ---------- SERVICOS ---------- */
+/* ---------- ANUNCIE AQUI ---------- */
+/* Reaproveita a tabela "servicos" sem alterar o banco:
+   - foto_url  -> foto do anúncio
+   - titulo    -> nome do anunciante
+   - descricao -> texto do anúncio
+   - icone_url -> link do WhatsApp (número ou link completo)
+   - slug      -> outro link (site / Instagram) */
+function montarLinkWhats(v){
+  if(!v) return '';
+  v = v.trim();
+  if(v.startsWith('http')) return v;
+  const digitos = v.replace(/\D/g,'');
+  return digitos ? `https://wa.me/${digitos}` : '';
+}
+function montarLinkExterno(v){
+  if(!v) return '';
+  v = v.trim();
+  if(v.startsWith('http')) return v;
+  return `https://${v}`;
+}
 async function carregarServicos(){
   const grid = document.getElementById('servicosGrid');
+  const ctaCard = `
+    <div class="anuncio-card anuncio-cta">
+      <i class="fa-solid fa-circle-plus"></i>
+      <h3>Quer anunciar aqui?</h3>
+      <p>Alcance moradores de condomínios em São Paulo. Fale com a gente e reserve seu espaço.</p>
+      <a href="https://wa.me/5511999999999?text=Quero%20anunciar%20aqui!" target="_blank" rel="noopener" class="btn btn-gold"><i class="fa-brands fa-whatsapp"></i> Quero anunciar</a>
+    </div>`;
   try{
     const res = await fetch('/api/servicos');
-    if(!res.ok) throw new Error('Falha ao buscar serviços');
-    const servicos = await res.json();
-    if(!servicos.length){
-      grid.innerHTML = '<p style="color:var(--cinza);grid-column:1/-1;">Nenhum serviço cadastrado no momento.</p>';
+    if(!res.ok) throw new Error('Falha ao buscar anúncios');
+    const anuncios = await res.json();
+    if(!anuncios.length){
+      grid.innerHTML = ctaCard;
       return;
     }
-    grid.innerHTML = servicos.map(s => {
-      let iconeHtml = '';
-      if(s.foto_url){
-        iconeHtml = `<div class="servico-icone" style="width:54px;height:54px;border-radius:50%;overflow:hidden;background:var(--rosa-suave);margin-bottom:20px;"><img src="${s.foto_url}" alt="${escapeHtml(s.titulo||'')}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-      } else if(s.icone_url && s.icone_url.startsWith('fa-')){
-        iconeHtml = `<div class="servico-icone"><i class="fa-solid ${s.icone_url}"></i></div>`;
-      } else {
-        iconeHtml = `<div class="servico-icone"><i class="fa-solid fa-calendar-star"></i></div>`;
-      }
+    grid.innerHTML = anuncios.map(a => {
+      const whats = montarLinkWhats(a.icone_url);
+      const link  = montarLinkExterno(a.slug);
+      const foto  = a.foto_url || 'https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png';
+      let botoes = '';
+      if(whats) botoes += `<a href="${whats}" target="_blank" rel="noopener" class="btn btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>`;
+      if(link)  botoes += `<a href="${link}" target="_blank" rel="noopener" class="btn btn-ghost">Saiba mais <i class="fa-solid fa-arrow-up-right-from-square"></i></a>`;
       return `
-        <div class="servico-card">
-          ${iconeHtml}
-          <h3>${escapeHtml(s.titulo || '')}</h3>
-          <p>${escapeHtml(s.descricao || '')}</p>
+        <div class="anuncio-card">
+          <div class="anuncio-foto"><img src="${foto}" alt="${escapeHtml(a.titulo||'')}" loading="lazy"></div>
+          <div class="anuncio-corpo">
+            <h3>${escapeHtml(a.titulo || '')}</h3>
+            <p>${escapeHtml(a.descricao || '')}</p>
+            ${botoes ? `<div class="anuncio-botoes">${botoes}</div>` : ''}
+          </div>
         </div>
       `;
-    }).join('');
+    }).join('') + ctaCard;
   }catch(err){
     console.error(err);
-    grid.innerHTML = '<p style="color:var(--cinza);grid-column:1/-1;">Não foi possível carregar os serviços agora.</p>';
+    grid.innerHTML = '<p style="color:var(--cinza);grid-column:1/-1;">Não foi possível carregar os anúncios agora.</p>';
   }
 }
 
