@@ -159,6 +159,22 @@ tbody tr:hover td{background:#fdfafb;}
   .dash-cards{grid-template-columns:1fr;}
   .section{padding:16px;}
 }
+
+/* TABELAS RESPONSIVAS (viram cards empilhados no mobile, sem rolagem lateral) */
+@media(max-width:700px){
+  .table-wrap{overflow-x:visible;}
+  table, thead, tbody, tr, td{display:block;width:100%;}
+  table thead{display:none;}
+  tbody tr{border-bottom:1px solid var(--linha);padding:10px 0;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody td{border-bottom:none;padding:6px 16px 6px 44%;position:relative;text-align:left;min-height:20px;}
+  tbody td[data-label]:not([data-label=""])::before{
+    content:attr(data-label);position:absolute;left:16px;top:6px;width:38%;
+    font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.3px;
+  }
+  tbody td.cell-acoes{padding-left:16px;}
+  tbody td.cell-acoes .td-acoes{justify-content:flex-start;}
+}
 </style>
 </head>
 <body>
@@ -223,6 +239,10 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="section-header">
       <h2>Expositores</h2>
       <button class="btn btn-primary" onclick="abrirModalExp()"><i class="fa-solid fa-plus"></i> Novo Expositor</button>
+    </div>
+    <div style="position:relative;max-width:340px;margin-bottom:16px;">
+      <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza);font-size:13px;"></i>
+      <input type="text" id="buscaExpositor" oninput="filtrarExpositores()" placeholder="Buscar expositor pelo nome..." style="width:100%;padding:10px 14px 10px 36px;border:1.5px solid var(--linha);border-radius:5px;font-size:14px;color:var(--carvao);background:#fff;outline:none;">
     </div>
     <div class="table-wrap" id="tabelaExpositores"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
   </div>
@@ -847,32 +867,42 @@ async function carregarDashboard(){
 
 // ─── EXPOSITORES ──────────────────────────────────────────────
 let _cacheExpositores = [];
+function renderTabelaExpositores(data){
+  if(!data.length){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-store"></i>Nenhum expositor encontrado.</div>'; return; }
+  $('tabelaExpositores').innerHTML = `<table><thead><tr>
+    <th>Nome</th><th>Categoria</th><th>Plano</th><th>Região</th><th>Status</th><th>Expiração</th><th>Ações</th>
+  </tr></thead><tbody>
+  ${data.map(e=>`<tr>
+    <td data-label="Nome"><b>${e.nome}</b></td>
+    <td data-label="Categoria">${e.categoria_nome||'—'}</td>
+    <td data-label="Plano">${e.plano_nome||'—'}</td>
+    <td data-label="Região">${e.regiao||'—'}</td>
+    <td data-label="Status">${e.bloqueado?'<span class="tag tag-red">Bloqueado</span>':e.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+    <td data-label="Expiração">${e.data_expiracao||'—'}</td>
+    <td data-label="" class="cell-acoes"><div class="td-acoes">
+      <button class="btn btn-ghost btn-sm" onclick="editarExpositorPorId(${e.id})"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-danger btn-sm" onclick="excluirExpositor(${e.id})"><i class="fa-solid fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
 async function carregarExpositores(){
   $('tabelaExpositores').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/expositores');
     _cacheExpositores = data;
-    if(!data.length){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-store"></i>Nenhum expositor cadastrado.</div>'; return; }
-    $('tabelaExpositores').innerHTML = `<table><thead><tr>
-      <th>Nome</th><th>Categoria</th><th>Plano</th><th>Região</th><th>Status</th><th>Expiração</th><th>Ações</th>
-    </tr></thead><tbody>
-    ${data.map(e=>`<tr>
-      <td><b>${e.nome}</b></td>
-      <td>${e.categoria_nome||'—'}</td>
-      <td>${e.plano_nome||'—'}</td>
-      <td>${e.regiao||'—'}</td>
-      <td>${e.bloqueado?'<span class="tag tag-red">Bloqueado</span>':e.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
-      <td>${e.data_expiracao||'—'}</td>
-      <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick="editarExpositorPorId(${e.id})"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="excluirExpositor(${e.id})"><i class="fa-solid fa-trash"></i></button>
-      </div></td>
-    </tr>`).join('')}
-    </tbody></table>`;
+    const buscaEl = $('buscaExpositor');
+    if(buscaEl) buscaEl.value = '';
+    renderTabelaExpositores(data);
   }catch(e){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Erro ao carregar.</div>'; }
 }
+function filtrarExpositores(){
+  const termo = ($('buscaExpositor').value||'').trim().toLowerCase();
+  const filtrados = termo ? _cacheExpositores.filter(e=>(e.nome||'').toLowerCase().includes(termo)) : _cacheExpositores;
+  renderTabelaExpositores(filtrados);
+}
 function editarExpositorPorId(id){
-  const e = _cacheExpositores.find(x=>x.id===id);
+  const e = _cacheExpositores.find(x=>String(x.id)===String(id));
   if(e) editarExpositor(e);
 }
 
