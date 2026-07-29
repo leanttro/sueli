@@ -188,16 +188,24 @@
   .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;}
   header.site.scrolled .hamburger{color:var(--vinho-escuro);}
 
-  /* ---------- BUSCA (HEADER) ---------- */
-  .nav-busca{position:relative;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:30px;padding:8px 14px;transition:background .3s ease, border-color .3s ease;}
-  header.site.scrolled .nav-busca{background:#fff;border-color:var(--linha);}
+  /* ---------- BARRA DE BUSCA (ABAIXO DO CABEÇALHO) ---------- */
+  .busca-bar{
+    position:fixed;left:0;right:0;z-index:49;
+    background:var(--vinho-escuro);
+    padding:12px 0;
+    transition:top .35s ease, background .35s ease, padding .35s ease;
+  }
+  header.site.scrolled + .busca-bar{background:#fff;box-shadow:0 6px 18px -12px rgba(84,31,81,.25);}
+  .busca-bar .nav-busca{max-width:420px;margin:0 auto;width:100%;}
+  .nav-busca{position:relative;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:30px;padding:9px 16px;transition:background .3s ease, border-color .3s ease;}
+  header.site.scrolled + .busca-bar .nav-busca{background:var(--rosa-suave);border-color:var(--linha);}
   .nav-busca i{color:rgba(255,255,255,.85);font-size:13px;}
-  header.site.scrolled .nav-busca i{color:var(--vinho);}
-  .nav-busca input{border:none;background:transparent;outline:none;font-family:inherit;font-size:13px;color:#fff;width:130px;}
+  header.site.scrolled + .busca-bar .nav-busca i{color:var(--vinho);}
+  .nav-busca input{border:none;background:transparent;outline:none;font-family:inherit;font-size:13px;color:#fff;width:100%;}
   .nav-busca input::placeholder{color:rgba(255,255,255,.65);}
-  header.site.scrolled .nav-busca input{color:var(--carvao);}
-  header.site.scrolled .nav-busca input::placeholder{color:var(--cinza);}
-  .busca-dropdown{position:absolute;top:calc(100% + 12px);right:0;width:320px;max-height:420px;overflow-y:auto;background:#fff;border-radius:8px;box-shadow:var(--sombra);border:1px solid var(--linha);padding:10px 0;display:none;z-index:80;}
+  header.site.scrolled + .busca-bar .nav-busca input{color:var(--carvao);}
+  header.site.scrolled + .busca-bar .nav-busca input::placeholder{color:var(--cinza);}
+  .busca-dropdown{position:absolute;top:calc(100% + 12px);left:0;right:0;max-height:420px;overflow-y:auto;background:#fff;border-radius:8px;box-shadow:var(--sombra);border:1px solid var(--linha);padding:10px 0;display:none;z-index:80;}
   .busca-dropdown.aberto{display:block;}
   .busca-grupo{padding:6px 18px;}
   .busca-grupo-titulo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--vinho);margin:10px 0 6px;}
@@ -206,10 +214,7 @@
   .busca-item:hover{color:var(--vinho);}
   .busca-item small{display:block;color:var(--cinza);font-size:12px;margin-top:2px;font-weight:400;}
   .busca-vazio{padding:20px 18px;text-align:center;color:var(--cinza);font-size:13.5px;}
-  @media(max-width:1180px){.nav-busca{display:none;}}
-  .mobile-menu .nav-busca{display:flex;width:100%;}
-  .mobile-menu .nav-busca input{width:100%;}
-  .mobile-menu .busca-dropdown{width:100%;right:auto;left:0;}
+  @media(max-width:680px){.busca-bar{padding:10px 0;} .busca-bar .nav-busca{max-width:none;}}
 
   .mobile-menu{position:fixed;inset:0;background:var(--vinho-escuro);z-index:60;display:flex;flex-direction:column;padding:28px 24px;transform:translateY(-100%);transition:transform .35s ease;}
   .mobile-menu.open{transform:translateY(0);}
@@ -228,7 +233,8 @@
     background:radial-gradient(circle at 18% 20%, rgba(201,212,84,.15), transparent 45%);
     pointer-events:none;
   }
-  .hero-inner{position:relative;z-index:2;padding-top:120px;padding-bottom:80px;}
+  .hero-inner{position:relative;z-index:2;padding-top:176px;padding-bottom:80px;}
+  @media(max-width:680px){.hero-inner{padding-top:168px;}}
   .hero .eyebrow{color:var(--dourado-claro);}
   .hero .eyebrow::before{background:var(--dourado-claro);}
   .hero h1{color:#fff;font-size:clamp(38px,6vw,64px);line-height:1.12;max-width:780px;}
@@ -673,22 +679,22 @@
       <a href="/blog">Blog</a>
       <a href="#contato" class="btn btn-ghost" style="padding:10px 20px;">Fale Conosco</a>
     </nav>
+    <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<div class="busca-bar" id="buscaBar">
+  <div class="container">
     <div class="nav-busca" id="navBusca">
       <i class="fa-solid fa-search"></i>
       <input type="text" id="buscaInput" placeholder="Buscar no site..." aria-label="Buscar no site" autocomplete="off">
       <div class="busca-dropdown" id="buscaDropdown"></div>
     </div>
-    <button class="hamburger" id="hamburgerBtn" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
   </div>
-</header>
+</div>
 
 <div class="mobile-menu" id="mobileMenu">
   <button class="mclose" id="mobileCloseBtn" aria-label="Fechar menu"><i class="fa-solid fa-xmark"></i></button>
-  <div class="nav-busca" id="navBuscaMobile" style="margin-bottom:10px;">
-    <i class="fa-solid fa-search"></i>
-    <input type="text" id="buscaInputMobile" placeholder="Buscar no site..." aria-label="Buscar no site" autocomplete="off">
-    <div class="busca-dropdown" id="buscaDropdownMobile"></div>
-  </div>
   <a href="#sobre">Sobre</a>
   <a href="#servicos">Anuncie Aqui</a>
   <a href="#expositores">Expositores</a>
@@ -1154,9 +1160,17 @@ document.getElementById('anoAtual').textContent = new Date().getFullYear();
 
 /* Header on scroll */
 const header = document.getElementById('siteHeader');
+const buscaBar = document.getElementById('buscaBar');
+function posicionarBuscaBar(){
+  if(buscaBar) buscaBar.style.top = header.offsetHeight + 'px';
+}
 window.addEventListener('scroll', () => {
   header.classList.toggle('scrolled', window.scrollY > 40);
+  posicionarBuscaBar();
 });
+window.addEventListener('resize', posicionarBuscaBar);
+window.addEventListener('load', posicionarBuscaBar);
+posicionarBuscaBar();
 
 /* Mobile menu */
 const hamburgerBtn = document.getElementById('hamburgerBtn');
