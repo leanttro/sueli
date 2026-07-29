@@ -122,6 +122,58 @@
     #ia-chat-bubble{right:16px;bottom:16px;}
     #ia-chat-teaser{right:10px;bottom:84px;width:calc(100vw - 20px);max-width:none;}
   }
+
+  /* ── POP-UP "CADASTRE-SE GRÁTIS" (expositores) ─────────────── */
+  #popupCadOverlay{
+    position:fixed;inset:0;background:rgba(43,31,38,.62);backdrop-filter:blur(3px);
+    z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity .25s ease;
+  }
+  #popupCadOverlay.mostrar{opacity:1;pointer-events:auto;}
+  .popup-cad{
+    position:relative;background:#fff;border-radius:16px;max-width:640px;width:100%;
+    max-height:90vh;overflow-y:auto;box-shadow:0 40px 90px -20px rgba(20,8,18,.55);
+    transform:translateY(18px) scale(.97);transition:transform .3s ease;
+  }
+  #popupCadOverlay.mostrar .popup-cad{transform:translateY(0) scale(1);}
+  .popup-cad-top{
+    background:linear-gradient(135deg,var(--vinho),var(--vinho-escuro));color:#fff;
+    padding:30px 34px 26px;border-radius:16px 16px 0 0;position:relative;
+  }
+  .popup-cad-badge{
+    display:inline-flex;align-items:center;gap:6px;background:var(--dourado);color:var(--vinho-escuro);
+    font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+    padding:6px 14px;border-radius:99px;margin-bottom:14px;
+  }
+  .popup-cad-top h3{font-size:clamp(21px,3.4vw,27px);line-height:1.25;margin-bottom:10px;}
+  .popup-cad-top p{font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.85);max-width:480px;}
+  .popup-cad-close{
+    position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;
+    background:rgba(255,255,255,.15);border:none;color:#fff;font-size:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;transition:background .2s;
+  }
+  .popup-cad-close:hover{background:rgba(255,255,255,.3);}
+  .popup-cad-body{padding:28px 34px 32px;}
+  @media(max-width:600px){
+    .popup-cad-top{padding:24px 22px 20px;}
+    .popup-cad-body{padding:22px 22px 26px;}
+  }
+
+  /* aba flutuante para reabrir o pop-up a qualquer momento */
+  #cadFlutuanteTab{
+    position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:9997;
+    background:var(--vinho);color:#fff;border:none;cursor:pointer;
+    padding:16px 14px;border-radius:0 10px 10px 0;box-shadow:4px 6px 18px -6px rgba(84,31,81,.5);
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    writing-mode:vertical-rl;text-orientation:mixed;font-weight:700;font-size:13px;letter-spacing:.3px;
+    transition:background .2s, padding-left .2s;
+  }
+  #cadFlutuanteTab:hover{background:var(--vinho-escuro);padding-left:18px;}
+  #cadFlutuanteTab i{writing-mode:horizontal-tb;color:var(--dourado);font-size:15px;}
+  #cadFlutuanteTab.hidden{display:none;}
+  @media(max-width:600px){
+    #cadFlutuanteTab{padding:12px 10px;font-size:11.5px;}
+  }
   html{scroll-behavior:smooth;overflow-x:hidden;max-width:100%;}
   body{
     margin:0;
@@ -311,7 +363,9 @@
   .exp-empty i, .exp-erro i{font-size:30px;color:var(--dourado);margin-bottom:14px;}
 
   /* ---------- CADASTRO DE EXPOSITOR (formulário inline) ---------- */
-  .cad-expositor{background:#fff;border:1px solid var(--linha);border-radius:8px;padding:32px 30px;margin-bottom:40px;box-shadow:0 14px 34px -22px rgba(61,11,28,.2);}
+  .cad-expositor{background:#fff;border:1px solid var(--linha);border-top:4px solid var(--dourado);border-radius:8px;padding:32px 30px;margin-bottom:40px;box-shadow:0 14px 34px -22px rgba(61,11,28,.2);}
+  .cad-badge-grátis{display:inline-flex;align-items:center;gap:6px;background:var(--rosa-suave);color:var(--vinho);
+    font-size:11.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:10px;}
   .cad-expositor-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:22px;}
   .cad-expositor-head h3{font-size:19px;color:var(--vinho-escuro);margin-bottom:6px;}
   .cad-expositor-head p{color:var(--cinza);font-size:14px;max-width:520px;line-height:1.6;}
@@ -675,6 +729,58 @@
 </head>
 <body>
 
+<!-- ── POP-UP "CADASTRE-SE GRÁTIS" (aparece no início e fica flutuando) ── -->
+<div id="popupCadOverlay">
+  <div class="popup-cad" role="dialog" aria-modal="true" aria-labelledby="popupCadTitulo">
+    <div class="popup-cad-top">
+      <button class="popup-cad-close" onclick="fecharPopupCadastro()" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      <span class="popup-cad-badge"><i class="fa-solid fa-star"></i> Cadastro 100% grátis</span>
+      <h3 id="popupCadTitulo">Quer ser um dos nossos expositores?</h3>
+      <p>Preencha seus dados abaixo. Faremos uma curadoria rápida e, assim que aprovado, seu perfil já aparece no nosso catálogo — sem custo nenhum.</p>
+    </div>
+    <div class="popup-cad-body">
+      <form id="formCadastroExpositorPopup">
+        <div class="cad-grid">
+          <div class="campo">
+            <label for="cadNomePopup">Nome da empresa *</label>
+            <input type="text" id="cadNomePopup" name="nome" required placeholder="Nome do seu negócio">
+          </div>
+          <div class="campo">
+            <label for="cadWhatsPopup">WhatsApp *</label>
+            <input type="tel" id="cadWhatsPopup" name="whatsapp" required placeholder="(11) 94809-2924">
+          </div>
+          <div class="campo">
+            <label for="cadRegiaoPopup">Região *</label>
+            <select id="cadRegiaoPopup" name="regiao" required>
+              <option value="">Selecione sua região</option>
+              <option value="__outra__">Outra (não está na lista)</option>
+            </select>
+            <input type="text" id="cadRegiaoOutraPopup" class="cad-outra" placeholder="Digite sua região">
+          </div>
+          <div class="campo">
+            <label for="cadCategoriaPopup">Categoria de produto</label>
+            <select id="cadCategoriaPopup" name="categoria_id">
+              <option value="">Selecione uma categoria</option>
+              <option value="__outra__">Outra (não está na lista)</option>
+            </select>
+            <input type="text" id="cadCategoriaOutraPopup" class="cad-outra" placeholder="Digite a categoria">
+          </div>
+        </div>
+        <div class="cad-acoes">
+          <button type="submit" class="btn btn-primary" id="btnCadEnviarPopup"><span>Cadastrar grátis</span> <i class="fa-solid fa-paper-plane"></i></button>
+          <span class="cad-separador">ou</span>
+          <a href="https://wa.me/5511948092924?text=Olá%2C%20quero%20aparecer%20com%20destaque%20como%20expositor!" target="_blank" rel="noopener" class="btn btn-outline" style="border-color:var(--linha);color:var(--vinho);"><i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp</a>
+        </div>
+        <div class="form-msg" id="cadMsgPopup"></div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<button id="cadFlutuanteTab" onclick="abrirPopupCadastro()">
+  <i class="fa-solid fa-star"></i> Cadastre-se grátis
+</button>
+
 <header class="site" id="siteHeader">
   <div class="container nav-wrap">
     <a href="/" class="brand"><img src="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png" alt="Oficina Empreender SP" style="height:88px;width:88px;object-fit:contain;border-radius:50%;">Oficina Empreender SP</a>
@@ -862,6 +968,7 @@
     <div class="cad-expositor" id="cadastro-expositor">
       <div class="cad-expositor-head">
         <div>
+          <span class="cad-badge-grátis"><i class="fa-solid fa-star"></i> Cadastro 100% grátis</span>
           <h3>Quer ser um dos nossos expositores?</h3>
           <p>Preencha seus dados abaixo. Faremos uma curadoria rápida e, assim que aprovado, seu perfil já aparece no nosso catálogo.</p>
         </div>
@@ -896,7 +1003,7 @@
         <div class="cad-acoes">
           <button type="submit" class="btn btn-primary" id="btnCadEnviar"><span>Enviar cadastro</span> <i class="fa-solid fa-paper-plane"></i></button>
           <span class="cad-separador">ou</span>
-          <a href="https://wa.me/5511948092924?text=Olá%2C%20quero%20aparecer%20com%20destaque%20como%20expositor!" target="_blank" rel="noopener" class="btn btn-outline"><i class="fa-brands fa-whatsapp"></i> Quero aparecer com destaque</a>
+          <a href="https://wa.me/5511948092924?text=Olá%2C%20quero%20aparecer%20com%20destaque%20como%20expositor!" target="_blank" rel="noopener" class="btn btn-outline" style="border-color:var(--linha);color:var(--vinho);"><i class="fa-brands fa-whatsapp"></i> Quero aparecer com destaque</a>
         </div>
         <div class="form-msg" id="cadMsg"></div>
       </form>
@@ -1349,8 +1456,7 @@ async function carregarServicos(){
 async function carregarCategorias(){
   const select = document.getElementById('filtroCategoria');
   const selectBasicos = document.getElementById('filtroCategoriaBasicos');
-  const selectCad = document.getElementById('cadCategoria');
-  const cadOutraOpt = selectCad ? selectCad.querySelector('option[value="__outra__"]') : null;
+  const selectsCad = [document.getElementById('cadCategoria'), document.getElementById('cadCategoriaPopup')].filter(Boolean);
   try{
     const res = await fetch('/api/categorias');
     if(!res.ok) throw new Error('Falha ao buscar categorias');
@@ -1368,20 +1474,20 @@ async function carregarCategorias(){
         selectBasicos.appendChild(optBasicos);
       }
 
-      if(selectCad){
+      selectsCad.forEach(selectCad => {
+        const cadOutraOpt = selectCad.querySelector('option[value="__outra__"]');
         const optCad = document.createElement('option');
         optCad.value = c.id;
         optCad.textContent = c.nome;
         selectCad.insertBefore(optCad, cadOutraOpt);
-      }
+      });
     });
   }catch(err){ console.error(err); }
 }
 
 async function carregarRegioes(){
   const select = document.getElementById('filtroRegiao');
-  const selectCad = document.getElementById('cadRegiao');
-  const cadOutraOpt = selectCad ? selectCad.querySelector('option[value="__outra__"]') : null;
+  const selectsCad = [document.getElementById('cadRegiao'), document.getElementById('cadRegiaoPopup')].filter(Boolean);
   try{
     const res = await fetch('/api/regioes');
     if(!res.ok) throw new Error('Falha ao buscar regiões');
@@ -1392,83 +1498,129 @@ async function carregarRegioes(){
       opt.textContent = r.nome;
       select.appendChild(opt);
 
-      if(selectCad){
+      selectsCad.forEach(selectCad => {
+        const cadOutraOpt = selectCad.querySelector('option[value="__outra__"]');
         const optCad = document.createElement('option');
         optCad.value = r.nome;
         optCad.textContent = r.nome;
         selectCad.insertBefore(optCad, cadOutraOpt);
-      }
+      });
     });
   }catch(err){ console.error(err); }
 }
 
-/* ---------- CADASTRO DE EXPOSITOR (form inline) ---------- */
+/* ---------- CADASTRO DE EXPOSITOR (form inline + pop-up) ---------- */
 function alternarCadOutra(selectEl, inputEl){
   const mostrar = selectEl.value === '__outra__';
   inputEl.classList.toggle('mostrar', mostrar);
   if(mostrar){ inputEl.focus(); } else { inputEl.value = ''; }
 }
-const cadRegiaoSelect = document.getElementById('cadRegiao');
-const cadRegiaoOutra = document.getElementById('cadRegiaoOutra');
-const cadCategoriaSelect = document.getElementById('cadCategoria');
-const cadCategoriaOutra = document.getElementById('cadCategoriaOutra');
-cadRegiaoSelect.addEventListener('change', () => alternarCadOutra(cadRegiaoSelect, cadRegiaoOutra));
-cadCategoriaSelect.addEventListener('change', () => alternarCadOutra(cadCategoriaSelect, cadCategoriaOutra));
 
-document.getElementById('formCadastroExpositor').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('btnCadEnviar');
-  const msg = document.getElementById('cadMsg');
-  msg.className = 'form-msg';
-  msg.textContent = '';
+function configurarFormularioCadastro(sufixo){
+  const form = document.getElementById('formCadastroExpositor' + sufixo);
+  if(!form) return;
+  const regiaoSelect = document.getElementById('cadRegiao' + sufixo);
+  const regiaoOutra = document.getElementById('cadRegiaoOutra' + sufixo);
+  const categoriaSelect = document.getElementById('cadCategoria' + sufixo);
+  const categoriaOutra = document.getElementById('cadCategoriaOutra' + sufixo);
+  const nomeInput = document.getElementById('cadNome' + sufixo);
+  const whatsInput = document.getElementById('cadWhats' + sufixo);
+  const btn = document.getElementById('btnCadEnviar' + sufixo);
+  const msg = document.getElementById('cadMsg' + sufixo);
 
-  const regiao = cadRegiaoSelect.value === '__outra__' ? cadRegiaoOutra.value.trim() : cadRegiaoSelect.value;
-  const categoriaOutra = cadCategoriaSelect.value === '__outra__' ? cadCategoriaOutra.value.trim() : '';
+  regiaoSelect.addEventListener('change', () => alternarCadOutra(regiaoSelect, regiaoOutra));
+  categoriaSelect.addEventListener('change', () => alternarCadOutra(categoriaSelect, categoriaOutra));
 
-  const payload = {
-    nome: document.getElementById('cadNome').value.trim(),
-    whatsapp: document.getElementById('cadWhats').value.trim(),
-    regiao: regiao,
-    categoria_id: (cadCategoriaSelect.value && cadCategoriaSelect.value !== '__outra__') ? cadCategoriaSelect.value : null,
-    categoria_outra: categoriaOutra || null
-  };
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    msg.className = 'form-msg';
+    msg.textContent = '';
 
-  if(!payload.nome || !payload.whatsapp || !payload.regiao){
-    msg.className = 'form-msg erro';
-    msg.textContent = 'Por favor, preencha nome, WhatsApp e região.';
-    return;
-  }
+    const regiao = regiaoSelect.value === '__outra__' ? regiaoOutra.value.trim() : regiaoSelect.value;
+    const categoriaOutraVal = categoriaSelect.value === '__outra__' ? categoriaOutra.value.trim() : '';
 
-  btn.disabled = true;
-  const original = btn.innerHTML;
-  btn.innerHTML = '<span>Enviando...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+    const payload = {
+      nome: nomeInput.value.trim(),
+      whatsapp: whatsInput.value.trim(),
+      regiao: regiao,
+      categoria_id: (categoriaSelect.value && categoriaSelect.value !== '__outra__') ? categoriaSelect.value : null,
+      categoria_outra: categoriaOutraVal || null
+    };
 
-  try{
-    const res = await fetch('/api/expositores/cadastro', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const data = await res.json();
-    if(res.ok && data.ok){
-      msg.className = 'form-msg ok';
-      msg.textContent = 'Cadastro enviado! Vamos revisar e publicar em breve.';
-      document.getElementById('formCadastroExpositor').reset();
-      alternarCadOutra(cadRegiaoSelect, cadRegiaoOutra);
-      alternarCadOutra(cadCategoriaSelect, cadCategoriaOutra);
-    }else{
+    if(!payload.nome || !payload.whatsapp || !payload.regiao){
       msg.className = 'form-msg erro';
-      msg.textContent = data.error || 'Não foi possível enviar seu cadastro. Tente novamente.';
+      msg.textContent = 'Por favor, preencha nome, WhatsApp e região.';
+      return;
     }
-  }catch(err){
-    console.error(err);
-    msg.className = 'form-msg erro';
-    msg.textContent = 'Erro de conexão. Verifique sua internet e tente novamente.';
-  }finally{
-    btn.disabled = false;
-    btn.innerHTML = original;
-  }
+
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.innerHTML = '<span>Enviando...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+
+    try{
+      const res = await fetch('/api/expositores/cadastro', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if(res.ok && data.ok){
+        msg.className = 'form-msg ok';
+        msg.textContent = 'Cadastro enviado! Vamos revisar e publicar em breve.';
+        form.reset();
+        alternarCadOutra(regiaoSelect, regiaoOutra);
+        alternarCadOutra(categoriaSelect, categoriaOutra);
+        if(sufixo === 'Popup'){
+          try{ sessionStorage.setItem('popupCadEnviado', '1'); }catch(err){}
+          setTimeout(fecharPopupCadastro, 1800);
+        }
+      }else{
+        msg.className = 'form-msg erro';
+        msg.textContent = data.error || 'Não foi possível enviar seu cadastro. Tente novamente.';
+      }
+    }catch(err){
+      console.error(err);
+      msg.className = 'form-msg erro';
+      msg.textContent = 'Erro de conexão. Verifique sua internet e tente novamente.';
+    }finally{
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
+  });
+}
+
+configurarFormularioCadastro('');
+configurarFormularioCadastro('Popup');
+
+/* ---------- POP-UP "CADASTRE-SE GRÁTIS" ---------- */
+const POPUP_CAD_KEY = 'popupCadMostrado';
+function abrirPopupCadastro(){
+  document.getElementById('popupCadOverlay').classList.add('mostrar');
+  document.getElementById('cadFlutuanteTab').classList.add('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function fecharPopupCadastro(){
+  document.getElementById('popupCadOverlay').classList.remove('mostrar');
+  document.getElementById('cadFlutuanteTab').classList.remove('hidden');
+  document.body.style.overflow = '';
+  try{ sessionStorage.setItem(POPUP_CAD_KEY, '1'); }catch(err){}
+}
+document.getElementById('popupCadOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'popupCadOverlay') fecharPopupCadastro();
 });
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && document.getElementById('popupCadOverlay').classList.contains('mostrar')) fecharPopupCadastro();
+});
+
+(function(){
+  let jaMostrado = false;
+  try{ jaMostrado = sessionStorage.getItem(POPUP_CAD_KEY) === '1' || sessionStorage.getItem('popupCadEnviado') === '1'; }catch(err){}
+  if(!jaMostrado){
+    setTimeout(abrirPopupCadastro, 1600);
+  }else{
+    document.getElementById('cadFlutuanteTab').classList.remove('hidden');
+  }
+})();
 
 /* ---------- EXPOSITORES ---------- */
 function cardExpositor(exp){
