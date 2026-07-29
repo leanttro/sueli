@@ -822,6 +822,63 @@ def api_blog():
 
 
 # ════════════════════════════════════════════════════════════
+#  API — BUSCA (barra de busca do site)
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/busca')
+def api_busca():
+    termo = (request.args.get('q') or '').strip()
+    resultado = {'expositores': [], 'feiras': [], 'posts': []}
+
+    if len(termo) < 2:
+        return jsonify(resultado)
+
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        like = f"%{termo}%"
+
+        cur.execute("""
+            SELECT e.nome, e.slug, c.nome AS categoria_nome
+            FROM expositores e
+            LEFT JOIN categorias c ON e.categoria_id = c.id
+            WHERE e.ativo = TRUE AND e.aprovado = TRUE
+              AND (e.nome ILIKE %s OR c.nome ILIKE %s)
+            ORDER BY e.destaque DESC, e.nome
+            LIMIT 6
+        """, (like, like))
+        resultado['expositores'] = [format_db_data(dict(r)) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT nome, local, data_evento
+            FROM feiras
+            WHERE ativo = TRUE AND data_evento >= CURRENT_DATE
+              AND (nome ILIKE %s OR local ILIKE %s)
+            ORDER BY data_evento ASC
+            LIMIT 4
+        """, (like, like))
+        resultado['feiras'] = [format_db_data(dict(r)) for r in cur.fetchall()]
+
+        cur.execute("""
+            SELECT titulo, subtitulo, slug
+            FROM posts
+            WHERE ativo = TRUE AND (titulo ILIKE %s OR subtitulo ILIKE %s)
+            ORDER BY criado_em DESC
+            LIMIT 4
+        """, (like, like))
+        resultado['posts'] = [format_db_data(dict(r)) for r in cur.fetchall()]
+
+        cur.close()
+        return jsonify(resultado)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao buscar'}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
 #  API — CONTATO (formulário da landing)
 # ════════════════════════════════════════════════════════════
 
