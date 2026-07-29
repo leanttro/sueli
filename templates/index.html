@@ -166,45 +166,37 @@
   .btn-gold{background:var(--dourado); color:var(--vinho-escuro);}
   .btn-gold:hover{background:var(--dourado-claro); transform:translateY(-2px);}
 
-  /* ---------- HEADER ---------- */
+  /* ---------- HEADER (não fixo — rola junto com a página) ---------- */
   header.site{
-    position:fixed;top:0;left:0;right:0;z-index:50;
-    padding:10px 0; transition:background .35s ease, padding .35s ease, box-shadow .35s ease;
+    position:relative; z-index:50;
+    background:rgba(248,248,244,.98);
+    padding:10px 0;
+    box-shadow:0 6px 24px -10px rgba(84,31,81,.18);
   }
-  header.site.scrolled{background:rgba(248,248,244,.95); backdrop-filter:blur(10px); padding:6px 0; box-shadow:0 6px 24px -10px rgba(84,31,81,.18);}
   .nav-wrap{display:flex;align-items:center;justify-content:space-between;}
-  .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:700;font-size:18px;color:#fff;letter-spacing:.3px;}
-  header.site.scrolled .brand{color:var(--vinho);}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:700;font-size:18px;color:var(--vinho);letter-spacing:.3px;}
   .brand .ring{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--dourado);display:flex;align-items:center;justify-content:center;color:var(--dourado);font-size:14px;}
   nav.links{display:flex;gap:14px;align-items:center;}
-  nav.links a{color:rgba(255,255,255,.88);font-size:13px;font-weight:500;position:relative;padding-bottom:4px;}
-  header.site.scrolled nav.links a{color:var(--carvao);}
+  nav.links a{color:var(--carvao);font-size:13px;font-weight:500;position:relative;padding-bottom:4px;}
   nav.links a:not(.btn)::after{content:'';position:absolute;left:0;bottom:0;height:1px;width:0;background:var(--dourado);transition:width .25s ease;}
   nav.links a:not(.btn):hover::after{width:100%;}
   nav.links a.btn{padding:9px 16px !important; color:var(--vinho); background:#fff; border-color:var(--linha);}
-  header.site.scrolled nav.links a.btn{color:var(--vinho);}
   nav.links a.btn:hover{background:var(--rosa-suave); border-color:var(--vinho);}
   .nav-cta{display:none;}
-  .hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;}
-  header.site.scrolled .hamburger{color:var(--vinho-escuro);}
+  .hamburger{display:none;background:none;border:none;color:var(--vinho-escuro);font-size:22px;}
 
   /* ---------- BARRA DE BUSCA (ABAIXO DO CABEÇALHO) ---------- */
   .busca-bar{
-    position:fixed;left:0;right:0;z-index:49;
-    background:var(--vinho-escuro);
+    position:relative; z-index:49;
+    background:#fff;
     padding:12px 0;
-    transition:top .35s ease, background .35s ease, padding .35s ease;
+    box-shadow:0 6px 18px -12px rgba(84,31,81,.25);
   }
-  header.site.scrolled + .busca-bar{background:#fff;box-shadow:0 6px 18px -12px rgba(84,31,81,.25);}
   .busca-bar .nav-busca{max-width:420px;margin:0 auto;width:100%;}
-  .nav-busca{position:relative;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:30px;padding:9px 16px;transition:background .3s ease, border-color .3s ease;}
-  header.site.scrolled + .busca-bar .nav-busca{background:var(--rosa-suave);border-color:var(--linha);}
-  .nav-busca i{color:rgba(255,255,255,.85);font-size:13px;}
-  header.site.scrolled + .busca-bar .nav-busca i{color:var(--vinho);}
-  .nav-busca input{border:none;background:transparent;outline:none;font-family:inherit;font-size:13px;color:#fff;width:100%;}
-  .nav-busca input::placeholder{color:rgba(255,255,255,.65);}
-  header.site.scrolled + .busca-bar .nav-busca input{color:var(--carvao);}
-  header.site.scrolled + .busca-bar .nav-busca input::placeholder{color:var(--cinza);}
+  .nav-busca{position:relative;display:flex;align-items:center;gap:8px;background:var(--rosa-suave);border:1px solid var(--linha);border-radius:30px;padding:9px 16px;transition:background .3s ease, border-color .3s ease;}
+  .nav-busca i{color:var(--vinho);font-size:13px;}
+  .nav-busca input{border:none;background:transparent;outline:none;font-family:inherit;font-size:13px;color:var(--carvao);width:100%;}
+  .nav-busca input::placeholder{color:var(--cinza);}
   .busca-dropdown{position:absolute;top:calc(100% + 12px);left:0;right:0;max-height:420px;overflow-y:auto;background:#fff;border-radius:8px;box-shadow:var(--sombra);border:1px solid var(--linha);padding:10px 0;display:none;z-index:80;}
   .busca-dropdown.aberto{display:block;}
   .busca-grupo{padding:6px 18px;}
@@ -233,8 +225,8 @@
     background:radial-gradient(circle at 18% 20%, rgba(201,212,84,.15), transparent 45%);
     pointer-events:none;
   }
-  .hero-inner{position:relative;z-index:2;padding-top:176px;padding-bottom:80px;}
-  @media(max-width:680px){.hero-inner{padding-top:168px;}}
+  .hero-inner{position:relative;z-index:2;padding-top:15px;padding-bottom:80px;}
+  @media(max-width:680px){.hero-inner{padding-top:12px;}}
   .hero .eyebrow{color:var(--dourado-claro);}
   .hero .eyebrow::before{background:var(--dourado-claro);}
   .hero h1{color:#fff;font-size:clamp(38px,6vw,64px);line-height:1.12;max-width:780px;}
@@ -334,6 +326,24 @@
 
   /* ---------- EXPOSITORES BÁSICOS (lista simples) ---------- */
   .expositores-basicos{background:var(--rosa-suave);}
+  .exp-basicos-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap;}
+  .exp-basicos-filtro{display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+  .exp-basicos-filtro select{
+    padding:12px 16px;border:1px solid var(--linha);border-radius:var(--raio);background:#fff;
+    font-family:inherit;font-size:14px;color:var(--carvao);min-width:190px;
+  }
+  .exp-basicos-filtro select:focus{outline:2px solid var(--dourado);outline-offset:1px;}
+  .exp-basicos-contagem{font-size:13px;color:var(--cinza);}
+  .exp-paginacao{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:22px;}
+  .exp-paginacao button{
+    display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--linha);border-radius:30px;
+    background:#fff;color:var(--vinho);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;
+    transition:background .25s ease, border-color .25s ease, opacity .25s ease;
+  }
+  .exp-paginacao button:hover:not(:disabled){background:var(--rosa-suave);border-color:var(--vinho);}
+  .exp-paginacao button:disabled{opacity:.4;cursor:not-allowed;}
+  .exp-paginacao-pagina{font-size:13px;color:var(--carvao);font-weight:600;white-space:nowrap;}
+  @media(max-width:680px){.exp-basicos-toolbar{flex-direction:column;align-items:stretch;} .exp-basicos-filtro select{width:100%;}}
   .exp-lista{display:flex;flex-direction:column;gap:0;background:#fff;border:1px solid var(--linha);border-radius:8px;overflow:hidden;}
   .exp-lista-item{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid var(--linha);flex-wrap:wrap;}
   .exp-lista-item:last-child{border-bottom:none;}
@@ -902,8 +912,21 @@
       <h2>Outros Expositores</h2>
       <p class="lead">Mais parceiros da nossa rede, além dos destaques do carrossel acima.</p>
     </div>
+    <div class="exp-basicos-toolbar">
+      <div class="exp-basicos-filtro">
+        <select id="filtroCategoriaBasicos" aria-label="Filtrar categoria dos outros expositores">
+          <option value="">Todas as categorias</option>
+        </select>
+      </div>
+      <span class="exp-basicos-contagem" id="expBasicosContagem"></span>
+    </div>
     <div class="exp-lista" id="expositoresBasicosLista">
       <div class="exp-lista-item"><div class="exp-lista-info"><b>Carregando expositores...</b></div></div>
+    </div>
+    <div class="exp-paginacao" id="expBasicosPaginacao" style="display:none;">
+      <button type="button" id="expBasicosAnterior"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
+      <span class="exp-paginacao-pagina" id="expBasicosPaginaAtual"></span>
+      <button type="button" id="expBasicosProximo">Próxima <i class="fa-solid fa-chevron-right"></i></button>
     </div>
   </div>
 </section>
@@ -1158,19 +1181,8 @@
 <script>
 document.getElementById('anoAtual').textContent = new Date().getFullYear();
 
-/* Header on scroll */
+/* Header: agora não é mais fixo, rola normalmente com a página */
 const header = document.getElementById('siteHeader');
-const buscaBar = document.getElementById('buscaBar');
-function posicionarBuscaBar(){
-  if(buscaBar) buscaBar.style.top = header.offsetHeight + 'px';
-}
-window.addEventListener('scroll', () => {
-  header.classList.toggle('scrolled', window.scrollY > 40);
-  posicionarBuscaBar();
-});
-window.addEventListener('resize', posicionarBuscaBar);
-window.addEventListener('load', posicionarBuscaBar);
-posicionarBuscaBar();
 
 /* Mobile menu */
 const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -1179,6 +1191,97 @@ const mobileCloseBtn = document.getElementById('mobileCloseBtn');
 hamburgerBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
 mobileCloseBtn.addEventListener('click', () => mobileMenu.classList.remove('open'));
 mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+/* ---------- BUSCA GLOBAL ---------- */
+const paginasSite = [
+  { nome: 'Sobre',            href: '#sobre' },
+  { nome: 'Anuncie Aqui',     href: '#servicos' },
+  { nome: 'Expositores',      href: '#expositores' },
+  { nome: 'Cursos',           href: '#cursos' },
+  { nome: 'Eventos / Feiras', href: '#eventos' },
+  { nome: 'Trabalhe Conosco', href: '#trabalhe' },
+  { nome: 'Depoimentos',      href: '#depoimentos' },
+  { nome: 'Blog',             href: '/blog' },
+  { nome: 'Fale Conosco',     href: '#contato' }
+];
+
+const buscaInput = document.getElementById('buscaInput');
+const buscaDropdown = document.getElementById('buscaDropdown');
+let buscaTimer = null;
+let buscaAbortController = null;
+
+function grupoBuscaHtml(titulo, itens){
+  if(!itens.length) return '';
+  return `<div class="busca-grupo"><div class="busca-grupo-titulo">${titulo}</div>${itens.join('')}</div>`;
+}
+
+function fecharBusca(){
+  buscaDropdown.classList.remove('aberto');
+  buscaDropdown.innerHTML = '';
+}
+
+async function executarBusca(termo){
+  const paginas = paginasSite.filter(p => p.nome.toLowerCase().includes(termo.toLowerCase()));
+  const paginasHtml = paginas.map(p => `<a class="busca-item" href="${p.href}">${escapeHtml(p.nome)}</a>`);
+
+  if(buscaAbortController) buscaAbortController.abort();
+  buscaAbortController = new AbortController();
+
+  let expositores = [], feiras = [], posts = [];
+  try{
+    const res = await fetch('/api/busca?q=' + encodeURIComponent(termo), { signal: buscaAbortController.signal });
+    if(res.ok){
+      const data = await res.json();
+      expositores = data.expositores || [];
+      feiras = data.feiras || [];
+      posts = data.posts || [];
+    }
+  }catch(err){
+    if(err.name !== 'AbortError') console.error(err);
+  }
+
+  const expositoresHtml = expositores.map(e => `
+    <a class="busca-item" href="/expositores/${e.slug}">${escapeHtml(e.nome)}<small>${escapeHtml(e.categoria_nome || 'Expositor')}</small></a>
+  `);
+  const feirasHtml = feiras.map(f => `
+    <a class="busca-item" href="#eventos">${escapeHtml(f.nome)}${f.local ? `<small>${escapeHtml(f.local)}</small>` : ''}</a>
+  `);
+  const postsHtml = posts.map(p => `
+    <a class="busca-item" href="/blog/${p.slug}">${escapeHtml(p.titulo)}${p.subtitulo ? `<small>${escapeHtml(p.subtitulo)}</small>` : ''}</a>
+  `);
+
+  const partes = [
+    grupoBuscaHtml('Páginas', paginasHtml),
+    grupoBuscaHtml('Expositores', expositoresHtml),
+    grupoBuscaHtml('Feiras e eventos', feirasHtml),
+    grupoBuscaHtml('Blog', postsHtml)
+  ].filter(Boolean);
+
+  buscaDropdown.innerHTML = partes.length
+    ? partes.join('')
+    : `<div class="busca-vazio">Nenhum resultado para "${escapeHtml(termo)}"</div>`;
+  buscaDropdown.classList.add('aberto');
+}
+
+buscaInput.addEventListener('input', () => {
+  const termo = buscaInput.value.trim();
+  clearTimeout(buscaTimer);
+  if(termo.length < 2){
+    fecharBusca();
+    return;
+  }
+  buscaTimer = setTimeout(() => executarBusca(termo), 300);
+});
+
+buscaInput.addEventListener('focus', () => {
+  if(buscaInput.value.trim().length >= 2) buscaDropdown.classList.add('aberto');
+});
+
+document.addEventListener('click', (e) => {
+  if(!buscaBar.contains(e.target)) fecharBusca();
+});
+
+buscaDropdown.addEventListener('click', () => fecharBusca());
 
 /* ---------- ANUNCIE AQUI ---------- */
 /* Reaproveita a tabela "servicos" sem alterar o banco:
@@ -1245,6 +1348,7 @@ async function carregarServicos(){
 /* ---------- CATEGORIAS (filtro) ---------- */
 async function carregarCategorias(){
   const select = document.getElementById('filtroCategoria');
+  const selectBasicos = document.getElementById('filtroCategoriaBasicos');
   const selectCad = document.getElementById('cadCategoria');
   const cadOutraOpt = selectCad ? selectCad.querySelector('option[value="__outra__"]') : null;
   try{
@@ -1256,6 +1360,13 @@ async function carregarCategorias(){
       opt.value = c.slug;
       opt.textContent = c.nome;
       select.appendChild(opt);
+
+      if(selectBasicos){
+        const optBasicos = document.createElement('option');
+        optBasicos.value = c.nome;
+        optBasicos.textContent = c.nome;
+        selectBasicos.appendChild(optBasicos);
+      }
 
       if(selectCad){
         const optCad = document.createElement('option');
@@ -1399,6 +1510,70 @@ function cardExpositorBasico(exp){
   `;
 }
 
+/* ---------- OUTROS EXPOSITORES: paginação (10 por página) + filtro próprio de categoria ---------- */
+const EXP_BASICOS_POR_PAGINA = 10;
+let expBasicosTodos = [];
+let expBasicosPaginaAtual = 1;
+
+function renderExpositoresBasicos(){
+  const listaBasica = document.getElementById('expositoresBasicosLista');
+  const paginacao = document.getElementById('expBasicosPaginacao');
+  const contagem = document.getElementById('expBasicosContagem');
+  const btnAnterior = document.getElementById('expBasicosAnterior');
+  const btnProximo = document.getElementById('expBasicosProximo');
+  const paginaSpan = document.getElementById('expBasicosPaginaAtual');
+  if(!listaBasica) return;
+
+  const categoriaSelecionada = document.getElementById('filtroCategoriaBasicos').value;
+  const lista = categoriaSelecionada
+    ? expBasicosTodos.filter(e => (e.categoria_nome || '') === categoriaSelecionada)
+    : expBasicosTodos;
+
+  if(!lista.length){
+    listaBasica.innerHTML = `<div class="exp-lista-item"><div class="exp-lista-info"><b>Nenhum outro expositor encontrado com esses filtros.</b></div></div>`;
+    if(paginacao) paginacao.style.display = 'none';
+    if(contagem) contagem.textContent = '';
+    return;
+  }
+
+  const totalPaginas = Math.max(1, Math.ceil(lista.length / EXP_BASICOS_POR_PAGINA));
+  if(expBasicosPaginaAtual > totalPaginas) expBasicosPaginaAtual = totalPaginas;
+  if(expBasicosPaginaAtual < 1) expBasicosPaginaAtual = 1;
+
+  const inicio = (expBasicosPaginaAtual - 1) * EXP_BASICOS_POR_PAGINA;
+  const paginaItens = lista.slice(inicio, inicio + EXP_BASICOS_POR_PAGINA);
+
+  listaBasica.innerHTML = paginaItens.map(cardExpositorBasico).join('');
+
+  if(contagem) contagem.textContent = `${lista.length} expositor${lista.length === 1 ? '' : 'es'}`;
+
+  if(paginacao){
+    if(totalPaginas > 1){
+      paginacao.style.display = 'flex';
+      if(paginaSpan) paginaSpan.textContent = `Página ${expBasicosPaginaAtual} de ${totalPaginas}`;
+      if(btnAnterior) btnAnterior.disabled = expBasicosPaginaAtual === 1;
+      if(btnProximo) btnProximo.disabled = expBasicosPaginaAtual === totalPaginas;
+    }else{
+      paginacao.style.display = 'none';
+    }
+  }
+}
+
+document.getElementById('expBasicosAnterior').addEventListener('click', () => {
+  expBasicosPaginaAtual--;
+  renderExpositoresBasicos();
+  document.getElementById('expositores-basicos').scrollIntoView({behavior:'smooth', block:'start'});
+});
+document.getElementById('expBasicosProximo').addEventListener('click', () => {
+  expBasicosPaginaAtual++;
+  renderExpositoresBasicos();
+  document.getElementById('expositores-basicos').scrollIntoView({behavior:'smooth', block:'start'});
+});
+document.getElementById('filtroCategoriaBasicos').addEventListener('change', () => {
+  expBasicosPaginaAtual = 1;
+  renderExpositoresBasicos();
+});
+
 async function carregarExpositores(){
   const grid = document.getElementById('expositoresGrid');
   const listaBasica = document.getElementById('expositoresBasicosLista');
@@ -1426,13 +1601,9 @@ async function carregarExpositores(){
       initCarrossel('expositoresGrid','expositoresNav','expositoresDots','expositoresAnterior','expositoresProximo');
     }
 
-    if(listaBasica){
-      if(!basicos.length){
-        listaBasica.innerHTML = `<div class="exp-lista-item"><div class="exp-lista-info"><b>Nenhum outro expositor encontrado com esses filtros.</b></div></div>`;
-      }else{
-        listaBasica.innerHTML = basicos.map(cardExpositorBasico).join('');
-      }
-    }
+    expBasicosTodos = basicos;
+    expBasicosPaginaAtual = 1;
+    renderExpositoresBasicos();
   }catch(err){
     console.error(err);
     grid.innerHTML = `<div class="exp-erro"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar os expositores agora. Tente novamente em breve.</p></div>`;
