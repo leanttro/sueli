@@ -148,8 +148,44 @@ def get_ia_produtos():
         if conn: conn.close()
 
 
-def get_dados_site():
-    """Busca feiras ativas (futuras) e expositores em destaque pra dar contexto real à IA."""
+# Palavras muito comuns em português que não ajudam na busca — ignoradas
+# ao extrair termos da pergunta do usuário.
+STOPWORDS_PT = {
+    'a', 'o', 'as', 'os', 'de', 'da', 'do', 'das', 'dos', 'em', 'no', 'na',
+    'nos', 'nas', 'um', 'uma', 'uns', 'umas', 'para', 'por', 'com', 'sem',
+    'que', 'se', 'sua', 'seu', 'suas', 'seus', 'ao', 'aos', 'e', 'ou', 'mas',
+    'como', 'tem', 'têm', 'ter', 'sao', 'são', 'é', 'sou', 'esta', 'está',
+    'estão', 'isso', 'essa', 'esse', 'essas', 'esses', 'quero', 'queria',
+    'gostaria', 'vocês', 'voce', 'você', 'pode', 'poderia', 'alguem',
+    'alguém', 'outro', 'outra', 'outros', 'outras', 'nenhuma', 'nenhum',
+    'pessoa', 'tudo', 'algo', 'onde', 'qual', 'quais', 'quem', 'quando',
+    'porque', 'tambem', 'também', 'nao', 'não', 'sim', 'ola', 'olá', 'oi',
+}
+
+
+def extrair_termos_busca(texto, max_termos=6):
+    """Extrai palavras-chave relevantes de uma frase do usuário para busca no banco."""
+    if not texto:
+        return []
+    texto = texto.lower()
+    for ch in '?!.,;:()[]{}"\'\n\r':
+        texto = texto.replace(ch, ' ')
+    palavras = [p.strip() for p in texto.split() if len(p.strip()) >= 4]
+    termos = [p for p in palavras if p not in STOPWORDS_PT]
+    # remove duplicados mantendo ordem
+    vistos = set()
+    unicos = []
+    for t in termos:
+        if t not in vistos:
+            vistos.add(t)
+            unicos.append(t)
+    return unicos[:max_termos]
+
+
+def get_dados_site(mensagem_usuario=None):
+    """Busca feiras ativas (futuras), expositores em destaque E expositores que batem
+    com o que o usuário perguntou (pesquisa em TODO o banco, não só nos destaques),
+    pra dar contexto real à IA."""
     conn = None
     try:
         conn = get_db_connection()
@@ -172,13 +208,54 @@ def get_dados_site():
             ORDER BY e.nome
             LIMIT 10
         """)
-        expositores = [format_db_data(dict(r)) for r in cur.fetchall()]
+        expositores_destaque = [format_db_data(dict(r)) for r in cur.fetchall()]
+
+        # Busca dinâmica: pega palavras-chave da última mensagem do usuário e
+        # procura em TODOS os expositores ativos (nome, descrição e categoria),
+        # não só nos que estão marcados como "destaque".
+        expositores_busca = []
+        termos = extrair_termos_busca(mensagem_usuario)
+        if termos:
+            condicoes = []
+            params = []
+            for termo in termos:
+                like = f"%{termo}%"
+                condicoes.append("(e.nome ILIKE %s OR e.descricao ILIKE %s OR c.nome ILIKE %s)")
+                params.extend([like, like, like])
+            where_termos = " OR ".join(condicoes)
+            sql = f"""
+                SELECT e.nome, e.descricao, e.regiao, e.cidade, c.nome as categoria_nome
+                FROM expositores e
+                LEFT JOIN categorias c ON e.categoria_id = c.id
+                WHERE e.ativo = TRUE AND ({where_termos})
+                ORDER BY e.destaque DESC, e.nome
+                LIMIT 20
+            """
+            cur.execute(sql, params)
+            expositores_busca = [format_db_data(dict(r)) for r in cur.fetchall()]
 
         cur.close()
-        return {'feiras': feiras, 'expositores': expositores}
+
+        # Junta busca + destaques, sem duplicar (busca tem prioridade porque é
+        # mais relevante pro que o usuário pediu).
+        vistos = set()
+        expositores = []
+        for e in expositores_busca + expositores_destaque:
+            chave = e.get('nome')
+            if chave and chave not in vistos:
+                vistos.add(chave)
+                expositores.append(e)
+        expositores = expositores[:20]
+
+        return {
+            'feiras': feiras,
+            'expositores': expositores,
+            'busca_encontrou_algo': bool(expositores_busca),
+            'busca_foi_feita': bool(termos),
+        }
     except Exception:
         traceback.print_exc()
-        return {'feiras': [], 'expositores': []}
+        return {'feiras': [], 'expositores': [], 'busca_encontrou_algo': False, 'busca_foi_feita': False}
     finally:
         if conn: conn.close()
 
@@ -244,7 +321,7 @@ def montar_system_prompt(config, produtos, dados_site=None):
 
     expositores = dados_site.get('expositores') or []
     if expositores:
-        partes.append("\nExpositores em destaque no site (pode citar como exemplos reais, nunca invente nomes):")
+        partes.append("\nExpositores encontrados no banco de dados relevantes para a conversa (cite como exemplos reais, nunca invente nomes que não estão aqui):")
         for e in expositores:
             linha = f"- {e.get('nome')}"
             if e.get('categoria_nome'):
@@ -255,8 +332,15 @@ def montar_system_prompt(config, produtos, dados_site=None):
                 linha += f" | {e.get('descricao')}"
             partes.append(linha)
 
-    if feiras or expositores:
-        partes.append("\nSe a pessoa perguntar sobre feiras, eventos ou expositores fora do que está listado acima, diga que não tem essa informação no momento e oriente a falar pelo WhatsApp — nunca invente datas, nomes ou informações.")
+    busca_foi_feita = dados_site.get('busca_foi_feita')
+    busca_encontrou_algo = dados_site.get('busca_encontrou_algo')
+
+    if busca_foi_feita and not busca_encontrou_algo:
+        # O usuário perguntou sobre algo específico e a busca no banco não achou
+        # NENHUM expositor com esse termo — aí sim é correto dizer que não tem.
+        partes.append("\nA busca no banco de dados para o que a pessoa pediu não encontrou nenhum expositor correspondente. Diga isso claramente, não invente nomes, e oriente a falar pelo WhatsApp para mais opções.")
+    elif feiras or expositores:
+        partes.append("\nSe a pessoa perguntar sobre feiras, eventos ou expositores que não aparecem nas listas acima, diga que não tem essa informação no momento e oriente a falar pelo WhatsApp — nunca invente datas, nomes ou informações.")
 
     return "\n".join(partes)
 
@@ -1467,8 +1551,16 @@ def api_chat():
                 'reply': 'No momento o assistente está indisponível. Fale com a gente pelo WhatsApp!'
             }), 200
 
+        # Pega a última mensagem do usuário pra usar como base da busca
+        # dinâmica de expositores no banco (não só os marcados como destaque).
+        ultima_mensagem_usuario = ''
+        for m in reversed(historico):
+            if m.get('role') == 'user' and m.get('content'):
+                ultima_mensagem_usuario = m.get('content')
+                break
+
         produtos = get_ia_produtos()
-        dados_site = get_dados_site()
+        dados_site = get_dados_site(ultima_mensagem_usuario)
         system_prompt = montar_system_prompt(config, produtos, dados_site)
 
         mensagens_groq = [{'role': 'system', 'content': system_prompt}]
