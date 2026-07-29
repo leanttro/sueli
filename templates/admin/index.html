@@ -189,6 +189,7 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="sb-label">Geral</div>
     <button class="sb-link active" data-section="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
     <button class="sb-link" data-section="expositores"><i class="fa-solid fa-store"></i> Expositores</button>
+    <button class="sb-link" data-section="pendentes"><i class="fa-solid fa-hourglass-half"></i> Cadastros Pendentes <span class="badge-notif" id="badgePendentes">0</span></button>
     <button class="sb-link" data-section="categorias"><i class="fa-solid fa-tags"></i> Categorias</button>
 
     <div class="sb-label">Conteúdo</div>
@@ -245,6 +246,12 @@ tbody tr:hover td{background:#fdfafb;}
       <input type="text" id="buscaExpositor" oninput="filtrarExpositores()" placeholder="Buscar expositor pelo nome..." style="width:100%;padding:10px 14px 10px 36px;border:1.5px solid var(--linha);border-radius:5px;font-size:14px;color:var(--carvao);background:#fff;outline:none;">
     </div>
     <div class="table-wrap" id="tabelaExpositores"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- CADASTROS PENDENTES -->
+  <div class="section" id="sec-pendentes">
+    <div class="section-header"><h2>Cadastros Pendentes</h2></div>
+    <div id="listaPendentes"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
   </div>
 
   <!-- CATEGORIAS -->
@@ -380,6 +387,7 @@ tbody tr:hover td{background:#fdfafb;}
     </div>
     <div class="modal-body">
       <input type="hidden" id="exp-id">
+      <input type="hidden" id="exp-aprovado" value="true">
       <div class="form-row">
         <div class="field-group"><label>Nome*</label><input id="exp-nome" oninput="gerarSlug('exp-nome','exp-slug')" placeholder="Nome do expositor"></div>
         <div class="field-group"><label>Slug*</label><input id="exp-slug" placeholder="gerado-automaticamente"></div>
@@ -805,13 +813,14 @@ function confirmar(msg){ return window.confirm(msg); }
 
 // ─── NAVEGAÇÃO ────────────────────────────────────────────────
 const titulos = {
-  dashboard:'Dashboard', expositores:'Expositores', categorias:'Categorias',
+  dashboard:'Dashboard', expositores:'Expositores', pendentes:'Cadastros Pendentes', categorias:'Categorias',
   feiras:'Feiras — Trabalhe Conosco',
   servicos:'Serviços', depoimentos:'Depoimentos', blog:'Blog',
   contatos:'Contatos', planos:'Planos', ia:'Configurar IA'
 };
 const loaders = {
   expositores: carregarExpositores,
+  pendentes: carregarPendentes,
   categorias: carregarCategorias,
   feiras: carregarFeiras,
   servicos: carregarServicos,
@@ -870,7 +879,7 @@ let _cacheExpositores = [];
 function renderTabelaExpositores(data){
   if(!data.length){ $('tabelaExpositores').innerHTML = '<div class="empty"><i class="fa-solid fa-store"></i>Nenhum expositor encontrado.</div>'; return; }
   $('tabelaExpositores').innerHTML = `<table><thead><tr>
-    <th>Nome</th><th>Categoria</th><th>Plano</th><th>Região</th><th>Status</th><th>Expiração</th><th>Ações</th>
+    <th>Nome</th><th>Categoria</th><th>Plano</th><th>Região</th><th>Status</th><th>Cadastro</th><th>Expiração</th><th>Ações</th>
   </tr></thead><tbody>
   ${data.map(e=>`<tr>
     <td data-label="Nome"><b>${e.nome}</b></td>
@@ -878,6 +887,7 @@ function renderTabelaExpositores(data){
     <td data-label="Plano">${e.plano_nome||'—'}</td>
     <td data-label="Região">${e.regiao||'—'}</td>
     <td data-label="Status">${e.bloqueado?'<span class="tag tag-red">Bloqueado</span>':e.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+    <td data-label="Cadastro">${e.aprovado===false?'<span class="tag tag-yellow">Pendente</span>':'<span class="tag tag-blue">Aprovado</span>'}</td>
     <td data-label="Expiração">${e.data_expiracao||'—'}</td>
     <td data-label="" class="cell-acoes"><div class="td-acoes">
       <button class="btn btn-ghost btn-sm" onclick="editarExpositorPorId(${e.id})"><i class="fa-solid fa-pen"></i></button>
@@ -939,6 +949,7 @@ async function abrirModalExp(){
   await carregarOpcoesModal();
   $('modalExpTit').textContent = 'Novo Expositor';
   ['id','nome','slug','descricao','foto','whatsapp','instagram','site','regiao','cidade','expiracao'].forEach(f=>$(`exp-${f}`).value='');
+  $('exp-aprovado').value = 'true';
   $('exp-ativo').checked = true;
   $('exp-destaque').checked = false;
   ['foto','whatsapp','instagram','site','regiao'].forEach(f=>$(`exp-overr-${f}`).value='');
@@ -952,6 +963,7 @@ async function editarExpositor(e){
   await carregarOpcoesModal();
   $('modalExpTit').textContent = 'Editar Expositor';
   $('exp-id').value = e.id;
+  $('exp-aprovado').value = e.aprovado === false ? 'false' : 'true';
   $('exp-nome').value = e.nome||'';
   $('exp-slug').value = e.slug||'';
   $('exp-descricao').value = e.descricao||'';
@@ -987,6 +999,7 @@ async function salvarExpositor(){
     site_url: $('exp-site').value, regiao: $('exp-regiao').value, cidade: $('exp-cidade').value,
     data_expiracao: $('exp-expiracao').value,
     ativo: $('exp-ativo').checked, destaque: $('exp-destaque').checked,
+    aprovado: $('exp-aprovado').value === 'true',
     categoria_id: $('exp-categoria').value || null,
     plano_id: $('exp-plano').value || null,
     overr_foto: overrSelectParaValor($('exp-overr-foto').value),
@@ -1331,6 +1344,56 @@ async function excluirPost(id){
   catch(e){ toast('Erro.','error'); }
 }
 
+// ─── CADASTROS PENDENTES ────────────────────────────────────────
+let _cachePendentes = [];
+async function carregarPendentes(){
+  $('listaPendentes').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/expositores/pendentes');
+    _cachePendentes = data;
+    if(data.length > 0){ $('badgePendentes').textContent = data.length; $('badgePendentes').classList.add('show'); }
+    else { $('badgePendentes').classList.remove('show'); }
+    if(!data.length){ $('listaPendentes').innerHTML = '<div class="empty"><i class="fa-solid fa-hourglass-half"></i>Nenhum cadastro pendente.</div>'; return; }
+    $('listaPendentes').innerHTML = data.map(e=>`
+      <div class="msg-card nao-lido" id="pend-${e.id}">
+        <div class="msg-head">
+          <div>
+            <div class="msg-nome">${e.nome} <span class="tag tag-yellow" style="font-size:11px;padding:2px 8px;">Pendente</span></div>
+            <div class="msg-info"><i class="fa-solid fa-phone" style="font-size:11px;"></i> ${e.whatsapp||'—'} &nbsp;·&nbsp; ${e.regiao||'—'} &nbsp;·&nbsp; ${e.categoria_nome||'Sem categoria'}</div>
+          </div>
+        </div>
+        <div class="msg-acoes">
+          <button class="btn btn-primary btn-sm" onclick="aprovarExpositor(${e.id})"><i class="fa-solid fa-check"></i> Aprovar</button>
+          <button class="btn btn-danger btn-sm" onclick="recusarExpositor(${e.id})"><i class="fa-solid fa-xmark"></i> Recusar</button>
+        </div>
+      </div>
+    `).join('');
+  }catch(e){ $('listaPendentes').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+async function aprovarExpositor(id){
+  // O PUT reescreve todos os campos (mesmo padrão do modal de edição), então
+  // reenviamos o registro completo já em cache, só trocando aprovado pra true.
+  const e = _cachePendentes.find(x=>String(x.id)===String(id));
+  if(!e){ toast('Erro ao aprovar.','error'); return; }
+  const body = {
+    nome: e.nome, slug: e.slug, descricao: e.descricao||'', foto_url: e.foto_url||'',
+    whatsapp: e.whatsapp||'', instagram: e.instagram||'', site_url: e.site_url||'',
+    regiao: e.regiao||'', cidade: e.cidade||'', data_expiracao: e.data_expiracao||null,
+    ativo: e.ativo !== false, destaque: !!e.destaque,
+    categoria_id: e.categoria_id || null, plano_id: e.plano_id || null,
+    overr_foto: e.overr_foto, overr_whatsapp: e.overr_whatsapp,
+    overr_instagram: e.overr_instagram, overr_site: e.overr_site, overr_regiao: e.overr_regiao,
+    aprovado: true,
+  };
+  try{ await api(`/api/admin/expositores/${id}`,'PUT',body); toast('Expositor aprovado!'); carregarPendentes(); }
+  catch(err){ toast('Erro ao aprovar.','error'); }
+}
+async function recusarExpositor(id){
+  if(!confirmar('Recusar e excluir este cadastro?')) return;
+  try{ await api(`/api/admin/expositores/${id}`,'DELETE'); toast('Cadastro recusado.'); carregarPendentes(); }
+  catch(e){ toast('Erro ao recusar.','error'); }
+}
+
 // ─── CONTATOS ─────────────────────────────────────────────────
 async function carregarContatos(){
   $('listaContatos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
@@ -1515,6 +1578,10 @@ async function excluirIAProduto(id){
 
 // ─── INIT ────────────────────────────────────────────────────
 carregarDashboard();
+api('/api/admin/expositores/pendentes').then(data=>{
+  if(data.length > 0){ $('badgePendentes').textContent = data.length; $('badgePendentes').classList.add('show'); }
+  _cachePendentes = data;
+}).catch(()=>{});
 </script>
 </body>
 </html>
