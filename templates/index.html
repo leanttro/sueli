@@ -2361,10 +2361,18 @@ carregarEventos();
     teaser.classList.add('hidden');
     bubble.classList.remove('hidden');
   } else {
-    // primeiro acesso da sessão: mostra a caixinha "teaser" (estado médio)
+    // primeiro acesso da sessão
+    const ehMobile = window.matchMedia('(max-width:680px)').matches;
     win.classList.add('hidden');
-    bubble.classList.add('hidden');
-    teaser.classList.remove('hidden');
+    if(ehMobile){
+      // no mobile: sem meio-termo — começa fechado, só a bolinha
+      teaser.classList.add('hidden');
+      bubble.classList.remove('hidden');
+    } else {
+      // no desktop: mostra a caixinha "teaser" (estado médio)
+      bubble.classList.add('hidden');
+      teaser.classList.remove('hidden');
+    }
   }
 })();
 </script>
