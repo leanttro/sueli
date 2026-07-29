@@ -1401,7 +1401,6 @@ async function carregarExpositores(){
     const res = await fetch('/api/expositores' + (params.toString() ? '?' + params.toString() : ''));
     if(!res.ok) throw new Error('Falha ao buscar expositores');
     const expositores = await res.json();
-    buscaIndex.expositores = expositores;
 
     const destaques = expositores.filter(e => e.destaque);
     const basicos = expositores.filter(e => !e.destaque);
