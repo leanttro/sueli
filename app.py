@@ -119,12 +119,40 @@ def init_visibilidade_columns():
         cur = conn.cursor()
         # Padrão por PLANO: se o plano libera ou não cada campo
         cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_foto BOOLEAN DEFAULT TRUE")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_whatsapp BOOLEAN DEFAULT TRUE")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_instagram BOOLEAN DEFAULT TRUE")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_site BOOLEAN DEFAULT TRUE")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_regiao BOOLEAN DEFAULT TRUE")
         # Exceção por EXPOSITOR: NULL = usa o padrão do plano, TRUE = força mostrar, FALSE = força esconder
         for col in ('overr_foto', 'overr_whatsapp', 'overr_instagram', 'overr_site', 'overr_regiao'):
             cur.execute(f"ALTER TABLE expositores ADD COLUMN IF NOT EXISTS {col} BOOLEAN")
         # Aprovação de cadastros vindos do formulário público: entram como
         # ativo=TRUE mas aprovado=FALSE até alguém no admin revisar.
         cur.execute("ALTER TABLE expositores ADD COLUMN IF NOT EXISTS aprovado BOOLEAN DEFAULT FALSE")
+
+        # ── CORREÇÃO (bug do deploy anterior) ──────────────────────
+        # Quando a coluna `aprovado` foi criada, o DEFAULT FALSE marcou como
+        # "não aprovado" TODOS os expositores que já existiam no banco desde
+        # antes dessa feature — inclusive os que já estavam ativos e em
+        # destaque. Isso fez eles sumirem do site.
+        # Correção: rodamos, uma ÚNICA vez (controlada pela tabela
+        # `migracoes_aplicadas`), um backfill que aprova retroativamente todo
+        # expositor que já existia. Cadastros novos vindos do formulário
+        # público (rota /api/expositores/cadastro) continuam entrando como
+        # aprovado=FALSE normalmente, sem serem afetados por essa correção.
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS migracoes_aplicadas (
+                nome TEXT PRIMARY KEY,
+                aplicada_em TIMESTAMP DEFAULT NOW()
+            )
+        """)
+        cur.execute("SELECT 1 FROM migracoes_aplicadas WHERE nome = %s", ('backfill_aprovado_expositores',))
+        ja_corrigido = cur.fetchone() is not None
+
+        if not ja_corrigido:
+            cur.execute("UPDATE expositores SET aprovado = TRUE WHERE aprovado = FALSE")
+            cur.execute("INSERT INTO migracoes_aplicadas (nome) VALUES (%s)", ('backfill_aprovado_expositores',))
+
         conn.commit()
         cur.close()
     except Exception as e:
