@@ -1,4 +1,6 @@
 import os
+import re
+import unicodedata
 import psycopg2
 import psycopg2.extras
 from flask import Flask, jsonify, request, send_from_directory, render_template, make_response, session, redirect, url_for
@@ -41,6 +43,15 @@ def format_db_data(data_dict):
         else:
             formatted[key] = value
     return formatted
+
+# ── Slugify (gera slug a partir de texto, sem acento) ─────────
+def slugify(texto):
+    texto = unicodedata.normalize('NFKD', texto or '').encode('ascii', 'ignore').decode('ascii')
+    texto = texto.lower().strip()
+    texto = re.sub(r'[^a-z0-9\s-]', '', texto)
+    texto = re.sub(r'\s+', '-', texto)
+    texto = re.sub(r'-+', '-', texto).strip('-')
+    return texto
 
 # ── Auth helper ──────────────────────────────────────────────
 def login_required(f):
@@ -111,6 +122,9 @@ def init_visibilidade_columns():
         # Exceção por EXPOSITOR: NULL = usa o padrão do plano, TRUE = força mostrar, FALSE = força esconder
         for col in ('overr_foto', 'overr_whatsapp', 'overr_instagram', 'overr_site', 'overr_regiao'):
             cur.execute(f"ALTER TABLE expositores ADD COLUMN IF NOT EXISTS {col} BOOLEAN")
+        # Aprovação de cadastros vindos do formulário público: entram como
+        # ativo=TRUE mas aprovado=FALSE até alguém no admin revisar.
+        cur.execute("ALTER TABLE expositores ADD COLUMN IF NOT EXISTS aprovado BOOLEAN DEFAULT FALSE")
         conn.commit()
         cur.close()
     except Exception as e:
@@ -456,7 +470,7 @@ def expositor_detalhe(slug):
             FROM expositores e
             LEFT JOIN categorias c ON e.categoria_id = c.id
             LEFT JOIN planos p ON e.plano_id = p.id
-            WHERE e.slug = %s AND e.ativo = TRUE
+            WHERE e.slug = %s AND e.ativo = TRUE AND e.aprovado = TRUE
         """, (slug,))
         expositor = cur.fetchone()
         cur.close()
@@ -510,7 +524,7 @@ def api_expositores():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        filtros = "WHERE e.ativo = TRUE"
+        filtros = "WHERE e.ativo = TRUE AND e.aprovado = TRUE"
         params  = []
 
         if categoria_slug:
@@ -564,7 +578,7 @@ def api_expositor(slug):
             FROM expositores e
             LEFT JOIN categorias c ON e.categoria_id = c.id
             LEFT JOIN planos p ON e.plano_id = p.id
-            WHERE e.slug = %s AND e.ativo = TRUE
+            WHERE e.slug = %s AND e.ativo = TRUE AND e.aprovado = TRUE
         """, (slug,))
         exp = cur.fetchone()
         cur.close()
@@ -578,6 +592,67 @@ def api_expositor(slug):
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': 'Erro ao buscar expositor'}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/expositores/cadastro', methods=['POST'])
+def api_expositor_cadastro():
+    """Cadastro público de expositor (formulário do site). Entra ativo=TRUE
+    mas aprovado=FALSE — só aparece nas rotas públicas depois de revisado
+    no admin."""
+    conn = None
+    try:
+        data            = request.get_json()
+        nome            = (data.get('nome') or '').strip()
+        whatsapp        = (data.get('whatsapp') or '').strip()
+        regiao          = (data.get('regiao') or '').strip()
+        categoria_id    = data.get('categoria_id') or None
+        categoria_outra = (data.get('categoria_outra') or '').strip()
+
+        if not nome or not whatsapp or not regiao:
+            return jsonify({'ok': False, 'error': 'Nome, WhatsApp e região são obrigatórios'}), 400
+
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # Categoria "Outra": reaproveita categoria existente com mesmo nome
+        # (case-insensitive) ou cria uma nova.
+        if not categoria_id and categoria_outra:
+            cur.execute("SELECT id FROM categorias WHERE LOWER(nome) = LOWER(%s)", (categoria_outra,))
+            existente = cur.fetchone()
+            if existente:
+                categoria_id = existente['id']
+            else:
+                cur.execute("""
+                    INSERT INTO categorias (nome, slug, icone_url, ativo)
+                    VALUES (%s,%s,%s,%s) RETURNING id
+                """, (categoria_outra, slugify(categoria_outra), '', True))
+                categoria_id = cur.fetchone()['id']
+
+        # Slug único a partir do nome
+        base_slug = slugify(nome) or 'expositor'
+        slug = base_slug
+        sufixo = 2
+        while True:
+            cur.execute("SELECT id FROM expositores WHERE slug = %s", (slug,))
+            if not cur.fetchone():
+                break
+            slug = f"{base_slug}-{sufixo}"
+            sufixo += 1
+
+        cur.execute("""
+            INSERT INTO expositores (nome, slug, categoria_id, regiao, cidade, whatsapp, ativo, aprovado, destaque)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
+            RETURNING id
+        """, (nome, slug, categoria_id, regiao, 'São Paulo', whatsapp, True, False, False))
+        new_id = cur.fetchone()['id']
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True, 'id': new_id, 'slug': slug})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'ok': False, 'error': 'Erro ao enviar cadastro'}), 500
     finally:
         if conn: conn.close()
 
@@ -819,8 +894,8 @@ def api_admin_expositores():
         cur.execute("""
             INSERT INTO expositores (nome, slug, categoria_id, plano_id, descricao, foto_url,
                 regiao, cidade, whatsapp, instagram, site_url, ativo, destaque, data_expiracao,
-                overr_foto, overr_whatsapp, overr_instagram, overr_site, overr_regiao)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                overr_foto, overr_whatsapp, overr_instagram, overr_site, overr_regiao, aprovado)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
             RETURNING id
         """, (
             data.get('nome',''), data.get('slug',''),
@@ -832,7 +907,10 @@ def api_admin_expositores():
             data.get('ativo', True), data.get('destaque', False),
             data.get('data_expiracao') or None,
             data.get('overr_foto'), data.get('overr_whatsapp'),
-            data.get('overr_instagram'), data.get('overr_site'), data.get('overr_regiao')
+            data.get('overr_instagram'), data.get('overr_site'), data.get('overr_regiao'),
+            # Cadastro feito pelo admin entra sempre já aprovado — só o
+            # formulário público (rota /api/expositores/cadastro) usa FALSE.
+            data.get('aprovado', True)
         ))
         new_id = cur.fetchone()['id']
         conn.commit()
@@ -865,7 +943,8 @@ def api_admin_expositor(exp_id):
                 nome=%s, slug=%s, categoria_id=%s, plano_id=%s, descricao=%s,
                 foto_url=%s, regiao=%s, cidade=%s, whatsapp=%s, instagram=%s,
                 site_url=%s, ativo=%s, destaque=%s, data_expiracao=%s,
-                overr_foto=%s, overr_whatsapp=%s, overr_instagram=%s, overr_site=%s, overr_regiao=%s
+                overr_foto=%s, overr_whatsapp=%s, overr_instagram=%s, overr_site=%s, overr_regiao=%s,
+                aprovado=%s
             WHERE id=%s
         """, (
             data.get('nome',''), data.get('slug',''),
@@ -878,11 +957,36 @@ def api_admin_expositor(exp_id):
             data.get('data_expiracao') or None,
             data.get('overr_foto'), data.get('overr_whatsapp'),
             data.get('overr_instagram'), data.get('overr_site'), data.get('overr_regiao'),
+            data.get('aprovado', True),
             exp_id
         ))
         conn.commit()
         cur.close()
         return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/expositores/pendentes', methods=['GET'])
+@login_required
+def api_admin_expositores_pendentes():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            SELECT e.*, c.nome as categoria_nome
+            FROM expositores e
+            LEFT JOIN categorias c ON e.categoria_id = c.id
+            WHERE e.aprovado = FALSE
+            ORDER BY e.criado_em DESC
+        """)
+        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+        cur.close()
+        return jsonify(rows)
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
@@ -1601,7 +1705,7 @@ def sitemap():
     try:
         conn = get_db_connection()
         cur  = conn.cursor()
-        cur.execute("SELECT slug FROM expositores WHERE ativo = TRUE AND slug IS NOT NULL")
+        cur.execute("SELECT slug FROM expositores WHERE ativo = TRUE AND aprovado = TRUE AND slug IS NOT NULL")
         for row in cur.fetchall():
             urls.append(f'{BASE_URL}/expositores/{row[0]}')
         cur.execute("SELECT slug FROM posts WHERE ativo = TRUE AND slug IS NOT NULL")
