@@ -784,6 +784,27 @@ def api_servicos():
 
 
 # ════════════════════════════════════════════════════════════
+#  API — PLANOS (pública, para a tabela comparativa do site)
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/planos')
+def api_planos():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM planos WHERE ativo = TRUE ORDER BY ordem, id")
+        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+        cur.close()
+        return jsonify(rows)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': 'Erro ao buscar planos'}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
 #  API — DEPOIMENTOS
 # ════════════════════════════════════════════════════════════
 
@@ -1423,17 +1444,81 @@ def api_admin_contato(cont_id):
 #  API ADMIN — PLANOS
 # ════════════════════════════════════════════════════════════
 
-@app.route('/api/admin/planos', methods=['GET'])
+@app.route('/api/admin/planos', methods=['GET', 'POST'])
 @login_required
 def api_admin_planos():
     conn = None
     try:
         conn = get_db_connection()
         cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        cur.execute("SELECT * FROM planos ORDER BY id")
-        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+
+        if request.method == 'GET':
+            cur.execute("SELECT * FROM planos ORDER BY ordem, id")
+            rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+            cur.close()
+            return jsonify(rows)
+
+        data = request.get_json()
+        cur.execute("""
+            INSERT INTO planos (
+                nome, descricao, duracao_dias, preco, texto_apresentacao,
+                itens_inclusos, ordem, destaque, ativo,
+                exibe_foto, exibe_whatsapp, exibe_instagram, exibe_site, exibe_regiao
+            )
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
+        """, (
+            data.get('nome', ''), data.get('descricao', ''), data.get('duracao_dias') or None,
+            data.get('preco', 0), data.get('texto_apresentacao', ''),
+            data.get('itens_inclusos', ''), data.get('ordem', 0), data.get('destaque', False),
+            data.get('ativo', True),
+            data.get('exibe_foto', True), data.get('exibe_whatsapp', True),
+            data.get('exibe_instagram', True), data.get('exibe_site', True),
+            data.get('exibe_regiao', True)
+        ))
+        new_id = cur.fetchone()['id']
+        conn.commit()
         cur.close()
-        return jsonify(rows)
+        return jsonify({'ok': True, 'id': new_id})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/planos/<int:plano_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_admin_plano(plano_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor()
+
+        if request.method == 'DELETE':
+            cur.execute("DELETE FROM planos WHERE id = %s", (plano_id,))
+            conn.commit()
+            cur.close()
+            return jsonify({'ok': True})
+
+        data = request.get_json()
+        cur.execute("""
+            UPDATE planos SET
+                nome=%s, descricao=%s, duracao_dias=%s, preco=%s, texto_apresentacao=%s,
+                itens_inclusos=%s, ordem=%s, destaque=%s, ativo=%s,
+                exibe_foto=%s, exibe_whatsapp=%s, exibe_instagram=%s, exibe_site=%s, exibe_regiao=%s
+            WHERE id=%s
+        """, (
+            data.get('nome', ''), data.get('descricao', ''), data.get('duracao_dias') or None,
+            data.get('preco', 0), data.get('texto_apresentacao', ''),
+            data.get('itens_inclusos', ''), data.get('ordem', 0), data.get('destaque', False),
+            data.get('ativo', True),
+            data.get('exibe_foto', True), data.get('exibe_whatsapp', True),
+            data.get('exibe_instagram', True), data.get('exibe_site', True),
+            data.get('exibe_regiao', True), plano_id
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
     except Exception as e:
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
