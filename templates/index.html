@@ -193,6 +193,9 @@
   button{font-family:inherit;cursor:pointer;}
 
   .container{max-width:1180px;margin:0 auto;padding:0 24px;}
+  @media(max-width:600px){
+    .container{padding-left:56px;}
+  }
   .eyebrow{
     display:inline-flex;align-items:center;gap:10px;
     font-family:'Inter',sans-serif; font-style:normal; font-weight:600;
@@ -352,6 +355,8 @@
   .plano-itens li{font-size:13.5px;color:var(--carvao);line-height:1.5;display:flex;gap:8px;align-items:flex-start;}
   .plano-itens li i{color:var(--vinho);margin-top:3px;font-size:12px;flex-shrink:0;}
   .plano-card .btn{width:100%;justify-content:center;}
+  .plano-card .btn-outline{border-color:var(--linha);color:var(--vinho);}
+  .plano-card .btn-outline:hover{background:var(--rosa-suave);}
   .planos-tabela-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--linha);background:#fff;}
   .planos-tabela{width:100%;border-collapse:collapse;font-size:13.5px;}
   .planos-tabela th,.planos-tabela td{padding:16px 18px;text-align:left;border-bottom:1px solid var(--linha);vertical-align:top;}
