@@ -514,6 +514,10 @@ def expositor_detalhe(slug):
     finally:
         if conn: conn.close()
 
+@app.route('/missao')
+def missao():
+    return render_template('missao.html')
+
 @app.route('/blog')
 def blog():
     return render_template('blog.html')
