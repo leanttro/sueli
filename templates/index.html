@@ -337,6 +337,32 @@
   .skeleton{background:linear-gradient(90deg,#eee,#f6f1ec,#eee);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:6px;}
   @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
+  /* ---------- PACOTES / PLANOS ---------- */
+  .planos-bloco{margin-top:64px;padding-top:56px;border-top:1px solid var(--linha);}
+  .planos-cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;margin-bottom:40px;}
+  .plano-card{background:#fff;border-radius:6px;border:1px solid var(--linha);padding:28px 24px;display:flex;flex-direction:column;position:relative;transition:transform .3s ease, box-shadow .3s ease;}
+  .plano-card:hover{transform:translateY(-6px);box-shadow:var(--sombra);}
+  .plano-card.destaque{border:2px solid var(--dourado);box-shadow:0 14px 34px -18px rgba(84,31,81,.35);}
+  .plano-selo{position:absolute;top:-13px;left:24px;background:var(--dourado);color:var(--vinho-escuro);font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:5px 12px;border-radius:20px;}
+  .plano-nome{font-size:18px;font-weight:700;color:var(--vinho-escuro);margin-bottom:6px;}
+  .plano-preco{font-size:28px;font-weight:800;color:var(--vinho);margin-bottom:4px;}
+  .plano-preco small{font-size:13px;font-weight:500;color:var(--cinza);}
+  .plano-apresentacao{font-size:13.5px;color:var(--cinza);line-height:1.6;margin-bottom:16px;}
+  .plano-itens{list-style:none;padding:0;margin:0 0 22px;flex:1;display:flex;flex-direction:column;gap:9px;}
+  .plano-itens li{font-size:13.5px;color:var(--carvao);line-height:1.5;display:flex;gap:8px;align-items:flex-start;}
+  .plano-itens li i{color:var(--vinho);margin-top:3px;font-size:12px;flex-shrink:0;}
+  .plano-card .btn{width:100%;justify-content:center;}
+  .planos-tabela-wrap{overflow-x:auto;border-radius:6px;border:1px solid var(--linha);background:#fff;}
+  .planos-tabela{width:100%;border-collapse:collapse;font-size:13.5px;}
+  .planos-tabela th,.planos-tabela td{padding:16px 18px;text-align:left;border-bottom:1px solid var(--linha);vertical-align:top;}
+  .planos-tabela th{background:var(--vinho-escuro);color:#fff;font-weight:700;font-size:12.5px;letter-spacing:.3px;text-transform:uppercase;}
+  .planos-tabela tr:last-child td{border-bottom:none;}
+  .planos-tabela td.plano-tabela-preco{white-space:nowrap;font-weight:700;color:var(--vinho);}
+  .planos-tabela .tabela-whats a{white-space:nowrap;}
+  @media (max-width: 860px){
+    .planos-tabela-wrap{display:none;}
+  }
+
   /* ---------- EXPOSITORES ---------- */
   .expositores{background:var(--creme);}
   .exp-toolbar{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:36px;flex-wrap:wrap;}
@@ -880,6 +906,30 @@
       <div class="anuncio-card"><div class="skeleton" style="height:160px;width:100%;"></div><div style="padding:22px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
       <div class="anuncio-card"><div class="skeleton" style="height:160px;width:100%;"></div><div style="padding:22px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
       <div class="anuncio-card"><div class="skeleton" style="height:160px;width:100%;"></div><div style="padding:22px;"><div class="skeleton" style="height:18px;width:70%;margin-bottom:10px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div></div>
+    </div>
+
+    <!-- PACOTES / PLANOS -->
+    <div class="planos-bloco" id="planosBloco">
+      <div class="section-head">
+        <p class="eyebrow">Planos para expositores</p>
+        <h2>Escolha o pacote ideal para a sua marca</h2>
+        <p class="lead">Do cadastro gratuito até a presença digital completa — cresça no seu ritmo.</p>
+      </div>
+
+      <div class="planos-cards-grid" id="planosGrid">
+        <div class="plano-card"><div class="skeleton" style="height:18px;width:60%;margin-bottom:14px;"></div><div class="skeleton" style="height:30px;width:40%;margin-bottom:18px;"></div><div class="skeleton" style="height:120px;width:100%;margin-bottom:18px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div>
+        <div class="plano-card"><div class="skeleton" style="height:18px;width:60%;margin-bottom:14px;"></div><div class="skeleton" style="height:30px;width:40%;margin-bottom:18px;"></div><div class="skeleton" style="height:120px;width:100%;margin-bottom:18px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div>
+        <div class="plano-card"><div class="skeleton" style="height:18px;width:60%;margin-bottom:14px;"></div><div class="skeleton" style="height:30px;width:40%;margin-bottom:18px;"></div><div class="skeleton" style="height:120px;width:100%;margin-bottom:18px;"></div><div class="skeleton" style="height:40px;width:100%;"></div></div>
+      </div>
+
+      <div class="planos-tabela-wrap" id="planosTabelaWrap" style="display:none;">
+        <table class="planos-tabela">
+          <thead>
+            <tr><th>Plano</th><th>Preço</th><th>O que inclui</th><th></th></tr>
+          </thead>
+          <tbody id="planosTabelaBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </section>
@@ -1449,6 +1499,66 @@ async function carregarServicos(){
   }catch(err){
     console.error(err);
     grid.innerHTML = '<p style="color:var(--cinza);grid-column:1/-1;">Não foi possível carregar os anúncios agora.</p>';
+  }
+}
+
+/* ---------- PACOTES / PLANOS ---------- */
+function formatarPreco(preco){
+  const n = Number(preco);
+  if(!n || n <= 0) return 'Gratuito';
+  return n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+}
+function itensParaLista(itens){
+  if(!itens) return [];
+  return itens.split(/\r?\n|;/).map(i => i.trim()).filter(Boolean);
+}
+async function carregarPlanos(){
+  const cardsGrid = document.getElementById('planosGrid');
+  const tabelaWrap = document.getElementById('planosTabelaWrap');
+  const tabelaBody = document.getElementById('planosTabelaBody');
+  try{
+    const res = await fetch('/api/planos');
+    if(!res.ok) throw new Error('Falha ao buscar planos');
+    const planos = await res.json();
+
+    if(!planos.length){
+      document.getElementById('planosBloco').style.display = 'none';
+      return;
+    }
+
+    cardsGrid.innerHTML = planos.map(p => {
+      const itens = itensParaLista(p.itens_inclusos);
+      const whatsHref = `https://wa.me/5511948092924?text=${encodeURIComponent('Quero saber mais sobre o plano ' + p.nome)}`;
+      return `
+        <div class="plano-card ${p.destaque ? 'destaque' : ''}">
+          ${p.destaque ? '<span class="plano-selo">Mais procurado</span>' : ''}
+          <div class="plano-nome">${escapeHtml(p.nome || '')}</div>
+          <div class="plano-preco">${formatarPreco(p.preco)}${Number(p.preco) > 0 ? '<small> /pacote</small>' : ''}</div>
+          ${p.texto_apresentacao ? `<p class="plano-apresentacao">${escapeHtml(p.texto_apresentacao)}</p>` : ''}
+          <ul class="plano-itens">
+            ${itens.map(i => `<li><i class="fa-solid fa-circle-check"></i> ${escapeHtml(i)}</li>`).join('')}
+          </ul>
+          <a href="${whatsHref}" target="_blank" rel="noopener" class="btn ${p.destaque ? 'btn-gold' : 'btn-outline'}"><i class="fa-brands fa-whatsapp"></i> Quero esse plano</a>
+        </div>
+      `;
+    }).join('');
+
+    tabelaBody.innerHTML = planos.map(p => {
+      const itens = itensParaLista(p.itens_inclusos);
+      const whatsHref = `https://wa.me/5511948092924?text=${encodeURIComponent('Quero saber mais sobre o plano ' + p.nome)}`;
+      return `
+        <tr>
+          <td><b>${escapeHtml(p.nome || '')}</b></td>
+          <td class="plano-tabela-preco">${formatarPreco(p.preco)}</td>
+          <td>${itens.length ? itens.map(escapeHtml).join(' · ') : '—'}</td>
+          <td class="tabela-whats"><a href="${whatsHref}" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding:8px 14px;font-size:12.5px;"><i class="fa-brands fa-whatsapp"></i> Falar</a></td>
+        </tr>
+      `;
+    }).join('');
+    tabelaWrap.style.display = '';
+  }catch(err){
+    console.error(err);
+    cardsGrid.innerHTML = '<p style="color:var(--cinza);grid-column:1/-1;">Não foi possível carregar os planos agora.</p>';
   }
 }
 
@@ -2196,6 +2306,7 @@ async function carregarEventos(){
 
 /* Init */
 carregarServicos();
+carregarPlanos();
 carregarRegioes();
 carregarCategorias().then(carregarExpositores);
 carregarDepoimentos();
