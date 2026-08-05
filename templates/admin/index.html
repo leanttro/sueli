@@ -269,6 +269,22 @@ tbody tr:hover td{background:#fdfafb;}
       <h2>Feiras — Trabalhe Conosco</h2>
       <button class="btn btn-primary" onclick="abrirModalFeira()"><i class="fa-solid fa-plus"></i> Nova Feira</button>
     </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+      <div style="position:relative;flex:1;min-width:240px;max-width:340px;">
+        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza);font-size:13px;"></i>
+        <input type="text" id="buscaFeira" oninput="filtrarFeiras()" placeholder="Buscar por nome, local ou organizador..." style="width:100%;padding:10px 14px 10px 36px;border:1.5px solid var(--linha);border-radius:5px;font-size:14px;color:var(--carvao);background:#fff;outline:none;">
+      </div>
+      <select id="filtroStatusFeira" onchange="filtrarFeiras()" style="padding:10px 14px;border:1.5px solid var(--linha);border-radius:5px;font-size:14px;color:var(--carvao);background:#fff;outline:none;">
+        <option value="">Todos os status</option>
+        <option value="ativa">Somente ativas</option>
+        <option value="inativa">Somente inativas</option>
+      </select>
+      <select id="ordenarFeira" onchange="filtrarFeiras()" style="padding:10px 14px;border:1.5px solid var(--linha);border-radius:5px;font-size:14px;color:var(--carvao);background:#fff;outline:none;">
+        <option value="data_asc">Data — mais próxima primeiro</option>
+        <option value="data_desc">Data — mais distante primeiro</option>
+        <option value="nome">Nome (A-Z)</option>
+      </select>
+    </div>
     <div class="table-wrap" id="tabelaFeiras"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
   </div>
 
@@ -307,7 +323,10 @@ tbody tr:hover td{background:#fdfafb;}
 
   <!-- PLANOS -->
   <div class="section" id="sec-planos">
-    <div class="section-header"><h2>Planos</h2></div>
+    <div class="section-header">
+      <h2>Planos</h2>
+      <button class="btn btn-primary" onclick="abrirModalPlano()"><i class="fa-solid fa-plus"></i> Novo Plano</button>
+    </div>
     <div class="table-wrap" id="tabelaPlanos"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
   </div>
 
@@ -611,15 +630,37 @@ tbody tr:hover td{background:#fdfafb;}
   </div>
 </div>
 
-<!-- MODAL VISIBILIDADE DO PLANO -->
+<!-- MODAL PLANO (completo) -->
 <div class="overlay" id="modalPlano">
-  <div class="modal" style="max-width:420px;">
+  <div class="modal">
     <div class="modal-header">
-      <h3 id="modalPlanoTit">Visibilidade do Plano</h3>
+      <h3 id="modalPlanoTit">Novo Plano</h3>
       <button class="modal-close" onclick="fecharModal('modalPlano')"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="plano-id">
+      <div class="form-row">
+        <div class="field-group"><label>Nome*</label><input id="plano-nome" placeholder="Ex: Vitrine em Destaque"></div>
+        <div class="field-group"><label>Preço (R$)</label><input id="plano-preco" type="number" step="0.01" min="0" placeholder="0 = gratuito"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Ordem de exibição</label><input id="plano-ordem" type="number" step="1" min="0" placeholder="0"></div>
+        <div class="field-group"><label>Duração (dias)</label><input id="plano-duracao" type="number" step="1" min="0" placeholder="Deixe vazio se não expira"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Texto de apresentação</label><textarea id="plano-apresentacao" placeholder="Frase curta usada no card do site. Ex: Apresente sua marca de forma mais completa e fique em evidência no catálogo."></textarea></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Itens inclusos</label><textarea id="plano-itens" placeholder="Um item por linha. Ex:&#10;Logotipo exposto&#10;Foto dos produtos&#10;Selo Expositor em Destaque"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Descrição interna (opcional, uso administrativo)</label><textarea id="plano-descricao" placeholder="Anotações internas sobre o plano…"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <label class="checkbox-row"><input type="checkbox" id="plano-ativo" checked> Plano ativo (aparece no site)</label>
+        <label class="checkbox-row"><input type="checkbox" id="plano-destaque"> Marcar como "Mais procurado" (destaque no site)</label>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--linha);margin:18px 0;">
       <p style="font-size:12.5px;color:var(--cinza);margin-bottom:14px;">Desmarque o que os expositores desse plano NÃO devem exibir no site (pode ser sobrescrito individualmente na tela de Expositores).</p>
       <div class="form-checks" style="display:flex;flex-direction:column;gap:10px;">
         <label class="checkbox-row"><input type="checkbox" id="plano-exibe-foto" checked> Exibir foto</label>
@@ -631,7 +672,8 @@ tbody tr:hover td{background:#fdfafb;}
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modalPlano')">Cancelar</button>
-      <button class="btn btn-primary" onclick="salvarPlanoVisibilidade()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+      <button class="btn btn-danger" id="btnExcluirPlano" style="display:none;" onclick="excluirPlano()"><i class="fa-solid fa-trash"></i> Excluir</button>
+      <button class="btn btn-primary" onclick="salvarPlano()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
     </div>
   </div>
 </div>
@@ -1193,29 +1235,74 @@ async function excluirDepoimento(id){
 
 // ─── FEIRAS ───────────────────────────────────────────────────
 let _cacheFeiras = [];
+function renderTabelaFeiras(data){
+  if(!data.length){ $('tabelaFeiras').innerHTML = '<div class="empty"><i class="fa-solid fa-calendar-star"></i>Nenhuma feira encontrada.</div>'; return; }
+  $('tabelaFeiras').innerHTML = `<table><thead><tr>
+    <th>Nome</th><th>Local</th><th>Data</th><th>Vagas para</th><th>Taxa</th><th>Status</th><th>Ações</th>
+  </tr></thead><tbody>
+  ${data.map(f=>`<tr>
+    <td><b>${f.nome}</b>${f.organizador?`<br><small style="color:var(--cinza)">${f.organizador}</small>`:''}</td>
+    <td style="max-width:180px;font-size:13px;">${f.local||'—'}</td>
+    <td style="white-space:nowrap;">${f.data_evento||'—'}${f.horario?`<br><small style="color:var(--cinza)">${f.horario}</small>`:''}</td>
+    <td style="max-width:160px;font-size:13px;">${f.vagas_para||'—'}</td>
+    <td style="white-space:nowrap;">${f.taxa||'—'}</td>
+    <td>${f.ativo?'<span class="tag tag-green">Ativa</span>':'<span class="tag tag-gray">Inativa</span>'}</td>
+    <td><div class="td-acoes">
+      <button class="btn btn-ghost btn-sm" onclick="editarFeiraPorId(${f.id})"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-danger btn-sm" onclick="excluirFeira(${f.id})"><i class="fa-solid fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
+function parseDataBr(str){
+  if(!str) return null;
+  const partes = str.split('/');
+  if(partes.length !== 3) return null;
+  const [d,m,a] = partes;
+  return new Date(`${a}-${m}-${d}`);
+}
 async function carregarFeiras(){
   $('tabelaFeiras').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/feiras');
     _cacheFeiras = data;
-    if(!data.length){ $('tabelaFeiras').innerHTML = '<div class="empty"><i class="fa-solid fa-calendar-star"></i>Nenhuma feira cadastrada.</div>'; return; }
-    $('tabelaFeiras').innerHTML = `<table><thead><tr>
-      <th>Nome</th><th>Local</th><th>Data</th><th>Vagas para</th><th>Taxa</th><th>Status</th><th>Ações</th>
-    </tr></thead><tbody>
-    ${data.map(f=>`<tr>
-      <td><b>${f.nome}</b>${f.organizador?`<br><small style="color:var(--cinza)">${f.organizador}</small>`:''}</td>
-      <td style="max-width:180px;font-size:13px;">${f.local||'—'}</td>
-      <td style="white-space:nowrap;">${f.data_evento||'—'}${f.horario?`<br><small style="color:var(--cinza)">${f.horario}</small>`:''}</td>
-      <td style="max-width:160px;font-size:13px;">${f.vagas_para||'—'}</td>
-      <td style="white-space:nowrap;">${f.taxa||'—'}</td>
-      <td>${f.ativo?'<span class="tag tag-green">Ativa</span>':'<span class="tag tag-gray">Inativa</span>'}</td>
-      <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick="editarFeiraPorId(${f.id})"><i class="fa-solid fa-pen"></i></button>
-        <button class="btn btn-danger btn-sm" onclick="excluirFeira(${f.id})"><i class="fa-solid fa-trash"></i></button>
-      </div></td>
-    </tr>`).join('')}
-    </tbody></table>`;
+    const buscaEl = $('buscaFeira');
+    if(buscaEl) buscaEl.value = '';
+    const statusEl = $('filtroStatusFeira');
+    if(statusEl) statusEl.value = '';
+    renderTabelaFeiras(ordenarFeiras(data));
   }catch(e){ $('tabelaFeiras').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Erro ao carregar.</div>'; }
+}
+function ordenarFeiras(lista){
+  const modo = $('ordenarFeira') ? $('ordenarFeira').value : 'data_asc';
+  const copia = [...lista];
+  if(modo === 'nome'){
+    copia.sort((a,b) => (a.nome||'').localeCompare(b.nome||'', 'pt-BR'));
+  }else{
+    copia.sort((a,b) => {
+      const da = parseDataBr(a.data_evento), db = parseDataBr(b.data_evento);
+      if(!da && !db) return 0;
+      if(!da) return 1;
+      if(!db) return -1;
+      return modo === 'data_desc' ? db - da : da - db;
+    });
+  }
+  return copia;
+}
+function filtrarFeiras(){
+  const termo = ($('buscaFeira').value||'').trim().toLowerCase();
+  const status = $('filtroStatusFeira').value;
+  let filtrados = _cacheFeiras;
+  if(termo){
+    filtrados = filtrados.filter(f =>
+      (f.nome||'').toLowerCase().includes(termo) ||
+      (f.local||'').toLowerCase().includes(termo) ||
+      (f.organizador||'').toLowerCase().includes(termo)
+    );
+  }
+  if(status === 'ativa')   filtrados = filtrados.filter(f => !!f.ativo);
+  if(status === 'inativa') filtrados = filtrados.filter(f => !f.ativo);
+  renderTabelaFeiras(ordenarFeiras(filtrados));
 }
 function editarFeiraPorId(id){
   const f = _cacheFeiras.find(x=>x.id===id);
@@ -1429,49 +1516,100 @@ async function excluirContato(id){
 }
 
 // ─── PLANOS ───────────────────────────────────────────────────
+let _cachePlanos = [];
 async function carregarPlanos(){
   $('tabelaPlanos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/planos');
     _cachePlanos = data;
-    if(!data.length){ $('tabelaPlanos').innerHTML = '<div class="empty"><i class="fa-solid fa-crown"></i>Nenhum plano.</div>'; return; }
-    $('tabelaPlanos').innerHTML = `<table><thead><tr><th>Nome</th><th>Descrição</th><th>Duração (dias)</th><th>Status</th><th>Visibilidade</th><th>Ações</th></tr></thead><tbody>
+    if(!data.length){ $('tabelaPlanos').innerHTML = '<div class="empty"><i class="fa-solid fa-crown"></i>Nenhum plano. Clique em "Novo Plano" para criar o primeiro.</div>'; return; }
+    $('tabelaPlanos').innerHTML = `<table><thead><tr><th>Ordem</th><th>Nome</th><th>Preço</th><th>Itens inclusos</th><th>Status</th><th>Ações</th></tr></thead><tbody>
     ${data.map(p=>`<tr>
-      <td><b>${p.nome}</b></td>
-      <td>${p.descricao||'—'}</td>
-      <td>${p.duracao_dias??'—'}</td>
+      <td>${p.ordem??0}</td>
+      <td><b>${p.nome}</b>${p.destaque?' <span class="tag" style="background:var(--dourado);color:var(--vinho-escuro);">Destaque</span>':''}</td>
+      <td>${(p.preco && Number(p.preco) > 0) ? 'R$ ' + Number(p.preco).toFixed(2).replace('.',',') : 'Gratuito'}</td>
+      <td style="font-size:12.5px;color:var(--cinza);max-width:260px;">${(p.itens_inclusos||'').split(/\r?\n|;/).map(i=>i.trim()).filter(Boolean).slice(0,3).join(' · ') || '—'}</td>
       <td>${p.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
-      <td style="font-size:12px;color:var(--cinza);">
-        ${['foto','whatsapp','instagram','site','regiao'].map(f=>p['exibe_'+f]===false?`<span class="tag tag-gray" style="margin:1px;">${f}</span>`:'').join('') || 'Mostra tudo'}
-      </td>
       <td><div class="td-acoes">
-        <button class="btn btn-ghost btn-sm" onclick="editarPlanoPorId(${p.id})"><i class="fa-solid fa-pen"></i> Visibilidade</button>
+        <button class="btn btn-ghost btn-sm" onclick="editarPlanoPorId(${p.id})"><i class="fa-solid fa-pen"></i> Editar</button>
       </div></td>
     </tr>`).join('')}
     </tbody></table>`;
   }catch(e){ $('tabelaPlanos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
 }
-let _cachePlanos = [];
+
+function abrirModalPlano(){
+  $('modalPlanoTit').textContent = 'Novo Plano';
+  $('plano-id').value = '';
+  $('plano-nome').value = '';
+  $('plano-preco').value = '';
+  $('plano-ordem').value = '';
+  $('plano-duracao').value = '';
+  $('plano-apresentacao').value = '';
+  $('plano-itens').value = '';
+  $('plano-descricao').value = '';
+  $('plano-ativo').checked = true;
+  $('plano-destaque').checked = false;
+  ['foto','whatsapp','instagram','site','regiao'].forEach(f=>{ $('plano-exibe-'+f).checked = true; });
+  $('btnExcluirPlano').style.display = 'none';
+  abrirModal('modalPlano');
+}
+
 function editarPlanoPorId(id){
   const p = _cachePlanos.find(x=>x.id===id);
   if(!p) return;
+  $('modalPlanoTit').textContent = 'Editar — ' + p.nome;
   $('plano-id').value = p.id;
-  $('modalPlanoTit').textContent = 'Visibilidade — ' + p.nome;
+  $('plano-nome').value = p.nome || '';
+  $('plano-preco').value = p.preco || '';
+  $('plano-ordem').value = p.ordem ?? '';
+  $('plano-duracao').value = p.duracao_dias ?? '';
+  $('plano-apresentacao').value = p.texto_apresentacao || '';
+  $('plano-itens').value = p.itens_inclusos || '';
+  $('plano-descricao').value = p.descricao || '';
+  $('plano-ativo').checked = p.ativo !== false;
+  $('plano-destaque').checked = !!p.destaque;
   ['foto','whatsapp','instagram','site','regiao'].forEach(f=>{
     $('plano-exibe-'+f).checked = p['exibe_'+f] !== false;
   });
+  $('btnExcluirPlano').style.display = '';
   abrirModal('modalPlano');
 }
-async function salvarPlanoVisibilidade(){
+
+async function salvarPlano(){
   const id = $('plano-id').value;
-  const body = {};
+  const body = {
+    nome: $('plano-nome').value.trim(),
+    preco: parseFloat($('plano-preco').value) || 0,
+    ordem: parseInt($('plano-ordem').value) || 0,
+    duracao_dias: $('plano-duracao').value ? parseInt($('plano-duracao').value) : null,
+    texto_apresentacao: $('plano-apresentacao').value,
+    itens_inclusos: $('plano-itens').value,
+    descricao: $('plano-descricao').value,
+    ativo: $('plano-ativo').checked,
+    destaque: $('plano-destaque').checked,
+  };
   ['foto','whatsapp','instagram','site','regiao'].forEach(f=>{
     body['exibe_'+f] = $('plano-exibe-'+f).checked;
   });
+  if(!body.nome){ toast('Nome do plano é obrigatório.','error'); return; }
   try{
-    await api(`/api/admin/planos/${id}/visibilidade`,'PUT',body);
+    if(id) await api(`/api/admin/planos/${id}`,'PUT',body);
+    else   await api('/api/admin/planos','POST',body);
     fecharModal('modalPlano');
-    toast('Visibilidade do plano atualizada!');
+    toast(id ? 'Plano atualizado!' : 'Plano criado!');
+    carregarPlanos();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+
+async function excluirPlano(){
+  const id = $('plano-id').value;
+  if(!id) return;
+  if(!confirmar('Excluir este plano? Expositores que estiverem nesse plano ficarão sem plano vinculado.')) return;
+  try{
+    await api(`/api/admin/planos/${id}`,'DELETE');
+    fecharModal('modalPlano');
+    toast('Plano excluído!');
     carregarPlanos();
   }catch(e){ toast('Erro: '+e.message,'error'); }
 }
