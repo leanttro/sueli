@@ -640,18 +640,32 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="modal-body">
       <input type="hidden" id="plano-id">
       <div class="form-row">
-        <div class="field-group"><label>Nome*</label><input id="plano-nome" placeholder="Ex: Vitrine em Destaque"></div>
-        <div class="field-group"><label>Preço (R$)</label><input id="plano-preco" type="number" step="0.01" min="0" placeholder="0 = gratuito"></div>
+        <div class="field-group">
+          <label>Preço (R$)</label>
+          <input id="plano-preco" type="number" step="0.01" min="0" placeholder="0 = gratuito">
+          <label class="checkbox-row" style="margin-top:6px;font-size:12.5px;"><input type="checkbox" id="plano-preco-combinar" onchange="togglePrecoCombinar()"> Preço a combinar (sem valor fixo)</label>
+        </div>
+        <div class="field-group"><label>Cobrança</label>
+          <select id="plano-periodo">
+            <option value="pacote">Pacote único</option>
+            <option value="mensal">Mensal</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
       </div>
       <div class="form-row">
+        <div class="field-group"><label>Nome*</label><input id="plano-nome" placeholder="Ex: Vitrine em Destaque"></div>
         <div class="field-group"><label>Ordem de exibição</label><input id="plano-ordem" type="number" step="1" min="0" placeholder="0"></div>
+      </div>
+      <div class="form-row">
         <div class="field-group"><label>Duração (dias)</label><input id="plano-duracao" type="number" step="1" min="0" placeholder="Deixe vazio se não expira"></div>
       </div>
       <div class="form-row full">
         <div class="field-group"><label>Texto de apresentação</label><textarea id="plano-apresentacao" placeholder="Frase curta usada no card do site. Ex: Apresente sua marca de forma mais completa e fique em evidência no catálogo."></textarea></div>
       </div>
-      <div class="form-row full">
+      <div class="form-row">
         <div class="field-group"><label>Itens inclusos</label><textarea id="plano-itens" placeholder="Um item por linha. Ex:&#10;Logotipo exposto&#10;Foto dos produtos&#10;Selo Expositor em Destaque"></textarea></div>
+        <div class="field-group"><label>Itens NÃO inclusos (opcional)</label><textarea id="plano-nao-itens" placeholder="Um item por linha. Ex:&#10;Vídeos promocionais&#10;Atendimento prioritário"></textarea></div>
       </div>
       <div class="form-row full">
         <div class="field-group"><label>Descrição interna (opcional, uso administrativo)</label><textarea id="plano-descricao" placeholder="Anotações internas sobre o plano…"></textarea></div>
@@ -1516,6 +1530,37 @@ async function excluirContato(id){
 }
 
 // ─── PLANOS ───────────────────────────────────────────────────
+// Guardamos periodicidade e itens "não inclusos" dentro do próprio campo
+// itens_inclusos (sem precisar de coluna nova no banco):
+// - 1ª linha opcional "@periodo:mensal" / "@periodo:anual" define a cobrança
+// - linhas que começam com "!" são itens NÃO inclusos
+// preco = -1 é usado como sentinela de "a combinar" (preço nunca é negativo).
+function parsePlanoItens(raw){
+  const linhas = (raw || '').split(/\r?\n/);
+  let periodo = 'pacote';
+  if(linhas[0] && /^@periodo:/i.test(linhas[0].trim())){
+    periodo = linhas[0].trim().split(':')[1].trim().toLowerCase();
+    linhas.shift();
+  }
+  const inclusos = [], naoInclusos = [];
+  linhas.join('\n').split(/\r?\n|;/).map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    if(l.startsWith('!')) naoInclusos.push(l.slice(1).trim());
+    else inclusos.push(l);
+  });
+  return { periodo, inclusos, naoInclusos };
+}
+function buildPlanoItens(periodo, inclusosTexto, naoInclusosTexto){
+  const inclusos = (inclusosTexto||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  const naoInclusos = (naoInclusosTexto||'').split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>'!'+l);
+  const linhas = [];
+  if(periodo && periodo !== 'pacote') linhas.push('@periodo:'+periodo);
+  return linhas.concat(inclusos, naoInclusos).join('\n');
+}
+function togglePrecoCombinar(){
+  const combinar = $('plano-preco-combinar').checked;
+  $('plano-preco').disabled = combinar;
+  if(combinar) $('plano-preco').value = '';
+}
 let _cachePlanos = [];
 async function carregarPlanos(){
   $('tabelaPlanos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
@@ -1527,8 +1572,8 @@ async function carregarPlanos(){
     ${data.map(p=>`<tr>
       <td>${p.ordem??0}</td>
       <td><b>${p.nome}</b>${p.destaque?' <span class="tag" style="background:var(--dourado);color:var(--vinho-escuro);">Destaque</span>':''}</td>
-      <td>${(p.preco && Number(p.preco) > 0) ? 'R$ ' + Number(p.preco).toFixed(2).replace('.',',') : 'Gratuito'}</td>
-      <td style="font-size:12.5px;color:var(--cinza);max-width:260px;">${(p.itens_inclusos||'').split(/\r?\n|;/).map(i=>i.trim()).filter(Boolean).slice(0,3).join(' · ') || '—'}</td>
+      <td>${Number(p.preco) === -1 ? 'A combinar' : (p.preco && Number(p.preco) > 0) ? 'R$ ' + Number(p.preco).toFixed(2).replace('.',',') + ({mensal:'/mês',anual:'/ano'}[parsePlanoItens(p.itens_inclusos).periodo] || '') : 'Gratuito'}</td>
+      <td style="font-size:12.5px;color:var(--cinza);max-width:260px;">${parsePlanoItens(p.itens_inclusos).inclusos.slice(0,3).join(' · ') || '—'}</td>
       <td>${p.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
       <td><div class="td-acoes">
         <button class="btn btn-ghost btn-sm" onclick="editarPlanoPorId(${p.id})"><i class="fa-solid fa-pen"></i> Editar</button>
@@ -1543,10 +1588,14 @@ function abrirModalPlano(){
   $('plano-id').value = '';
   $('plano-nome').value = '';
   $('plano-preco').value = '';
+  $('plano-preco-combinar').checked = false;
+  $('plano-preco').disabled = false;
+  $('plano-periodo').value = 'pacote';
   $('plano-ordem').value = '';
   $('plano-duracao').value = '';
   $('plano-apresentacao').value = '';
   $('plano-itens').value = '';
+  $('plano-nao-itens').value = '';
   $('plano-descricao').value = '';
   $('plano-ativo').checked = true;
   $('plano-destaque').checked = false;
@@ -1561,11 +1610,17 @@ function editarPlanoPorId(id){
   $('modalPlanoTit').textContent = 'Editar — ' + p.nome;
   $('plano-id').value = p.id;
   $('plano-nome').value = p.nome || '';
-  $('plano-preco').value = p.preco || '';
+  const combinar = Number(p.preco) === -1;
+  $('plano-preco-combinar').checked = combinar;
+  $('plano-preco').disabled = combinar;
+  $('plano-preco').value = combinar ? '' : (p.preco || '');
   $('plano-ordem').value = p.ordem ?? '';
   $('plano-duracao').value = p.duracao_dias ?? '';
   $('plano-apresentacao').value = p.texto_apresentacao || '';
-  $('plano-itens').value = p.itens_inclusos || '';
+  const partesItens = parsePlanoItens(p.itens_inclusos);
+  $('plano-periodo').value = partesItens.periodo;
+  $('plano-itens').value = partesItens.inclusos.join('\n');
+  $('plano-nao-itens').value = partesItens.naoInclusos.join('\n');
   $('plano-descricao').value = p.descricao || '';
   $('plano-ativo').checked = p.ativo !== false;
   $('plano-destaque').checked = !!p.destaque;
@@ -1580,11 +1635,11 @@ async function salvarPlano(){
   const id = $('plano-id').value;
   const body = {
     nome: $('plano-nome').value.trim(),
-    preco: parseFloat($('plano-preco').value) || 0,
+    preco: $('plano-preco-combinar').checked ? -1 : (parseFloat($('plano-preco').value) || 0),
     ordem: parseInt($('plano-ordem').value) || 0,
     duracao_dias: $('plano-duracao').value ? parseInt($('plano-duracao').value) : null,
     texto_apresentacao: $('plano-apresentacao').value,
-    itens_inclusos: $('plano-itens').value,
+    itens_inclusos: buildPlanoItens($('plano-periodo').value, $('plano-itens').value, $('plano-nao-itens').value),
     descricao: $('plano-descricao').value,
     ativo: $('plano-ativo').checked,
     destaque: $('plano-destaque').checked,
