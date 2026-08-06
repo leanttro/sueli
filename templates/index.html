@@ -1508,14 +1508,35 @@ async function carregarServicos(){
 }
 
 /* ---------- PACOTES / PLANOS ---------- */
+// periodicidade e itens "não inclusos" ficam guardados dentro do próprio
+// campo itens_inclusos (ver convenção no painel admin); preco=-1 é a
+// sentinela de "a combinar".
 function formatarPreco(preco){
   const n = Number(preco);
+  if(n === -1) return 'A combinar';
   if(!n || n <= 0) return 'Gratuito';
   return n.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
 }
+function sufixoPeriodo(periodo){
+  return periodo === 'mensal' ? '/mês' : periodo === 'anual' ? '/ano' : '/pacote';
+}
+function parsePlanoItens(raw){
+  const linhas = (raw || '').split(/\r?\n/);
+  let periodo = 'pacote';
+  if(linhas[0] && /^@periodo:/i.test(linhas[0].trim())){
+    periodo = linhas[0].trim().split(':')[1].trim().toLowerCase();
+    linhas.shift();
+  }
+  const inclusos = [], naoInclusos = [];
+  linhas.join('\n').split(/\r?\n|;/).map(l=>l.trim()).filter(Boolean).forEach(l=>{
+    if(l.startsWith('!')) naoInclusos.push(l.slice(1).trim());
+    else inclusos.push(l);
+  });
+  return { periodo, inclusos, naoInclusos };
+}
 function itensParaLista(itens){
-  if(!itens) return [];
-  return itens.split(/\r?\n|;/).map(i => i.trim()).filter(Boolean);
+  // mantido por compatibilidade com quem ainda chamar direto
+  return parsePlanoItens(itens).inclusos;
 }
 async function carregarPlanos(){
   const cardsGrid = document.getElementById('planosGrid');
@@ -1532,16 +1553,19 @@ async function carregarPlanos(){
     }
 
     cardsGrid.innerHTML = planos.map(p => {
-      const itens = itensParaLista(p.itens_inclusos);
+      const { periodo, inclusos, naoInclusos } = parsePlanoItens(p.itens_inclusos);
+      const precoNum = Number(p.preco);
+      const mostraSufixo = precoNum > 0; // não mostra /mês, /ano etc quando é grátis ou "a combinar"
       const whatsHref = `https://wa.me/5511948092924?text=${encodeURIComponent('Quero saber mais sobre o plano ' + p.nome)}`;
       return `
         <div class="plano-card ${p.destaque ? 'destaque' : ''}">
           ${p.destaque ? '<span class="plano-selo">Mais procurado</span>' : ''}
           <div class="plano-nome">${escapeHtml(p.nome || '')}</div>
-          <div class="plano-preco">${formatarPreco(p.preco)}${Number(p.preco) > 0 ? '<small> /pacote</small>' : ''}</div>
+          <div class="plano-preco">${formatarPreco(p.preco)}${mostraSufixo ? `<small> ${sufixoPeriodo(periodo)}</small>` : ''}</div>
           ${p.texto_apresentacao ? `<p class="plano-apresentacao">${escapeHtml(p.texto_apresentacao)}</p>` : ''}
           <ul class="plano-itens">
-            ${itens.map(i => `<li><i class="fa-solid fa-circle-check"></i> ${escapeHtml(i)}</li>`).join('')}
+            ${inclusos.map(i => `<li><i class="fa-solid fa-circle-check"></i> ${escapeHtml(i)}</li>`).join('')}
+            ${naoInclusos.map(i => `<li class="plano-item-nao"><i class="fa-solid fa-circle-xmark"></i> ${escapeHtml(i)}</li>`).join('')}
           </ul>
           <a href="${whatsHref}" target="_blank" rel="noopener" class="btn ${p.destaque ? 'btn-gold' : 'btn-outline'}"><i class="fa-brands fa-whatsapp"></i> Quero esse plano</a>
         </div>
@@ -1549,13 +1573,15 @@ async function carregarPlanos(){
     }).join('');
 
     tabelaBody.innerHTML = planos.map(p => {
-      const itens = itensParaLista(p.itens_inclusos);
+      const { periodo, inclusos } = parsePlanoItens(p.itens_inclusos);
+      const precoNum = Number(p.preco);
+      const mostraSufixo = precoNum > 0;
       const whatsHref = `https://wa.me/5511948092924?text=${encodeURIComponent('Quero saber mais sobre o plano ' + p.nome)}`;
       return `
         <tr>
           <td><b>${escapeHtml(p.nome || '')}</b></td>
-          <td class="plano-tabela-preco">${formatarPreco(p.preco)}</td>
-          <td>${itens.length ? itens.map(escapeHtml).join(' · ') : '—'}</td>
+          <td class="plano-tabela-preco">${formatarPreco(p.preco)}${mostraSufixo ? ' ' + sufixoPeriodo(periodo) : ''}</td>
+          <td>${inclusos.length ? inclusos.map(escapeHtml).join(' · ') : '—'}</td>
           <td class="tabela-whats"><a href="${whatsHref}" target="_blank" rel="noopener" class="btn btn-whatsapp" style="padding:8px 14px;font-size:12.5px;"><i class="fa-brands fa-whatsapp"></i> Falar</a></td>
         </tr>
       `;
