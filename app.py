@@ -117,6 +117,15 @@ def init_visibilidade_columns():
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+        # Garante que a tabela "planos" tenha todas as colunas usadas pelo app
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS descricao TEXT DEFAULT ''")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS duracao_dias INTEGER")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS preco NUMERIC DEFAULT 0")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS texto_apresentacao TEXT DEFAULT ''")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS itens_inclusos TEXT DEFAULT ''")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS ordem INTEGER DEFAULT 0")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS destaque BOOLEAN DEFAULT FALSE")
+        cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS ativo BOOLEAN DEFAULT TRUE")
         # Padrão por PLANO: se o plano libera ou não cada campo
         cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_foto BOOLEAN DEFAULT TRUE")
         cur.execute("ALTER TABLE planos ADD COLUMN IF NOT EXISTS exibe_whatsapp BOOLEAN DEFAULT TRUE")
