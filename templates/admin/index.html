@@ -63,6 +63,7 @@ input,select,textarea,button{font-family:'Inter',sans-serif;}
 .btn-primary:hover{background:var(--vinho-escuro);}
 .btn-sm{padding:6px 13px;font-size:12.5px;}
 .btn-ghost{background:#fff;color:var(--carvao);border-color:var(--linha);}
+.sos-subtab.active{background:var(--vinho);color:#fff;border-color:transparent;}
 .btn-ghost:hover{border-color:var(--cinza);}
 .btn-danger{background:#fef2f2;color:#b91c1c;border-color:#fecaca;}
 .btn-danger:hover{background:#fee2e2;}
@@ -204,6 +205,10 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="sb-label">Sistema</div>
     <button class="sb-link" data-section="planos"><i class="fa-solid fa-crown"></i> Planos</button>
     <button class="sb-link" data-section="ia"><i class="fa-solid fa-robot"></i> Configurar IA</button>
+
+    <div class="sb-label">Outro negócio</div>
+    <button class="sb-link" data-section="sos"><i class="fa-solid fa-briefcase"></i> SOS Corporativa</button>
+
     <a class="sb-link danger" href="/admin/logout"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
   </nav>
 </aside>
@@ -390,6 +395,45 @@ tbody tr:hover td{background:#fdfafb;}
       <button class="btn btn-primary" onclick="abrirModalIAProduto()"><i class="fa-solid fa-plus"></i> Novo item</button>
     </div>
     <div class="table-wrap" id="tabelaIAProdutos"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+  </div>
+
+  <!-- SOS CORPORATIVA (outro negócio, mesmo admin) -->
+  <div class="section" id="sec-sos">
+    <div class="section-header">
+      <h2>SOS Corporativa</h2>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm sos-subtab active" data-sossub="produtos" onclick="mudarSosSub('produtos')"><i class="fa-solid fa-box"></i> Produtos</button>
+      <button class="btn btn-ghost btn-sm sos-subtab" data-sossub="posts" onclick="mudarSosSub('posts')"><i class="fa-solid fa-newspaper"></i> Blog</button>
+      <button class="btn btn-ghost btn-sm sos-subtab" data-sossub="leads" onclick="mudarSosSub('leads')"><i class="fa-solid fa-envelope"></i> Leads</button>
+    </div>
+
+    <!-- SOS: PRODUTOS -->
+    <div class="sos-sub" id="sos-sub-produtos">
+      <div class="section-header">
+        <h2 style="font-size:17px;">Produtos</h2>
+        <button class="btn btn-primary" onclick="abrirModalSosProduto()"><i class="fa-solid fa-plus"></i> Novo Produto</button>
+      </div>
+      <div class="table-wrap" id="tabelaSosProdutos"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+    </div>
+
+    <!-- SOS: BLOG/POSTS -->
+    <div class="sos-sub" id="sos-sub-posts" style="display:none;">
+      <div class="section-header">
+        <h2 style="font-size:17px;">Blog</h2>
+        <button class="btn btn-primary" onclick="abrirModalSosPost()"><i class="fa-solid fa-plus"></i> Novo Post</button>
+      </div>
+      <div class="table-wrap" id="tabelaSosPosts"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+    </div>
+
+    <!-- SOS: LEADS -->
+    <div class="sos-sub" id="sos-sub-leads" style="display:none;">
+      <div class="section-header">
+        <h2 style="font-size:17px;">Leads Recebidos</h2>
+      </div>
+      <div class="table-wrap" id="tabelaSosLeads"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+    </div>
   </div>
 
 </div><!-- /main -->
@@ -738,6 +782,101 @@ tbody tr:hover td{background:#fdfafb;}
   </div>
 </div>
 
+<!-- MODAL SOS PRODUTO -->
+<div class="overlay" id="modalSosProduto">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <h3 id="modalSosProdutoTit">Novo Produto</h3>
+      <button class="modal-close" onclick="fecharModal('modalSosProduto')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sosp-id">
+      <div class="form-row">
+        <div class="field-group"><label>Nome*</label><input id="sosp-nome" oninput="gerarSlug('sosp-nome','sosp-slug')" placeholder="Nome do produto"></div>
+        <div class="field-group"><label>Slug*</label><input id="sosp-slug" placeholder="gerado-automaticamente"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Ordem</label><input id="sosp-ordem" type="number" value="0"></div>
+        <div class="field-group">
+          <label>Imagem</label>
+          <div class="upload-box">
+            <input type="hidden" id="sosp-imagem">
+            <div class="upload-area" onclick="document.getElementById('file-sosp-imagem').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-sosp-imagem" accept="image/*" style="display:none" onchange="uploadImagem(this,'sosp-imagem','prev-sosp-imagem')">
+            <img id="prev-sosp-imagem" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-sosp-imagem"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Descrição curta</label><textarea id="sosp-descricao" placeholder="Resumo exibido na vitrine"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Descrição completa</label><textarea id="sosp-descricao_completa" style="min-height:140px;" placeholder="Texto completo exibido na página do produto"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <label class="checkbox-row"><input type="checkbox" id="sosp-ativo" checked> Ativo (visível no site)</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalSosProduto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarSosProduto()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SOS POST -->
+<div class="overlay" id="modalSosPost">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-header">
+      <h3 id="modalSosPostTit">Novo Post</h3>
+      <button class="modal-close" onclick="fecharModal('modalSosPost')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="sospost-id">
+      <div class="form-row">
+        <div class="field-group"><label>Título*</label><input id="sospost-titulo" oninput="gerarSlug('sospost-titulo','sospost-slug')" placeholder="Título do post"></div>
+        <div class="field-group"><label>Slug*</label><input id="sospost-slug" placeholder="gerado-automaticamente"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Categoria</label><input id="sospost-categoria" placeholder="Ex: Segurança do Trabalho"></div>
+        <div class="field-group"><label>Data (texto livre)</label><input id="sospost-data" placeholder="Ex: 12 Ago 2026"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Resumo</label><input id="sospost-resumo" placeholder="Chamada curta do post"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group">
+          <label>Capa</label>
+          <div class="upload-box">
+            <input type="hidden" id="sospost-capa">
+            <div class="upload-area" onclick="document.getElementById('file-sospost-capa').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-sospost-capa" accept="image/*" style="display:none" onchange="uploadImagem(this,'sospost-capa','prev-sospost-capa')">
+            <img id="prev-sospost-capa" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-sospost-capa"></div>
+          </div>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Conteúdo (HTML)</label><textarea id="sospost-conteudo" style="min-height:180px;" placeholder="<p>Conteúdo do post em HTML…</p>"></textarea></div>
+      </div>
+      <div class="form-row full">
+        <label class="checkbox-row"><input type="checkbox" id="sospost-publicado" checked> Publicado</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalSosPost')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarSosPost()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL FEIRA -->
 <div class="overlay" id="modalFeira">
   <div class="modal" style="max-width:680px;">
@@ -872,8 +1011,24 @@ const titulos = {
   dashboard:'Dashboard', expositores:'Expositores', pendentes:'Cadastros Pendentes', categorias:'Categorias',
   feiras:'Feiras — Trabalhe Conosco',
   servicos:'Serviços', depoimentos:'Depoimentos', blog:'Blog',
-  contatos:'Contatos', planos:'Planos', ia:'Configurar IA'
+  contatos:'Contatos', planos:'Planos', ia:'Configurar IA', sos:'SOS Corporativa'
 };
+
+// ─── SOS CORPORATIVA — sub-abas (Produtos / Blog / Leads) ─────
+function mudarSosSub(sub){
+  document.querySelectorAll('.sos-subtab').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.sos-subtab[data-sossub="${sub}"]`).classList.add('active');
+  document.querySelectorAll('.sos-sub').forEach(s=>s.style.display='none');
+  $(`sos-sub-${sub}`).style.display='';
+  if(sub==='produtos') carregarSosProdutos();
+  if(sub==='posts') carregarSosPosts();
+  if(sub==='leads') carregarSosLeads();
+}
+function carregarSOS(){
+  // sempre recarrega a sub-aba de produtos ao entrar na seção
+  mudarSosSub('produtos');
+}
+
 const loaders = {
   expositores: carregarExpositores,
   pendentes: carregarPendentes,
@@ -885,6 +1040,7 @@ const loaders = {
   contatos: carregarContatos,
   planos: carregarPlanos,
   ia: carregarIA,
+  sos: carregarSOS,
 };
 
 document.querySelectorAll('.sb-link[data-section]').forEach(btn => {
@@ -1442,6 +1598,153 @@ async function salvarPost(){
 async function excluirPost(id){
   if(!confirmar('Excluir este post?')) return;
   try{ await api(`/api/admin/blog/${id}`,'DELETE'); toast('Excluído!'); carregarBlog(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── SOS CORPORATIVA — PRODUTOS ─────────────────────────────────
+let _cacheSosProdutos = [];
+async function carregarSosProdutos(){
+  $('tabelaSosProdutos').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/sos/produtos');
+    _cacheSosProdutos = data;
+    if(!data.length){ $('tabelaSosProdutos').innerHTML = '<div class="empty"><i class="fa-solid fa-box"></i>Nenhum produto.</div>'; return; }
+    $('tabelaSosProdutos').innerHTML = `<table><thead><tr><th>Ordem</th><th>Nome</th><th>Descrição</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(p=>`<tr>
+      <td>${p.ordem ?? 0}</td>
+      <td><b>${p.nome}</b></td>
+      <td style="font-size:12.5px;color:var(--cinza);max-width:300px;">${(p.descricao||'—')}</td>
+      <td>${p.ativo?'<span class="tag tag-green">Ativo</span>':'<span class="tag tag-gray">Inativo</span>'}</td>
+      <td><div class="td-acoes">
+        <button class="btn btn-ghost btn-sm" onclick="editarSosProdutoPorId(${p.id})"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="excluirSosProduto(${p.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaSosProdutos').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function editarSosProdutoPorId(id){
+  const p = _cacheSosProdutos.find(x=>x.id===id);
+  if(p) editarSosProduto(p);
+}
+function abrirModalSosProduto(){
+  $('modalSosProdutoTit').textContent='Novo Produto';
+  ['id','nome','slug','imagem','descricao','descricao_completa'].forEach(f=>$(`sosp-${f}`).value='');
+  $('sosp-ordem').value=0;
+  $('sosp-ativo').checked=true;
+  const prev=$('prev-sosp-imagem'); if(prev){prev.style.display='none';prev.src='';}
+  const stat=$('status-sosp-imagem'); if(stat){stat.className='upload-status';stat.textContent='';}
+  abrirModal('modalSosProduto');
+}
+function editarSosProduto(p){
+  $('modalSosProdutoTit').textContent='Editar Produto';
+  $('sosp-id').value=p.id; $('sosp-nome').value=p.nome||''; $('sosp-slug').value=p.slug||'';
+  $('sosp-ordem').value=p.ordem ?? 0;
+  $('sosp-imagem').value=p.imagem||''; $('sosp-descricao').value=p.descricao||'';
+  $('sosp-descricao_completa').value=p.descricao_completa||''; $('sosp-ativo').checked=!!p.ativo;
+  mostrarPreviewExistente(p.imagem,'prev-sosp-imagem','status-sosp-imagem');
+  abrirModal('modalSosProduto');
+}
+async function salvarSosProduto(){
+  const id=$('sosp-id').value;
+  const body={nome:$('sosp-nome').value, slug:$('sosp-slug').value, ordem:Number($('sosp-ordem').value)||0,
+    imagem:$('sosp-imagem').value, descricao:$('sosp-descricao').value,
+    descricao_completa:$('sosp-descricao_completa').value, ativo:$('sosp-ativo').checked};
+  if(!body.nome||!body.slug){ toast('Nome e slug obrigatórios.','error'); return; }
+  try{
+    if(id) await api(`/api/admin/sos/produtos/${id}`,'PUT',body);
+    else   await api('/api/admin/sos/produtos','POST',body);
+    fecharModal('modalSosProduto'); toast(id?'Produto atualizado!':'Produto criado!'); carregarSosProdutos();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+async function excluirSosProduto(id){
+  if(!confirmar('Excluir este produto?')) return;
+  try{ await api(`/api/admin/sos/produtos/${id}`,'DELETE'); toast('Excluído!'); carregarSosProdutos(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── SOS CORPORATIVA — BLOG/POSTS ────────────────────────────────
+let _cacheSosPosts = [];
+async function carregarSosPosts(){
+  $('tabelaSosPosts').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/sos/posts');
+    _cacheSosPosts = data;
+    if(!data.length){ $('tabelaSosPosts').innerHTML = '<div class="empty"><i class="fa-solid fa-newspaper"></i>Nenhum post.</div>'; return; }
+    $('tabelaSosPosts').innerHTML = `<table><thead><tr><th>Título</th><th>Categoria</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(p=>`<tr>
+      <td><b>${p.titulo}</b></td><td>${p.categoria||'—'}</td><td>${p.data||'—'}</td>
+      <td>${p.publicado?'<span class="tag tag-green">Publicado</span>':'<span class="tag tag-gray">Rascunho</span>'}</td>
+      <td><div class="td-acoes">
+        <button class="btn btn-ghost btn-sm" onclick="editarSosPostPorId(${p.id})"><i class="fa-solid fa-pen"></i></button>
+        <button class="btn btn-danger btn-sm" onclick="excluirSosPost(${p.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaSosPosts').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+function editarSosPostPorId(id){
+  const p = _cacheSosPosts.find(x=>x.id===id);
+  if(p) editarSosPost(p);
+}
+function abrirModalSosPost(){
+  $('modalSosPostTit').textContent='Novo Post';
+  ['id','titulo','slug','categoria','data','resumo','capa','conteudo'].forEach(f=>$(`sospost-${f}`).value='');
+  $('sospost-publicado').checked=true;
+  const prev=$('prev-sospost-capa'); if(prev){prev.style.display='none';prev.src='';}
+  const stat=$('status-sospost-capa'); if(stat){stat.className='upload-status';stat.textContent='';}
+  abrirModal('modalSosPost');
+}
+function editarSosPost(p){
+  $('modalSosPostTit').textContent='Editar Post';
+  $('sospost-id').value=p.id; $('sospost-titulo').value=p.titulo||''; $('sospost-slug').value=p.slug||'';
+  $('sospost-categoria').value=p.categoria||''; $('sospost-data').value=p.data||'';
+  $('sospost-resumo').value=p.resumo||''; $('sospost-capa').value=p.capa||'';
+  $('sospost-conteudo').value=p.conteudo||''; $('sospost-publicado').checked=!!p.publicado;
+  mostrarPreviewExistente(p.capa,'prev-sospost-capa','status-sospost-capa');
+  abrirModal('modalSosPost');
+}
+async function salvarSosPost(){
+  const id=$('sospost-id').value;
+  const body={titulo:$('sospost-titulo').value, slug:$('sospost-slug').value, categoria:$('sospost-categoria').value,
+    data:$('sospost-data').value, resumo:$('sospost-resumo').value, capa:$('sospost-capa').value,
+    conteudo:$('sospost-conteudo').value, publicado:$('sospost-publicado').checked};
+  if(!body.titulo||!body.slug){ toast('Título e slug obrigatórios.','error'); return; }
+  try{
+    if(id) await api(`/api/admin/sos/posts/${id}`,'PUT',body);
+    else   await api('/api/admin/sos/posts','POST',body);
+    fecharModal('modalSosPost'); toast(id?'Post atualizado!':'Post publicado!'); carregarSosPosts();
+  }catch(e){ toast('Erro: '+e.message,'error'); }
+}
+async function excluirSosPost(id){
+  if(!confirmar('Excluir este post?')) return;
+  try{ await api(`/api/admin/sos/posts/${id}`,'DELETE'); toast('Excluído!'); carregarSosPosts(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
+// ─── SOS CORPORATIVA — LEADS ──────────────────────────────────────
+let _cacheSosLeads = [];
+async function carregarSosLeads(){
+  $('tabelaSosLeads').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/sos/leads');
+    _cacheSosLeads = data;
+    if(!data.length){ $('tabelaSosLeads').innerHTML = '<div class="empty"><i class="fa-solid fa-envelope"></i>Nenhum lead recebido.</div>'; return; }
+    $('tabelaSosLeads').innerHTML = `<table><thead><tr><th>Nome</th><th>Empresa</th><th>Contato</th><th>Serviço</th><th>Recebido em</th><th>Ações</th></tr></thead><tbody>
+    ${data.map(l=>`<tr>
+      <td><b>${l.nome}</b></td><td>${l.empresa||'—'}</td>
+      <td style="font-size:12.5px;">${l.email}${l.whatsapp?'<br>'+l.whatsapp:''}</td>
+      <td>${l.servico||'—'}</td><td>${l.criado_em||'—'}</td>
+      <td><div class="td-acoes">
+        <button class="btn btn-danger btn-sm" onclick="excluirSosLead(${l.id})"><i class="fa-solid fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+    </tbody></table>`;
+  }catch(e){ $('tabelaSosLeads').innerHTML = '<div class="empty">Erro ao carregar.</div>'; }
+}
+async function excluirSosLead(id){
+  if(!confirmar('Excluir este lead?')) return;
+  try{ await api(`/api/admin/sos/leads/${id}`,'DELETE'); toast('Excluído!'); carregarSosLeads(); }
   catch(e){ toast('Erro.','error'); }
 }
 
