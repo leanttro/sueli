@@ -2102,23 +2102,14 @@ def serve_static(path):
 
 
 # ════════════════════════════════════════════════════════════
-#  SOS CORPORATIVA — montado no mesmo servidor, prefixo /sos
-#  (outro negócio da mesma dona, painel acessado via aba dentro
-#  do admin da Oficina, através do iframe apontando /sos/admin)
+#  SOS CORPORATIVA agora é um app separado, com seu próprio
+#  deploy no Dokploy (serviço "sos corporativa"). NÃO é mais
+#  montado aqui dentro via DispatcherMiddleware — o gerenciamento
+#  dos dados do SOS (produtos/posts/leads) é feito pelas rotas
+#  /api/admin/sos/* aqui em cima, mas quem serve o SITE público
+#  do SOS é o outro container (app.py dele), rodando sozinho.
 # ════════════════════════════════════════════════════════════
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-from sos_app import app as sos_app
-
-# 'application' é o objeto que o servidor (gunicorn) precisa apontar agora,
-# em vez de 'app' sozinho — ele decide, pela URL, se manda a requisição
-# pro app da Oficina ou pro app do SOS.
-application = DispatcherMiddleware(app, {
-    '/sos': sos_app,
-})
-
 
 if __name__ == '__main__':
-    from werkzeug.serving import run_simple
     port = int(os.environ.get("PORT", 10000))
-    # Rodando local com os dois apps juntos (Oficina na raiz, SOS em /sos)
-    run_simple("0.0.0.0", port, application, use_reloader=True, use_debugger=True)
+    app.run(host="0.0.0.0", port=port, debug=False)
