@@ -1564,6 +1564,185 @@ def api_admin_plano_visibilidade(plano_id):
 
 
 # ════════════════════════════════════════════════════════════
+#  API ADMIN — SOS CORPORATIVA (outro negócio, mesmo admin)
+#  Tabelas: sos_produtos, sos_posts, sos_leads (ver app_sos.py)
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/admin/sos/produtos', methods=['GET', 'POST'])
+@login_required
+def api_admin_sos_produtos():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        if request.method == 'GET':
+            cur.execute("SELECT * FROM sos_produtos ORDER BY ordem ASC, criado_em DESC")
+            rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+            cur.close()
+            return jsonify(rows)
+
+        data = request.get_json()
+        cur.execute("""
+            INSERT INTO sos_produtos (nome, slug, descricao, descricao_completa, imagem, ativo, ordem)
+            VALUES (%s,%s,%s,%s,%s,%s,%s) RETURNING id
+        """, (
+            data.get('nome', ''), data.get('slug', ''),
+            data.get('descricao', ''), data.get('descricao_completa', ''),
+            data.get('imagem', ''), data.get('ativo', True),
+            data.get('ordem', 0)
+        ))
+        new_id = cur.fetchone()['id']
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True, 'id': new_id})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/sos/produtos/<int:produto_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_admin_sos_produto(produto_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor()
+
+        if request.method == 'DELETE':
+            cur.execute("DELETE FROM sos_produtos WHERE id = %s", (produto_id,))
+            conn.commit()
+            cur.close()
+            return jsonify({'ok': True})
+
+        data = request.get_json()
+        cur.execute("""
+            UPDATE sos_produtos SET nome=%s, slug=%s, descricao=%s,
+            descricao_completa=%s, imagem=%s, ativo=%s, ordem=%s WHERE id=%s
+        """, (
+            data.get('nome', ''), data.get('slug', ''),
+            data.get('descricao', ''), data.get('descricao_completa', ''),
+            data.get('imagem', ''), data.get('ativo', True),
+            data.get('ordem', 0), produto_id
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/sos/posts', methods=['GET', 'POST'])
+@login_required
+def api_admin_sos_posts():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        if request.method == 'GET':
+            cur.execute("SELECT * FROM sos_posts ORDER BY criado_em DESC")
+            rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+            cur.close()
+            return jsonify(rows)
+
+        data = request.get_json()
+        cur.execute("""
+            INSERT INTO sos_posts (titulo, slug, resumo, conteudo, capa, categoria, data, publicado)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
+        """, (
+            data.get('titulo', ''), data.get('slug', ''),
+            data.get('resumo', ''), data.get('conteudo', ''),
+            data.get('capa', ''), data.get('categoria', ''),
+            data.get('data', ''), data.get('publicado', True)
+        ))
+        new_id = cur.fetchone()['id']
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True, 'id': new_id})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/sos/posts/<int:post_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_admin_sos_post(post_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor()
+
+        if request.method == 'DELETE':
+            cur.execute("DELETE FROM sos_posts WHERE id = %s", (post_id,))
+            conn.commit()
+            cur.close()
+            return jsonify({'ok': True})
+
+        data = request.get_json()
+        cur.execute("""
+            UPDATE sos_posts SET titulo=%s, slug=%s, resumo=%s, conteudo=%s,
+            capa=%s, categoria=%s, data=%s, publicado=%s WHERE id=%s
+        """, (
+            data.get('titulo', ''), data.get('slug', ''),
+            data.get('resumo', ''), data.get('conteudo', ''),
+            data.get('capa', ''), data.get('categoria', ''),
+            data.get('data', ''), data.get('publicado', True), post_id
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/sos/leads', methods=['GET'])
+@login_required
+def api_admin_sos_leads():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("SELECT * FROM sos_leads ORDER BY criado_em DESC")
+        rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+        cur.close()
+        return jsonify(rows)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/sos/leads/<int:lead_id>', methods=['DELETE'])
+@login_required
+def api_admin_sos_lead(lead_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor()
+        cur.execute("DELETE FROM sos_leads WHERE id = %s", (lead_id,))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+# ════════════════════════════════════════════════════════════
 #  API PÚBLICA — FEIRAS
 # ════════════════════════════════════════════════════════════
 
