@@ -1922,6 +1922,24 @@ def serve_static(path):
     return "Not Found", 404
 
 
+# ════════════════════════════════════════════════════════════
+#  SOS CORPORATIVA — montado no mesmo servidor, prefixo /sos
+#  (outro negócio da mesma dona, painel acessado via aba dentro
+#  do admin da Oficina, através do iframe apontando /sos/admin)
+# ════════════════════════════════════════════════════════════
+from werkzeug.middleware.dispatcher import DispatcherMiddleware
+from sos_app import app as sos_app
+
+# 'application' é o objeto que o servidor (gunicorn) precisa apontar agora,
+# em vez de 'app' sozinho — ele decide, pela URL, se manda a requisição
+# pro app da Oficina ou pro app do SOS.
+application = DispatcherMiddleware(app, {
+    '/sos': sos_app,
+})
+
+
 if __name__ == '__main__':
+    from werkzeug.serving import run_simple
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    # Rodando local com os dois apps juntos (Oficina na raiz, SOS em /sos)
+    run_simple("0.0.0.0", port, application, use_reloader=True, use_debugger=True)
