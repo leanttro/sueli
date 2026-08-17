@@ -1131,7 +1131,8 @@ const titulos = {
   dashboard:'Dashboard', expositores:'Expositores', pendentes:'Cadastros Pendentes', categorias:'Categorias',
   feiras:'Feiras — Trabalhe Conosco',
   servicos:'Serviços', depoimentos:'Depoimentos', blog:'Blog',
-  contatos:'Contatos', planos:'Planos', ia:'Configurar IA', sos:'SOS Corporativa'
+  contatos:'Contatos', planos:'Planos', ia:'Configurar IA', sos:'SOS Corporativa',
+  engrena:'Engrena Meu Bairro'
 };
 
 // ─── SOS CORPORATIVA — sub-abas (Produtos / Blog / Leads) ─────
@@ -1161,6 +1162,7 @@ const loaders = {
   planos: carregarPlanos,
   ia: carregarIA,
   sos: carregarSOS,
+  engrena: carregarEngrena,
 };
 
 document.querySelectorAll('.sb-link[data-section]').forEach(btn => {
@@ -1866,6 +1868,161 @@ async function excluirSosLead(id){
   if(!confirmar('Excluir este lead?')) return;
   try{ await api(`/api/admin/sos/leads/${id}`,'DELETE'); toast('Excluído!'); carregarSosLeads(); }
   catch(e){ toast('Erro.','error'); }
+}
+
+// ─── ENGRENA MEU BAIRRO ─────────────────────────────────────────
+let _cacheEngrena = [];
+let _engrenaSubAtual = 'pendente';
+
+function mudarEngrenaSub(sub){
+  _engrenaSubAtual = sub;
+  document.querySelectorAll('.engrena-subtab').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.engrena-subtab[data-engsub="${sub}"]`).classList.add('active');
+  carregarEngrena(sub);
+}
+
+function carregarEngrena(status){
+  if(status === undefined) status = _engrenaSubAtual;
+  $('tabelaEngrena').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  const qs = status ? `?status=${encodeURIComponent(status)}` : '';
+  api(`/api/admin/engrena/expositores${qs}`).then(data=>{
+    _cacheEngrena = data;
+    renderTabelaEngrena(data, status);
+  }).catch(e=>{
+    $('tabelaEngrena').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Erro ao carregar.</div>';
+  });
+}
+
+function renderTabelaEngrena(data, status){
+  if(!data.length){ $('tabelaEngrena').innerHTML = '<div class="empty"><i class="fa-solid fa-store"></i>Nenhum expositor encontrado.</div>'; return; }
+  const mostrarCheck = status === 'aprovado';
+  const tagStatus = s => s==='aprovado' ? '<span class="tag tag-green">Aprovado</span>'
+                       : s==='recusado' ? '<span class="tag tag-red">Recusado</span>'
+                       : '<span class="tag tag-yellow">Pendente</span>';
+  $('tabelaEngrena').innerHTML = `<table><thead><tr>
+    ${mostrarCheck ? '<th></th>' : ''}
+    <th>Nome</th><th>Categoria</th><th>Bairro</th><th>WhatsApp</th><th>Status</th><th>Cupom</th><th>Ações</th>
+  </tr></thead><tbody>
+  ${data.map(e=>`<tr>
+    ${mostrarCheck ? `<td><input type="checkbox" class="engrena-check" value="${e.id}"></td>` : ''}
+    <td data-label="Nome"><b>${e.nome}</b>${e.destaque?' <span class="tag tag-blue">Destaque</span>':''}</td>
+    <td data-label="Categoria">${e.categoria||'—'}</td>
+    <td data-label="Bairro">${e.bairro||'—'}</td>
+    <td data-label="WhatsApp">${e.whatsapp||'—'}</td>
+    <td data-label="Status">${tagStatus(e.status)}</td>
+    <td data-label="Cupom">${e.cupom_codigo||'—'}</td>
+    <td data-label="" class="cell-acoes"><div class="td-acoes">
+      ${e.status==='pendente' ? `<button class="btn btn-primary btn-sm" onclick="mudarStatusEngrena(${e.id},'aprovado')"><i class="fa-solid fa-check"></i></button>
+      <button class="btn btn-danger btn-sm" onclick="mudarStatusEngrena(${e.id},'recusado')"><i class="fa-solid fa-xmark"></i></button>` : ''}
+      <button class="btn btn-ghost btn-sm" onclick="editarEngrenaPorId(${e.id})"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-danger btn-sm" onclick="excluirEngrena(${e.id})"><i class="fa-solid fa-trash"></i></button>
+    </div></td>
+  </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function editarEngrenaPorId(id){
+  const e = _cacheEngrena.find(x=>String(x.id)===String(id));
+  if(e) editarEngrena(e);
+}
+
+async function mudarStatusEngrena(id, status){
+  const e = _cacheEngrena.find(x=>String(x.id)===String(id));
+  if(!e) return;
+  try{
+    await api(`/api/admin/engrena/expositores/${id}`,'PUT', {...e, status});
+    toast(status==='aprovado' ? 'Expositor aprovado!' : 'Expositor recusado.');
+    carregarEngrena();
+  }catch(err){ toast('Erro ao atualizar status.','error'); }
+}
+
+function abrirModalEngrena(){
+  $('modalEngrenaTit').textContent = 'Novo Expositor';
+  ['id','nome','slug','categoria','bairro','whatsapp','endereco','site','rede_social','foto','descricao_curta','cupom_codigo','cupom_descricao'].forEach(f=>$(`eng-${f}`).value='');
+  $('eng-status').value = 'pendente';
+  $('eng-destaque').checked = false;
+  $('eng-autorizacao_divulgacao').checked = false;
+  const prev = $('prev-eng-foto'); if(prev){ prev.style.display='none'; prev.src=''; }
+  const stat = $('status-eng-foto'); if(stat){ stat.className='upload-status'; stat.textContent=''; }
+  abrirModal('modalEngrena');
+}
+
+function editarEngrena(e){
+  $('modalEngrenaTit').textContent = 'Editar Expositor';
+  $('eng-id').value = e.id;
+  $('eng-nome').value = e.nome||'';
+  $('eng-slug').value = e.slug||'';
+  $('eng-categoria').value = e.categoria||'';
+  $('eng-bairro').value = e.bairro||'';
+  $('eng-whatsapp').value = e.whatsapp||'';
+  $('eng-endereco').value = e.endereco||'';
+  $('eng-site').value = e.site||'';
+  $('eng-rede_social').value = e.rede_social||'';
+  $('eng-foto').value = e.foto||'';
+  $('eng-status').value = e.status||'pendente';
+  $('eng-descricao_curta').value = e.descricao_curta||'';
+  $('eng-cupom_codigo').value = e.cupom_codigo||'';
+  $('eng-cupom_descricao').value = e.cupom_descricao||'';
+  $('eng-destaque').checked = !!e.destaque;
+  $('eng-autorizacao_divulgacao').checked = !!e.autorizacao_divulgacao;
+  mostrarPreviewExistente(e.foto, 'prev-eng-foto', 'status-eng-foto');
+  abrirModal('modalEngrena');
+}
+
+async function salvarEngrena(){
+  const id = $('eng-id').value;
+  const body = {
+    nome: $('eng-nome').value, slug: $('eng-slug').value,
+    categoria: $('eng-categoria').value, bairro: $('eng-bairro').value,
+    whatsapp: $('eng-whatsapp').value, endereco: $('eng-endereco').value,
+    site: $('eng-site').value, rede_social: $('eng-rede_social').value,
+    descricao_curta: $('eng-descricao_curta').value, foto: $('eng-foto').value,
+    status: $('eng-status').value, destaque: $('eng-destaque').checked,
+    autorizacao_divulgacao: $('eng-autorizacao_divulgacao').checked,
+    cupom_codigo: $('eng-cupom_codigo').value, cupom_descricao: $('eng-cupom_descricao').value,
+  };
+  if(!body.nome || !body.whatsapp){ toast('Nome da empresa e WhatsApp são obrigatórios.','error'); return; }
+  try{
+    if(id){ await api(`/api/admin/engrena/expositores/${id}`,'PUT',body); }
+    else   { await api('/api/admin/engrena/expositores','POST',body); }
+    fecharModal('modalEngrena');
+    toast(id ? 'Expositor atualizado!' : 'Expositor criado!');
+    carregarEngrena();
+  }catch(e){ toast('Erro ao salvar: '+e.message,'error'); }
+}
+
+async function excluirEngrena(id){
+  if(!confirmar('Excluir este expositor?')) return;
+  try{ await api(`/api/admin/engrena/expositores/${id}`,'DELETE'); toast('Excluído!'); carregarEngrena(); }
+  catch(e){ toast('Erro ao excluir.','error'); }
+}
+
+function abrirModalEngrenaCupomMassa(){
+  $('engmassa-codigo').value = '';
+  $('engmassa-descricao').value = '';
+  $('engmassa-alvo').value = 'todos';
+  abrirModal('modalEngrenaCupomMassa');
+}
+
+async function salvarEngrenaCupomMassa(){
+  const cupom_codigo = $('engmassa-codigo').value;
+  const cupom_descricao = $('engmassa-descricao').value;
+  if(!cupom_codigo){ toast('Informe o código do cupom.','error'); return; }
+  const alvo = $('engmassa-alvo').value;
+  const body = { cupom_codigo, cupom_descricao };
+  if(alvo === 'todos'){
+    body.todos_aprovados = true;
+  }else{
+    const ids = Array.from(document.querySelectorAll('.engrena-check:checked')).map(c=>Number(c.value));
+    if(!ids.length){ toast('Marque ao menos um expositor na aba "Aprovados".','error'); return; }
+    body.ids = ids;
+  }
+  try{
+    await api('/api/admin/engrena/expositores/cupom-massa','POST',body);
+    fecharModal('modalEngrenaCupomMassa');
+    toast('Cupom aplicado!');
+    carregarEngrena();
+  }catch(e){ toast('Erro ao aplicar cupom: '+e.message,'error'); }
 }
 
 // ─── CADASTROS PENDENTES ────────────────────────────────────────
