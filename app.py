@@ -1743,6 +1743,144 @@ def api_admin_sos_lead(lead_id):
 
 
 # ════════════════════════════════════════════════════════════
+#  NOVO — API ADMIN — ENGRENA MEU BAIRRO (módulo dentro da SOS)
+#  Tabela: sos_expositores (ver Expositor em app.py da SOS)
+#  Mesmo padrão raw-SQL das rotas /api/admin/sos/* acima — não dá
+#  pra importar a classe Expositor aqui porque app_oficina.py e o
+#  app.py da SOS rodam em processos/containers separados.
+# ════════════════════════════════════════════════════════════
+
+@app.route('/api/admin/engrena/expositores', methods=['GET', 'POST'])
+@login_required
+def api_admin_engrena_expositores():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        if request.method == 'GET':
+            status_filtro = request.args.get('status', '').strip()
+            if status_filtro:
+                cur.execute(
+                    "SELECT * FROM sos_expositores WHERE status = %s ORDER BY criado_em DESC",
+                    (status_filtro,)
+                )
+            else:
+                cur.execute("SELECT * FROM sos_expositores ORDER BY criado_em DESC")
+            rows = [format_db_data(dict(r)) for r in cur.fetchall()]
+            cur.close()
+            return jsonify(rows)
+
+        data = request.get_json()
+        cur.execute("""
+            INSERT INTO sos_expositores
+                (nome, slug, categoria, bairro, whatsapp, endereco, site,
+                 rede_social, descricao_curta, foto, autorizacao_divulgacao,
+                 status, destaque, cupom_codigo, cupom_descricao)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id
+        """, (
+            data.get('nome', ''), data.get('slug', ''),
+            data.get('categoria', ''), data.get('bairro', ''),
+            data.get('whatsapp', ''), data.get('endereco', ''),
+            data.get('site', ''), data.get('rede_social', ''),
+            data.get('descricao_curta', ''), data.get('foto', ''),
+            data.get('autorizacao_divulgacao', False),
+            data.get('status', 'pendente'), data.get('destaque', False),
+            data.get('cupom_codigo', ''), data.get('cupom_descricao', '')
+        ))
+        new_id = cur.fetchone()['id']
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True, 'id': new_id})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/engrena/expositores/<int:expositor_id>', methods=['PUT', 'DELETE'])
+@login_required
+def api_admin_engrena_expositor(expositor_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor()
+
+        if request.method == 'DELETE':
+            cur.execute("DELETE FROM sos_expositores WHERE id = %s", (expositor_id,))
+            conn.commit()
+            cur.close()
+            return jsonify({'ok': True})
+
+        data = request.get_json()
+        cur.execute("""
+            UPDATE sos_expositores SET nome=%s, slug=%s, categoria=%s, bairro=%s,
+            whatsapp=%s, endereco=%s, site=%s, rede_social=%s, descricao_curta=%s,
+            foto=%s, autorizacao_divulgacao=%s, status=%s, destaque=%s,
+            cupom_codigo=%s, cupom_descricao=%s WHERE id=%s
+        """, (
+            data.get('nome', ''), data.get('slug', ''),
+            data.get('categoria', ''), data.get('bairro', ''),
+            data.get('whatsapp', ''), data.get('endereco', ''),
+            data.get('site', ''), data.get('rede_social', ''),
+            data.get('descricao_curta', ''), data.get('foto', ''),
+            data.get('autorizacao_divulgacao', False),
+            data.get('status', 'pendente'), data.get('destaque', False),
+            data.get('cupom_codigo', ''), data.get('cupom_descricao', ''),
+            expositor_id
+        ))
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/engrena/expositores/cupom-massa', methods=['POST'])
+@login_required
+def api_admin_engrena_cupom_massa():
+    conn = None
+    try:
+        data = request.get_json() or {}
+        cupom_codigo = data.get('cupom_codigo', '')
+        cupom_descricao = data.get('cupom_descricao', '')
+        ids = data.get('ids')  # lista de IDs específicos
+        todos_aprovados = data.get('todos_aprovados', False)  # aplica a todo status='aprovado'
+
+        conn = get_db_connection()
+        cur  = conn.cursor()
+
+        if todos_aprovados:
+            cur.execute(
+                "UPDATE sos_expositores SET cupom_codigo=%s, cupom_descricao=%s WHERE status='aprovado'",
+                (cupom_codigo, cupom_descricao)
+            )
+        elif ids:
+            cur.execute(
+                "UPDATE sos_expositores SET cupom_codigo=%s, cupom_descricao=%s WHERE id = ANY(%s)",
+                (cupom_codigo, cupom_descricao, ids)
+            )
+        else:
+            cur.close()
+            return jsonify({'error': "Informe 'ids' (lista) ou 'todos_aprovados': true"}), 400
+
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+# FIM NOVO — API ADMIN — ENGRENA MEU BAIRRO
+
+
+# ════════════════════════════════════════════════════════════
 #  API PÚBLICA — FEIRAS
 # ════════════════════════════════════════════════════════════
 
