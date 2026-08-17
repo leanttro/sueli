@@ -64,6 +64,7 @@ input,select,textarea,button{font-family:'Inter',sans-serif;}
 .btn-sm{padding:6px 13px;font-size:12.5px;}
 .btn-ghost{background:#fff;color:var(--carvao);border-color:var(--linha);}
 .sos-subtab.active{background:var(--vinho);color:#fff;border-color:transparent;}
+.engrena-subtab.active{background:var(--vinho);color:#fff;border-color:transparent;}
 .btn-ghost:hover{border-color:var(--cinza);}
 .btn-danger{background:#fef2f2;color:#b91c1c;border-color:#fecaca;}
 .btn-danger:hover{background:#fee2e2;}
@@ -208,6 +209,7 @@ tbody tr:hover td{background:#fdfafb;}
 
     <div class="sb-label">Outro negócio</div>
     <button class="sb-link" data-section="sos"><i class="fa-solid fa-briefcase"></i> SOS Corporativa</button>
+    <button class="sb-link" data-section="engrena"><i class="fa-solid fa-gear"></i> Engrena Meu Bairro <span class="badge-notif" id="badgeEngrena">0</span></button>
 
     <a class="sb-link danger" href="/admin/logout"><i class="fa-solid fa-right-from-bracket"></i> Sair</a>
   </nav>
@@ -434,6 +436,26 @@ tbody tr:hover td{background:#fdfafb;}
       </div>
       <div class="table-wrap" id="tabelaSosLeads"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
     </div>
+  </div>
+
+  <!-- ENGRENA MEU BAIRRO (módulo dentro da SOS) -->
+  <div class="section" id="sec-engrena">
+    <div class="section-header">
+      <h2>Engrena Meu Bairro</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="abrirModalEngrenaCupomMassa()"><i class="fa-solid fa-ticket"></i> Cupom em massa</button>
+        <button class="btn btn-primary" onclick="abrirModalEngrena()"><i class="fa-solid fa-plus"></i> Novo Expositor</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="btn btn-ghost btn-sm engrena-subtab active" data-engsub="pendente" onclick="mudarEngrenaSub('pendente')"><i class="fa-solid fa-hourglass-half"></i> Pendentes</button>
+      <button class="btn btn-ghost btn-sm engrena-subtab" data-engsub="aprovado" onclick="mudarEngrenaSub('aprovado')"><i class="fa-solid fa-check"></i> Aprovados</button>
+      <button class="btn btn-ghost btn-sm engrena-subtab" data-engsub="recusado" onclick="mudarEngrenaSub('recusado')"><i class="fa-solid fa-xmark"></i> Recusados</button>
+      <button class="btn btn-ghost btn-sm engrena-subtab" data-engsub="" onclick="mudarEngrenaSub('')"><i class="fa-solid fa-list"></i> Todos</button>
+    </div>
+
+    <div class="table-wrap" id="tabelaEngrena"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
   </div>
 
 </div><!-- /main -->
@@ -873,6 +895,104 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="fecharModal('modalSosPost')">Cancelar</button>
       <button class="btn btn-primary" onclick="salvarSosPost()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ENGRENA — EXPOSITOR -->
+<div class="overlay" id="modalEngrena">
+  <div class="modal" style="max-width:760px;">
+    <div class="modal-header">
+      <h3 id="modalEngrenaTit">Novo Expositor</h3>
+      <button class="modal-close" onclick="fecharModal('modalEngrena')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="eng-id">
+      <div class="form-row">
+        <div class="field-group"><label>Nome da empresa*</label><input id="eng-nome" oninput="gerarSlug('eng-nome','eng-slug')" placeholder="Ex: Padaria do Zé"></div>
+        <div class="field-group"><label>Slug*</label><input id="eng-slug" placeholder="gerado-automaticamente"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Categoria</label><input id="eng-categoria" placeholder="Ex: Alimentação"></div>
+        <div class="field-group"><label>Bairro</label><input id="eng-bairro" placeholder="Ex: Jardim Aeroporto"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>WhatsApp*</label><input id="eng-whatsapp" placeholder="(11) 99999-9999"></div>
+        <div class="field-group"><label>Endereço</label><input id="eng-endereco" placeholder="Rua, número, bairro"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Site</label><input id="eng-site" placeholder="https://..."></div>
+        <div class="field-group"><label>Instagram / rede social</label><input id="eng-rede_social" placeholder="@seunegocio"></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label>Foto</label>
+          <div class="upload-box">
+            <input type="hidden" id="eng-foto">
+            <div class="upload-area" onclick="document.getElementById('file-eng-foto').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Clique para enviar imagem</span>
+            </div>
+            <input type="file" id="file-eng-foto" accept="image/*" style="display:none" onchange="uploadImagem(this,'eng-foto','prev-eng-foto')">
+            <img id="prev-eng-foto" class="upload-preview" style="display:none">
+            <div class="upload-status" id="status-eng-foto"></div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>Status</label>
+          <select id="eng-status">
+            <option value="pendente">Pendente</option>
+            <option value="aprovado">Aprovado</option>
+            <option value="recusado">Recusado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Descrição curta</label><textarea id="eng-descricao_curta" placeholder="Conte em poucas linhas o que o negócio oferece..."></textarea></div>
+      </div>
+      <div class="form-row">
+        <div class="field-group"><label>Cupom — código</label><input id="eng-cupom_codigo" placeholder="Ex: ENGRENA10"></div>
+        <div class="field-group"><label>Cupom — descrição</label><input id="eng-cupom_descricao" placeholder="Ex: 10% off na primeira compra"></div>
+      </div>
+      <div class="form-row full">
+        <label class="checkbox-row"><input type="checkbox" id="eng-destaque"> Destaque (aparece em "Engrena Jardim Aeroporto")</label>
+        <label class="checkbox-row" style="margin-top:6px;"><input type="checkbox" id="eng-autorizacao_divulgacao" disabled> Autorizou divulgação de dados/foto (preenchido pelo próprio expositor no cadastro)</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalEngrena')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEngrena()"><i class="fa-solid fa-floppy-disk"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ENGRENA — CUPOM EM MASSA -->
+<div class="overlay" id="modalEngrenaCupomMassa">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <h3>Aplicar cupom em massa</h3>
+      <button class="modal-close" onclick="fecharModal('modalEngrenaCupomMassa')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row full">
+        <div class="field-group"><label>Código do cupom</label><input id="engmassa-codigo" placeholder="Ex: ENGRENA10"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group"><label>Descrição do cupom</label><input id="engmassa-descricao" placeholder="Ex: 10% off para clientes do bairro"></div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group">
+          <label>Aplicar para</label>
+          <select id="engmassa-alvo">
+            <option value="todos">Todos os expositores aprovados</option>
+            <option value="selecionados">Somente os selecionados na tabela (marcados na aba "Aprovados")</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fecharModal('modalEngrenaCupomMassa')">Cancelar</button>
+      <button class="btn btn-primary" onclick="salvarEngrenaCupomMassa()"><i class="fa-solid fa-ticket"></i> Aplicar cupom</button>
     </div>
   </div>
 </div>
