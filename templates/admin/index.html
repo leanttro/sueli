@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="icon" type="image/png" href="https://res.cloudinary.com/dhu1cqvrb/image/upload/v1782417827/OFICINA_EMPREENDER_SP_1000_x_1000_px_1_g2ejcc.png">
 <style>
 :root{
@@ -246,7 +247,10 @@ tbody tr:hover td{background:#fdfafb;}
   <div class="section" id="sec-expositores">
     <div class="section-header">
       <h2>Expositores</h2>
-      <button class="btn btn-primary" onclick="abrirModalExp()"><i class="fa-solid fa-plus"></i> Novo Expositor</button>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-ghost" onclick="exportarExpositoresExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+        <button class="btn btn-primary" onclick="abrirModalExp()"><i class="fa-solid fa-plus"></i> Novo Expositor</button>
+      </div>
     </div>
     <div style="position:relative;max-width:340px;margin-bottom:16px;">
       <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cinza);font-size:13px;"></i>
@@ -1248,6 +1252,40 @@ function filtrarExpositores(){
 function editarExpositorPorId(id){
   const e = _cacheExpositores.find(x=>String(x.id)===String(id));
   if(e) editarExpositor(e);
+}
+
+function exportarExpositoresExcel(){
+  if(typeof XLSX === 'undefined'){ toast('Não foi possível carregar o gerador de Excel. Verifique sua conexão.','error'); return; }
+  const termo = ($('buscaExpositor')?.value||'').trim().toLowerCase();
+  const base = (_cacheExpositores||[]);
+  const dados = termo ? base.filter(e=>(e.nome||'').toLowerCase().includes(termo)) : base;
+  if(!dados.length){ toast('Nenhum expositor para exportar.','error'); return; }
+
+  const linhas = dados.map(e=>({
+    'Nome': e.nome || '',
+    'Categoria': e.categoria_nome || '',
+    'Plano': e.plano_nome || '',
+    'Região': e.regiao || '',
+    'Cidade': e.cidade || '',
+    'Status': e.bloqueado ? 'Bloqueado' : (e.ativo ? 'Ativo' : 'Inativo'),
+    'Cadastro': e.aprovado === false ? 'Pendente' : 'Aprovado',
+    'Expiração': e.data_expiracao || '',
+    'WhatsApp': e.whatsapp || '',
+    'Instagram': e.instagram || '',
+    'Site': e.site || ''
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(linhas);
+  ws['!cols'] = [
+    {wch:26},{wch:22},{wch:16},{wch:16},{wch:16},
+    {wch:12},{wch:12},{wch:14},{wch:16},{wch:20},{wch:26}
+  ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Expositores');
+
+  const dataStr = new Date().toISOString().slice(0,10);
+  XLSX.writeFile(wb, `expositores_${dataStr}.xlsx`);
+  toast('Planilha exportada!');
 }
 
 async function carregarOpcoesModal(){
