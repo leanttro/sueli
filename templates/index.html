@@ -1203,7 +1203,7 @@
         <h2 style="font-size:clamp(22px,3vw,30px);color:#fff;line-height:1.2;margin-bottom:14px;">Quer realizar um evento?</h2>
         <p style="color:rgba(255,255,255,.75);font-size:15px;line-height:1.7;margin-bottom:28px;flex:1;">Desenvolvemos experiências personalizadas para o perfil e a infraestrutura do seu condomínio. Da curadoria à execução, cuidamos de tudo.</p>
         <div style="display:flex;flex-direction:column;gap:12px;">
-          <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" class="btn btn-gold"><i class="fa-brands fa-whatsapp"></i> Falar pelo WhatsApp</a>
+          <a href="https://wa.me/5511948092924" target="_blank" rel="noopener" class="btn btn-gold"><i class="fa-brands fa-whatsapp"></i> Falar pelo WhatsApp</a>
           <a href="#contato" class="btn btn-outline">Enviar mensagem</a>
         </div>
       </div>
@@ -1215,7 +1215,7 @@
         <p style="color:rgba(255,255,255,.75);font-size:15px;line-height:1.7;margin-bottom:28px;flex:1;">Confira as feiras com vagas abertas e garanta seu espaço. Trabalhamos com curadoria rigorosa para garantir as melhores oportunidades para o seu negócio.</p>
         <div style="display:flex;flex-direction:column;gap:12px;">
           <a href="#trabalhe" class="btn btn-gold"><i class="fa-solid fa-search"></i> Ver vagas disponíveis</a>
-          <a href="https://wa.me/5511999999999?text=Olá%2C%20quero%20ser%20expositor!" target="_blank" rel="noopener" class="btn btn-outline"><i class="fa-brands fa-whatsapp"></i> Quero ser expositor</a>
+          <a href="https://wa.me/5511948092924?text=Olá%2C%20quero%20ser%20expositor!" target="_blank" rel="noopener" class="btn btn-outline"><i class="fa-brands fa-whatsapp"></i> Quero ser expositor</a>
         </div>
       </div>
     </div>
@@ -1275,7 +1275,7 @@
       </div>
       <div class="whats-card">
         <i class="fa-brands fa-whatsapp"></i>
-        <div><span>Prefere falar agora?</span><br><a href="https://wa.me/5511999999999" target="_blank" rel="noopener">Conversar no WhatsApp</a></div>
+        <div><span>Prefere falar agora?</span><br><a href="https://wa.me/5511948092924" target="_blank" rel="noopener">Conversar no WhatsApp</a></div>
       </div>
     </div>
     <form class="form-contato" id="formContato">
@@ -1309,7 +1309,7 @@
         <p>Eventos elegantes e estratégicos dentro de condomínios residenciais — conectando moradores e expositores.</p>
         <div class="socials">
           <a href="https://www.instagram.com/oficinaempreendersp/" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="https://wa.me/5511999999999" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="https://wa.me/5511948092924" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
       </div>
       <div class="footer-col">
@@ -1330,7 +1330,7 @@
         <h4>Contato</h4>
         <span>sueliflopes@gmail.com</span>
         <span>São Paulo, SP</span>
-        <a href="https://wa.me/5511999999999" target="_blank" rel="noopener">+55 11 94809-2924</a>
+        <a href="https://wa.me/5511948092924" target="_blank" rel="noopener">+55 11 94809-2924</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -1657,6 +1657,20 @@ function alternarCadOutra(selectEl, inputEl){
   if(mostrar){ inputEl.focus(); } else { inputEl.value = ''; }
 }
 
+/* ---------- WHATSAPP: número oficial + envio dos formulários ---------- */
+const WHATS_NUMERO = '5511948092924';
+function abrirJanelaWhats(){
+  // abre a aba no clique (evita bloqueio de pop-up) e preenche depois
+  let w = null;
+  try{ w = window.open('', '_blank'); }catch(err){}
+  return w;
+}
+function irParaWhats(janela, texto){
+  const url = `https://wa.me/${WHATS_NUMERO}?text=${encodeURIComponent(texto)}`;
+  if(janela && !janela.closed){ janela.location.href = url; }
+  else{ window.location.href = url; }
+}
+
 function configurarFormularioCadastro(sufixo){
   const form = document.getElementById('formCadastroExpositor' + sufixo);
   if(!form) return;
@@ -1685,7 +1699,9 @@ function configurarFormularioCadastro(sufixo){
       whatsapp: whatsInput.value.trim(),
       regiao: regiao,
       categoria_id: (categoriaSelect.value && categoriaSelect.value !== '__outra__') ? categoriaSelect.value : null,
-      categoria_outra: categoriaOutraVal || null
+      categoria_outra: categoriaOutraVal || null,
+      origem: 'site',
+      observacao: 'Cadastro vindo do site'
     };
 
     if(!payload.nome || !payload.whatsapp || !payload.regiao){
@@ -1697,6 +1713,13 @@ function configurarFormularioCadastro(sufixo){
     btn.disabled = true;
     const original = btn.innerHTML;
     btn.innerHTML = '<span>Enviando...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
+    const janelaWhats = abrirJanelaWhats();
+    const categoriaTxt = categoriaOutraVal || (categoriaSelect.value && categoriaSelect.value !== '__outra__' ? categoriaSelect.options[categoriaSelect.selectedIndex].text : '');
+    const textoWhats = 'Olá! Acabei de me cadastrar como expositor pelo site.\n' +
+      'Nome: ' + payload.nome + '\n' +
+      'WhatsApp: ' + payload.whatsapp + '\n' +
+      'Região: ' + payload.regiao +
+      (categoriaTxt ? '\nCategoria: ' + categoriaTxt : '');
 
     try{
       const res = await fetch('/api/expositores/cadastro', {
@@ -1707,7 +1730,8 @@ function configurarFormularioCadastro(sufixo){
       const data = await res.json();
       if(res.ok && data.ok){
         msg.className = 'form-msg ok';
-        msg.textContent = 'Cadastro enviado! Vamos revisar e publicar em breve.';
+        msg.textContent = 'Cadastro enviado! Abrindo o WhatsApp para confirmar...';
+        irParaWhats(janelaWhats, textoWhats);
         form.reset();
         alternarCadOutra(regiaoSelect, regiaoOutra);
         alternarCadOutra(categoriaSelect, categoriaOutra);
@@ -1718,11 +1742,13 @@ function configurarFormularioCadastro(sufixo){
       }else{
         msg.className = 'form-msg erro';
         msg.textContent = data.error || 'Não foi possível enviar seu cadastro. Tente novamente.';
+        if(janelaWhats) janelaWhats.close();
       }
     }catch(err){
       console.error(err);
       msg.className = 'form-msg erro';
       msg.textContent = 'Erro de conexão. Verifique sua internet e tente novamente.';
+      if(janelaWhats) janelaWhats.close();
     }finally{
       btn.disabled = false;
       btn.innerHTML = original;
@@ -1980,8 +2006,12 @@ document.getElementById('formContato').addEventListener('submit', async (e) => {
     nome: document.getElementById('nome').value.trim(),
     email: document.getElementById('email').value.trim(),
     telefone: document.getElementById('telefone').value.trim(),
-    mensagem: document.getElementById('mensagem').value.trim()
+    mensagem: document.getElementById('mensagem').value.trim(),
+    origem: 'site'
   };
+  const mensagemOriginal = payload.mensagem;
+  // marca no painel que a mensagem veio do site
+  payload.mensagem = '[Mensagem vinda do site] ' + (mensagemOriginal || '(sem mensagem)');
 
   if(!payload.nome || !payload.telefone){
     msg.className = 'form-msg erro';
@@ -1993,6 +2023,13 @@ document.getElementById('formContato').addEventListener('submit', async (e) => {
   const original = btn.innerHTML;
   btn.innerHTML = '<span>Enviando...</span> <i class="fa-solid fa-spinner fa-spin"></i>';
 
+  const janelaWhats = abrirJanelaWhats();
+  const textoWhats = 'Olá! Enviei uma mensagem pelo site.\n' +
+    'Nome: ' + payload.nome +
+    (payload.email ? '\nE-mail: ' + payload.email : '') +
+    '\nTelefone: ' + payload.telefone +
+    (mensagemOriginal ? '\nMensagem: ' + mensagemOriginal : '');
+
   try{
     const res = await fetch('/api/contato', {
       method: 'POST',
@@ -2002,16 +2039,19 @@ document.getElementById('formContato').addEventListener('submit', async (e) => {
     const data = await res.json();
     if(res.ok && data.ok){
       msg.className = 'form-msg ok';
-      msg.textContent = 'Mensagem enviada com sucesso! Retornarei em breve.';
+      msg.textContent = 'Mensagem enviada com sucesso! Abrindo o WhatsApp...';
+      irParaWhats(janelaWhats, textoWhats);
       document.getElementById('formContato').reset();
     }else{
       msg.className = 'form-msg erro';
       msg.textContent = data.error || 'Não foi possível enviar sua mensagem. Tente novamente.';
+      if(janelaWhats) janelaWhats.close();
     }
   }catch(err){
     console.error(err);
     msg.className = 'form-msg erro';
     msg.textContent = 'Erro de conexão. Verifique sua internet e tente novamente.';
+    if(janelaWhats) janelaWhats.close();
   }finally{
     btn.disabled = false;
     btn.innerHTML = original;
@@ -2273,7 +2313,7 @@ async function carregarFeiras(){
       // still add CTA
     } else {
       // Render cards + CTA card at end
-      const ctaCard = `<div class="cta-expositor-card"><i class="fa-solid fa-plus-circle"></i><h3>Quer anunciar aqui?</h3><p>Reserve sua vaga no próximo evento e alcance moradores de condomínios em São Paulo.</p><a href="https://wa.me/5511999999999?text=Quero%20anunciar%20minha%20feira!" target="_blank" rel="noopener" class="btn btn-gold" style="font-size:13px;padding:11px 18px;"><i class="fa-brands fa-whatsapp"></i> Falar conosco</a></div>`;
+      const ctaCard = `<div class="cta-expositor-card"><i class="fa-solid fa-plus-circle"></i><h3>Quer anunciar aqui?</h3><p>Reserve sua vaga no próximo evento e alcance moradores de condomínios em São Paulo.</p><a href="https://wa.me/5511948092924?text=Quero%20anunciar%20minha%20feira!" target="_blank" rel="noopener" class="btn btn-gold" style="font-size:13px;padding:11px 18px;"><i class="fa-brands fa-whatsapp"></i> Falar conosco</a></div>`;
       grid.innerHTML = feiras.map(cardFeira).join('') + ctaCard;
     }
     // Init carousel
