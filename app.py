@@ -171,6 +171,34 @@ def init_visibilidade_columns():
 
 init_visibilidade_columns()
 
+# ── Engrena Meu Bairro — tabela de moradores (idempotente) ────
+# Mesma estrutura do modelo Morador no app.py da SOS (sos_moradores).
+# Se a tabela já existir (criada pelo app da SOS), nada acontece.
+def init_moradores_table():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS sos_moradores (
+                id SERIAL PRIMARY KEY,
+                nome VARCHAR(200) NOT NULL,
+                telefone VARCHAR(40) NOT NULL,
+                bairro VARCHAR(120),
+                cep VARCHAR(12),
+                origem VARCHAR(60) DEFAULT 'landing-engrena',
+                criado_em TIMESTAMP DEFAULT (NOW() AT TIME ZONE 'UTC')
+            )
+        """)
+        conn.commit()
+        cur.close()
+    except Exception:
+        traceback.print_exc()
+    finally:
+        if conn: conn.close()
+
+init_moradores_table()
+
 
 # ── IA / Chatbot — helpers ────────────────────────────────────
 def get_ia_config():
@@ -1868,6 +1896,50 @@ def api_admin_engrena_cupom_massa():
             cur.close()
             return jsonify({'error': "Informe 'ids' (lista) ou 'todos_aprovados': true"}), 400
 
+        conn.commit()
+        cur.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+# ── Moradores cadastrados pela landing "Engrena Meu Bairro" ───
+# Tabela: sos_moradores (o cadastro público é recebido pelo app.py da SOS,
+# rota POST /engrena/cadastro-morador; aqui só listamos e excluímos).
+@app.route('/api/admin/engrena/moradores', methods=['GET'])
+@login_required
+def api_admin_engrena_moradores():
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        cur.execute("""
+            SELECT id, nome, telefone, bairro, cep, origem,
+                   to_char((criado_em AT TIME ZONE 'UTC') AT TIME ZONE 'America/Sao_Paulo',
+                           'DD/MM/YYYY HH24:MI') AS criado_em
+            FROM sos_moradores
+            ORDER BY id DESC
+        """)
+        rows = [dict(r) for r in cur.fetchall()]
+        cur.close()
+        return jsonify(rows)
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        if conn: conn.close()
+
+
+@app.route('/api/admin/engrena/moradores/<int:morador_id>', methods=['DELETE'])
+@login_required
+def api_admin_engrena_morador(morador_id):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cur  = conn.cursor()
+        cur.execute("DELETE FROM sos_moradores WHERE id = %s", (morador_id,))
         conn.commit()
         cur.close()
         return jsonify({'ok': True})
