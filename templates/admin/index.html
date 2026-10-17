@@ -457,9 +457,11 @@ tbody tr:hover td{background:#fdfafb;}
       <button class="btn btn-ghost btn-sm engrena-subtab" data-engsub="aprovado" onclick="mudarEngrenaSub('aprovado')"><i class="fa-solid fa-check"></i> Aprovados</button>
       <button class="btn btn-ghost btn-sm engrena-subtab" data-engsub="recusado" onclick="mudarEngrenaSub('recusado')"><i class="fa-solid fa-xmark"></i> Recusados</button>
       <button class="btn btn-ghost btn-sm engrena-subtab" data-engsub="" onclick="mudarEngrenaSub('')"><i class="fa-solid fa-list"></i> Todos</button>
+      <button class="btn btn-ghost btn-sm engrena-subtab" data-engsub="moradores" onclick="mudarEngrenaSub('moradores')"><i class="fa-solid fa-house-user"></i> Moradores</button>
     </div>
 
     <div class="table-wrap" id="tabelaEngrena"><div class="loading"><i class="fa-solid fa-spinner"></i></div></div>
+    <div class="table-wrap" id="tabelaMoradores" style="display:none;"></div>
   </div>
 
 </div><!-- /main -->
@@ -1908,6 +1910,42 @@ async function excluirSosLead(id){
   catch(e){ toast('Erro.','error'); }
 }
 
+// ─── ENGRENA MEU BAIRRO — MORADORES (cadastros vindos da landing) ───
+const _escMor = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function carregarMoradores(){
+  $('tabelaMoradores').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
+  try{
+    const data = await api('/api/admin/engrena/moradores');
+    if(!data.length){ $('tabelaMoradores').innerHTML = '<div class="empty"><i class="fa-solid fa-house-user"></i>Nenhum morador cadastrado ainda.</div>'; return; }
+    $('tabelaMoradores').innerHTML = `<table><thead><tr>
+      <th>Nome</th><th>Telefone</th><th>Bairro / região</th><th>CEP</th><th>Recebido em</th><th>Ações</th>
+    </tr></thead><tbody>
+    ${data.map(m=>{
+      const d = String(m.telefone||'').replace(/\D/g,'');
+      const wa = d ? 'https://wa.me/' + (d.length <= 11 ? '55' + d : d) : '';
+      return `<tr>
+        <td data-label="Nome"><b>${_escMor(m.nome)}</b></td>
+        <td data-label="Telefone">${_escMor(m.telefone)}</td>
+        <td data-label="Bairro / região">${_escMor(m.bairro) || '—'}</td>
+        <td data-label="CEP">${_escMor(m.cep) || '—'}</td>
+        <td data-label="Recebido em">${_escMor(m.criado_em) || '—'}</td>
+        <td data-label="" class="cell-acoes"><div class="td-acoes">
+          ${wa ? `<a class="btn btn-primary btn-sm" href="${wa}" target="_blank" rel="noopener" title="Chamar no WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` : ''}
+          <button class="btn btn-danger btn-sm" onclick="excluirMorador(${Number(m.id)})"><i class="fa-solid fa-trash"></i></button>
+        </div></td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+  }catch(e){
+    $('tabelaMoradores').innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Erro ao carregar.</div>';
+  }
+}
+async function excluirMorador(id){
+  if(!confirmar('Excluir este morador?')) return;
+  try{ await api(`/api/admin/engrena/moradores/${id}`,'DELETE'); toast('Excluído!'); carregarMoradores(); }
+  catch(e){ toast('Erro.','error'); }
+}
+
 // ─── ENGRENA MEU BAIRRO ─────────────────────────────────────────
 let _cacheEngrena = [];
 let _engrenaSubAtual = 'pendente';
@@ -1916,11 +1954,16 @@ function mudarEngrenaSub(sub){
   _engrenaSubAtual = sub;
   document.querySelectorAll('.engrena-subtab').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.engrena-subtab[data-engsub="${sub}"]`).classList.add('active');
+  const mor = (sub === 'moradores');
+  $('tabelaEngrena').style.display = mor ? 'none' : '';
+  $('tabelaMoradores').style.display = mor ? '' : 'none';
+  if(mor){ carregarMoradores(); return; }
   carregarEngrena(sub);
 }
 
 function carregarEngrena(status){
   if(status === undefined) status = _engrenaSubAtual;
+  if(status === 'moradores'){ carregarMoradores(); return; }
   $('tabelaEngrena').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   const qs = status ? `?status=${encodeURIComponent(status)}` : '';
   api(`/api/admin/engrena/expositores${qs}`).then(data=>{
