@@ -419,6 +419,13 @@
   }
   .exp-basicos-filtro select:focus{outline:2px solid var(--dourado);outline-offset:1px;}
   .exp-basicos-contagem{font-size:13px;color:var(--cinza);}
+  /* busca ativa: a lista de não-destaques sobe para logo abaixo do carrossel */
+  .exp-busca-slot{margin-top:34px;}
+  .exp-busca-slot:empty{display:none;}
+  .exp-basicos-titulo{display:none;font-size:18px;color:var(--vinho-escuro);margin:0 0 14px;}
+  #expBasicosWrap.modo-busca .exp-basicos-titulo{display:block;}
+  #expBasicosWrap.modo-busca .exp-basicos-filtro{display:none;}
+  #expBasicosWrap.modo-busca .exp-basicos-toolbar{margin-bottom:12px;}
   .exp-paginacao{display:flex;justify-content:center;align-items:center;gap:16px;margin-top:22px;}
   .exp-paginacao button{
     display:flex;align-items:center;gap:8px;padding:10px 18px;border:1px solid var(--linha);border-radius:30px;
@@ -1020,6 +1027,8 @@
       </div>
     </div>
 
+    <div class="exp-busca-slot" id="expBuscaSlot"></div>
+
     <div class="cad-expositor" id="cadastro-expositor">
       <div class="cad-expositor-head">
         <div>
@@ -1074,6 +1083,8 @@
       <h2>Outros Expositores</h2>
       <p class="lead">Mais parceiros da nossa rede, além dos destaques do carrossel acima.</p>
     </div>
+    <div id="expBasicosWrap">
+    <h3 class="exp-basicos-titulo">Outros expositores encontrados</h3>
     <div class="exp-basicos-toolbar">
       <div class="exp-basicos-filtro">
         <select id="filtroCategoriaBasicos" aria-label="Filtrar categoria dos outros expositores">
@@ -1089,6 +1100,7 @@
       <button type="button" id="expBasicosAnterior"><i class="fa-solid fa-chevron-left"></i> Anterior</button>
       <span class="exp-paginacao-pagina" id="expBasicosPaginaAtual"></span>
       <button type="button" id="expBasicosProximo">Próxima <i class="fa-solid fa-chevron-right"></i></button>
+    </div>
     </div>
   </div>
 </section>
@@ -1881,12 +1893,12 @@ function renderExpositoresBasicos(){
 document.getElementById('expBasicosAnterior').addEventListener('click', () => {
   expBasicosPaginaAtual--;
   renderExpositoresBasicos();
-  document.getElementById('expositores-basicos').scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('expBasicosWrap').scrollIntoView({behavior:'smooth', block:'start'});
 });
 document.getElementById('expBasicosProximo').addEventListener('click', () => {
   expBasicosPaginaAtual++;
   renderExpositoresBasicos();
-  document.getElementById('expositores-basicos').scrollIntoView({behavior:'smooth', block:'start'});
+  document.getElementById('expBasicosWrap').scrollIntoView({behavior:'smooth', block:'start'});
 });
 document.getElementById('filtroCategoriaBasicos').addEventListener('change', () => {
   expBasicosPaginaAtual = 1;
@@ -1912,6 +1924,33 @@ async function carregarExpositores(){
 
     const destaques = expositores.filter(e => e.destaque);
     const basicos = expositores.filter(e => !e.destaque);
+    const buscaAtiva = !!(categoria || regiao);
+
+    // busca ativa: lista dos não-destaques sobe para logo abaixo do carrossel
+    const wrap = document.getElementById('expBasicosWrap');
+    const slot = document.getElementById('expBuscaSlot');
+    const secaoBasicos = document.getElementById('expositores-basicos');
+    const selBasicos = document.getElementById('filtroCategoriaBasicos');
+    const carrosselWrap = document.getElementById('expositoresCarrossel');
+    const toggleView = document.getElementById('expositoresToggle');
+    if(wrap && slot && secaoBasicos){
+      if(buscaAtiva){
+        if(selBasicos) selBasicos.value = ''; // o filtro do topo já vale para tudo
+        if(wrap.parentNode !== slot) slot.appendChild(wrap);
+        wrap.classList.add('modo-busca');
+        secaoBasicos.style.display = 'none';
+      }else{
+        const container = secaoBasicos.querySelector('.container');
+        if(wrap.parentNode !== container) container.appendChild(wrap);
+        wrap.classList.remove('modo-busca');
+        secaoBasicos.style.display = '';
+      }
+    }
+
+    // sem destaques mas com outros resultados na busca: esconde o carrossel vazio
+    const esconderCarrossel = buscaAtiva && !destaques.length && basicos.length;
+    if(carrosselWrap) carrosselWrap.style.display = esconderCarrossel ? 'none' : '';
+    if(toggleView) toggleView.style.display = esconderCarrossel ? 'none' : '';
 
     if(!destaques.length){
       grid.innerHTML = `<div class="exp-empty"><i class="fa-solid fa-store-slash"></i><p>Nenhum expositor em destaque com esses filtros.</p></div>`;
