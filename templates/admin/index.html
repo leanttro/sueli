@@ -447,6 +447,7 @@ tbody tr:hover td{background:#fdfafb;}
     <div class="section-header">
       <h2>Engrena Meu Bairro</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="exportarEngrenaExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
         <button class="btn btn-ghost" onclick="abrirModalEngrenaCupomMassa()"><i class="fa-solid fa-ticket"></i> Cupom em massa</button>
         <button class="btn btn-primary" onclick="abrirModalEngrena()"><i class="fa-solid fa-plus"></i> Novo Expositor</button>
       </div>
@@ -1912,10 +1913,12 @@ async function excluirSosLead(id){
 
 // ─── ENGRENA MEU BAIRRO — MORADORES (cadastros vindos da landing) ───
 const _escMor = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let _cacheMoradores = [];
 async function carregarMoradores(){
   $('tabelaMoradores').innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i></div>';
   try{
     const data = await api('/api/admin/engrena/moradores');
+    _cacheMoradores = data;
     if(!data.length){ $('tabelaMoradores').innerHTML = '<div class="empty"><i class="fa-solid fa-house-user"></i>Nenhum morador cadastrado ainda.</div>'; return; }
     $('tabelaMoradores').innerHTML = `<table><thead><tr>
       <th>Nome</th><th>Telefone</th><th>Bairro / região</th><th>CEP</th><th>Recebido em</th><th>Ações</th>
@@ -1944,6 +1947,55 @@ async function excluirMorador(id){
   if(!confirmar('Excluir este morador?')) return;
   try{ await api(`/api/admin/engrena/moradores/${id}`,'DELETE'); toast('Excluído!'); carregarMoradores(); }
   catch(e){ toast('Erro.','error'); }
+}
+
+function exportarEngrenaExcel(){
+  if(typeof XLSX === 'undefined'){ toast('Não foi possível carregar o gerador de Excel. Verifique sua conexão.','error'); return; }
+  const dataStr = new Date().toISOString().slice(0,10);
+  const wb = XLSX.utils.book_new();
+  let ws, nomeAba, arquivo;
+
+  if(_engrenaSubAtual === 'moradores'){
+    const dados = _cacheMoradores || [];
+    if(!dados.length){ toast('Nenhum morador para exportar.','error'); return; }
+    ws = XLSX.utils.json_to_sheet(dados.map(m=>({
+      'Nome': m.nome || '',
+      'Telefone': m.telefone || '',
+      'Bairro / região': m.bairro || '',
+      'CEP': m.cep || '',
+      'Recebido em': m.criado_em || ''
+    })));
+    ws['!cols'] = [{wch:28},{wch:18},{wch:24},{wch:12},{wch:20}];
+    nomeAba = 'Moradores';
+    arquivo = `engrena_moradores_${dataStr}.xlsx`;
+  } else {
+    const dados = _cacheEngrena || [];
+    if(!dados.length){ toast('Nenhum expositor para exportar.','error'); return; }
+    const stLabel = s => s==='aprovado' ? 'Aprovado' : s==='recusado' ? 'Recusado' : 'Pendente';
+    ws = XLSX.utils.json_to_sheet(dados.map(e=>({
+      'Nome': e.nome || '',
+      'Categoria': e.categoria || '',
+      'Bairro': e.bairro || '',
+      'WhatsApp': e.whatsapp || '',
+      'Endereço': e.endereco || '',
+      'Site': e.site || '',
+      'Rede social': e.rede_social || '',
+      'Status': stLabel(e.status),
+      'Cupom': e.cupom_codigo || '',
+      'Descrição do cupom': e.cupom_descricao || '',
+      'Destaque': e.destaque ? 'Sim' : 'Não'
+    })));
+    ws['!cols'] = [
+      {wch:26},{wch:22},{wch:18},{wch:16},{wch:30},{wch:26},
+      {wch:22},{wch:12},{wch:16},{wch:28},{wch:10}
+    ];
+    nomeAba = 'Engrena Meu Bairro';
+    const suf = _engrenaSubAtual ? '_' + _engrenaSubAtual : '';
+    arquivo = `engrena_expositores${suf}_${dataStr}.xlsx`;
+  }
+  XLSX.utils.book_append_sheet(wb, ws, nomeAba);
+  XLSX.writeFile(wb, arquivo);
+  toast('Planilha exportada!');
 }
 
 // ─── ENGRENA MEU BAIRRO ─────────────────────────────────────────
